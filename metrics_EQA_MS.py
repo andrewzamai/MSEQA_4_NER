@@ -87,7 +87,7 @@ def compute_precision_recall_f1_for_a_NE_category(all_predictions_related_to_a_t
                 fn += len(missed_ga)
 
     tagName = all_predictions_related_to_a_tagName[0]['tagName']
-    print("NE category: {} --> TP: {}, FN: {}, FP: {}, TN: {}".format(tagName, tp, fn, fp, tn))
+    # print("NE category: {} --> TP: {}, FN: {}, FP: {}, TN: {}".format(tagName, tp, fn, fp, tn))
 
     precision = 0 if (tp + fp) == 0 else tp / (tp + fp)
     recall = 0 if (tp + fn) == 0 else tp / (tp + fn)
@@ -174,13 +174,14 @@ def compute_all_metrics(pred_answers_for_a_quest_on_doc_list: List[dict]) -> Tup
     indices_per_tagName = collections.defaultdict(list)
     for sample in pred_answers_for_a_quest_on_doc_list:
         indices_per_tagName[sample["tagName"]].append(sample)
-    # sorted by decresing number of occurrences
-    indices_per_tagName = dict(sorted(indices_per_tagName.items(), key=lambda x: len(x[1]), reverse=True))
 
     # now we compute for each NE category its TP, FN, FP, TN and Prec, Recall, F1
     metrics_per_tagName = {}
     for tagName, preds_associated_to_this_tagName in indices_per_tagName.items():
         metrics_per_tagName[tagName] = compute_precision_recall_f1_for_a_NE_category(preds_associated_to_this_tagName)
+
+    # sorted by decreasing support count
+    metrics_per_tagName = dict(sorted(metrics_per_tagName.items(), key=lambda x: x[1]['tp'] + x[1]['fn'], reverse=True))
 
     """ ---------- MACRO-AVERAGES ---------- """
     # MACRO-precision
@@ -244,6 +245,24 @@ def compute_all_metrics(pred_answers_for_a_quest_on_doc_list: List[dict]) -> Tup
     }
 
     return overall_metrics, metrics_per_tagName
+
+
+def get_predictions_squad_for_official_eval_script(pred_answers_for_a_quest_on_doc_list):
+    # constructing json file for squad-evaluation official script
+    predictions_squad_format = {}
+    for sample in pred_answers_for_a_quest_on_doc_list:
+        id = sample['doc_question_pairID']
+        # merging answers from passage level to document level
+        pred_answers_for_doc = sample['predicted_answers_doc_level']
+        # keeping always only top answer
+        if isinstance(pred_answers_for_doc, list):
+            pred_answers_for_doc = pred_answers_for_doc[0]
+
+        predictions_squad_format[id] = pred_answers_for_doc['text']
+
+    #with open(os.path.join(output_dir, 'predictions_squad_format.json'), 'w', encoding='utf-8') as f:
+    #json.dump(predictions_squad_format, f)
+    return predictions_squad_format
 
 
 # ------------- OTHER USEFUL METRICS -------------

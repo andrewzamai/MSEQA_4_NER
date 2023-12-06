@@ -199,43 +199,34 @@ if __name__ == "__main__":
             print(text)
             print("---")
     """
-    #uniNER_dataset_MSEQA_format = build_uniNER_dataset_MSEQA_format()
-    #uniNER_dataset_MSEQA_format.save_to_disk("./uniNER_dataset_MSEQA_format")
-    uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("./uniNER_dataset_MSEQA_format")
+    #uniNER_dataset_MSEQA_format = build_dataset_MSEQA_format()
+    #uniNER_dataset_MSEQA_format.save_to_disk("../../../datasets/uniNER_dataset_MSEQA_format")
+    uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/uniNER_dataset_MSEQA_format")
 
     for i in range(10):
         print(uniNER_dataset_MSEQA_format['train'][i])
 
-    ne_types = {}
-    for sample in uniNER_dataset_MSEQA_format['train']:
-        if sample["tagName"] not in ne_types:
-            ne_types[sample["tagName"]] = 1
-        else:
-            ne_types[sample["tagName"]] += 1
+    """
+    ne_types = {split: {} for split in uniNER_dataset_MSEQA_format.keys()}
+    for split in uniNER_dataset_MSEQA_format.keys():
+        for sample in uniNER_dataset_MSEQA_format[split]:
+            if sample["tagName"] in ne_types[split]:
+                ne_types[split][sample["tagName"]] += len(sample['answers']['text'])
+            else:
+                ne_types[split][sample["tagName"]] = len(sample['answers']['text'])
 
-    print(len(ne_types))
-
-    # Convert the sorted items to an OrderedDict to maintain order
-    sorted_ordered_dict = dict(sorted(ne_types.items(), key=lambda item: item[1], reverse=True))
-
-    print(sorted_ordered_dict)
-
-    filtered_dataset = remove_outlier_ne_types(uniNER_dataset_MSEQA_format, min_num_samples_per_ne_type=100)
-    print(filtered_dataset)
+    ne_types = {split:dict(sorted(values.items(), key=lambda item: item[1], reverse=True)).keys() for split, values in ne_types.items()}
+    """
 
     ne_types = {}
-    for sample in filtered_dataset['train']:
-        if sample["tagName"] not in ne_types:
-            ne_types[sample["tagName"]] = 1
-        else:
-            ne_types[sample["tagName"]] += 1
+    for split in uniNER_dataset_MSEQA_format.keys():
+        for sample in uniNER_dataset_MSEQA_format[split]:
+            if sample["tagName"] in ne_types:
+                ne_types[sample["tagName"]] += len(sample['answers']['text'])
+            else:
+                ne_types[sample["tagName"]] = len(sample['answers']['text'])
 
+    ne_types = [a[0] for a in sorted(ne_types.items(), key=lambda item: item[1], reverse=True) if a[1] >= 100]
     print(len(ne_types))
+    print(ne_types)
 
-    # Convert the sorted items to an OrderedDict to maintain order
-    sorted_ordered_dict = dict(sorted(ne_types.items(), key=lambda item: item[1], reverse=True))
-
-    print(sorted_ordered_dict)
-
-    print(filtered_dataset)
-    filtered_dataset.save_to_disk("small_uniNER_dataset_MSEQA")

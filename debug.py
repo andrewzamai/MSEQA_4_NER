@@ -1,3 +1,6 @@
-from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering
+#from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering
+#model = MultiSpanRobertaQuestionAnswering.from_pretrained("deepset/roberta-base-squad2")
 
-model = MultiSpanRobertaQuestionAnswering.from_pretrained("deepset/roberta-base-squad2")
+from models.MultiSpanRobertaQuestionAnswering_from_scratch import MultiSpanRobertaQuestionAnswering_from_scratch
+model = MultiSpanRobertaQuestionAnswering_from_scratch.from_pretrained("roberta-base")
+

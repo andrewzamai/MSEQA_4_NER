@@ -17,7 +17,7 @@ def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
     tokenized_examples = tokenizer(
         collated_batch["question"],
         collated_batch["document_context"],
-        truncation="only_second",
+        truncation='only_second',  # longest_first
         max_length=max_seq_length,
         stride=doc_stride,
         return_overflowing_tokens=True,

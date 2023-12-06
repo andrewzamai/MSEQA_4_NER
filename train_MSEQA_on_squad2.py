@@ -1,7 +1,7 @@
 """
---- Train/Fine-tune a Multi-Span Extractive QA model for NER task ---
+--- Train a Multi-Span Extractive QA model on SQUAD2 dataset (single-span QA dataset) ---
 
-1) implement a data_handler that converts a NER dataset in BIO format to MS-EQA format:
+1) implement a data_handler that converts dataset to MS-EQA format:
     --> DatasetDict with 3 Dataset partitions train/validation/test
 each item in the Dataset must have features:
     - doc_question_pairID: a str "docID:questionID_on_that_doc"
@@ -13,6 +13,18 @@ The answer_start are the starting positions in characters from the beginning of 
 
 2) import the data_handler and run this script
 
+Finetuning a MSEQA model on SQUAD2 (which is instead a single-span EQA dataset)
+Despite the MS_EQA bulding up from already pretrained weights on SQUAD2,
+we need to finetune the weights to be able to extract, through the multispan extraction algorithm,
+also single span answers.
+The new extraction algorithm works differently:
+In the single-span setting we were scoring the top answer against a list of gold answers,
+but the top answer was "hard" picked from the best candidates (controlled by hyperparams)
+In the multi-span setting we automatically let emerge only good spans of text (sum of logits > 0),
+so we need to fine-tune the model again on squad-2 to learn to do single-span questions with the same multi-span extraction algorithm,
+in order to not switch manually between single-span e multi-span extraction algorithms
+
+The squad evaluation script cannot be used anymore and we develop our metrics (more strict also on char interval == )
 """
 
 from datasets import Dataset, DatasetDict
@@ -27,35 +39,38 @@ import sys
 import os
 
 # my libraries
-from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering
+# from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering
+from models.MultiSpanRobertaQuestionAnswering_from_scratch import MultiSpanRobertaQuestionAnswering_from_scratch
 from utils.EarlyStopping import EarlyStopping
 from collator_MSEQA import collate_fn_MSEQA
 import inference_EQA_MS
 import metrics_EQA_MS
+
+from utils import officialSQUADevalscript_mod
 
 
 if __name__ == '__main__':
 
     """ -------------------- Training parameters -------------------- """
 
-    # fine-tuning on BUSTER default permutation 123-4-5
+    # training MSEQA on SQUAD2 dataset (single-span dataset but with Multi-Span model)
 
-    from data_handlers import data_handler_BUSTER as data_handler_MSEQA_dataset
+    from data_handlers import data_handler_squad2 as data_handler_MSEQA_dataset
 
-    path_to_dataset_MSEQA_format = './datasets/BUSTER_def_perm'  # if already existing, otherwise will be saved when first created
-    path_to_dataset_NER_format = './datasets/BUSTER/FULL_KFOLDS/123_4_5'
-    path_to_questions = './MSEQA_4_NER/data_handlers/questions/BUSTER_describes.txt'
+    path_to_dataset_MSEQA_format = './datasets/squad2/squad2_MSEQA'  # if already existing, otherwise will be saved when first created
+    path_to_dataset_NER_format = None
+    path_to_questions = None
 
     tokenizer_to_use = "roberta-base"
-    pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
+    pretrained_model_relying_on = "roberta-base"
 
-    name_finetuned_model = "MSEQA_on_BUSTER_def_perm"
+    name_finetuned_model = "MSEQA_on_squad2"
 
-    MAX_SEQ_LENGTH = 384  # question + context + special tokens
-    DOC_STRIDE = 128  # overlap between 2 consecutive passages from same document
-    MAX_QUERY_LENGTH = 48  # not used, but questions must not be too long given a chosen DOC_STRIDE
+    MAX_SEQ_LENGTH = 256  # question + context + special tokens
+    DOC_STRIDE = 96  # overlap between 2 consecutive passages from same document
+    MAX_QUERY_LENGTH = 48  # not used, but questions must not be too long given a chosen DOC_STRIDE, based on squad2 train max question length
 
-    BATCH_SIZE = 8
+    BATCH_SIZE = 32
     EVAL_BATCH_SIZE = 64
 
     learning_rate = 3e-5
@@ -63,45 +78,13 @@ if __name__ == '__main__':
     warmup_ratio = 0.2
 
     EARLY_STOPPING_PATIENCE = 5
-    EVALUATE_EVERY_N_STEPS = 250
-    EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
-    GRADIENT_ACCUMULATION_STEPS = 1
-
-    MAX_ANS_LENGTH_IN_TOKENS = 20
-
-    EVALUATE_ZERO_SHOT = True
-
-    """
-    # pre-training on universalNER gpt conversations
-    
-    import data_handler_uniNER as data_handler_MSEQA_dataset
-
-    path_to_dataset_MSEQA_format = './datasets/uniNER_MSEQA'
-    tokenizer_to_use = "roberta-base"
-    pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
-
-    name_finetuned_model = "MSEQA_uniNER_all_dataset_pretrained"
-
-    MAX_SEQ_LENGTH = 256  # question + context + special tokens
-    DOC_STRIDE = 64  # overlap between 2 consecutive passages from same document
-    MAX_QUERY_LENGTH = 48  # not used, but questions must not be too long given a chosen DOC_STRIDE
-
-    BATCH_SIZE = 32
-    EVAL_BATCH_SIZE = 128
-
-    learning_rate = 3e-5
-    num_train_epochs = 10
-    warmup_ratio = 0.2
-
-    EARLY_STOPPING_PATIENCE = 10
     EVALUATE_EVERY_N_STEPS = 1000
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
     GRADIENT_ACCUMULATION_STEPS = 1
 
-    MAX_ANS_LENGTH_IN_TOKENS = 10
-    
+    MAX_ANS_LENGTH_IN_TOKENS = 40  # squad2 max answer length in tokens in train fold
+
     EVALUATE_ZERO_SHOT = False
-    """
 
     """ -------------------- Loading Datasets in MS-EQA format -------------------- """
 
@@ -110,15 +93,11 @@ if __name__ == '__main__':
     print("Loading train/validation/test Datasets in MS-EQA format...")
     if not os.path.exists(path_to_dataset_MSEQA_format):
         print(" ...building Datasets from huggingface repository in MS-EQA format")
-        dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(path_to_dataset_NER_format, path_to_questions)
-        # removing outliers
-        # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
+        dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format()
         dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)
     else:
         print(" ...using already existing Datasets in MS-EQA format")
         dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_dataset_MSEQA_format)
-
-    # print(uniNER_dataset_MSEQA_format['train'].features)
 
     print(f"\nMS-EQA model relies on pre-trained model: {pretrained_model_relying_on}")
 
@@ -161,7 +140,7 @@ if __name__ == '__main__':
     )
 
     # loading MS-EQA model with weights pretrained on SQuAD2
-    model = MultiSpanRobertaQuestionAnswering.from_pretrained(pretrained_model_relying_on)
+    model = MultiSpanRobertaQuestionAnswering_from_scratch.from_pretrained(pretrained_model_relying_on)
 
     optimizer = AdamW(model.parameters(), lr=learning_rate)
 
@@ -200,20 +179,11 @@ if __name__ == '__main__':
         print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100,
                                                                      micro_metrics['recall'] * 100,
                                                                      micro_metrics['f1'] * 100))
-
-        # compute all other metrics
-        overall_metrics, metrics_per_tagName = metrics_EQA_MS.compute_all_metrics(question_on_document_predicted_answers_list)
-
-        print("\nOverall metrics (100%):")
-        print("\n------------------------------------------")
-        for metric_name, value in overall_metrics.items():
-            print("{}: {:.2f}".format(metric_name, value * 100))
-        print("------------------------------------------\n")
-
-        print("\nMetrics per NE category (100%):\n")
-        for tagName, m in metrics_per_tagName.items():
-            print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, m['precision'] * 100, m['recall'] * 100, m['f1'] * 100))
-            print("------------------------------------------")
+        # running official evaluation script (softer text level match against list of gold answers)
+        print("\nManually picking 1st top answer and using official squad2 evaluation script: \n")
+        predictions_squad_for_official_eval_script = metrics_EQA_MS.get_predictions_squad_for_official_eval_script(question_on_document_predicted_answers_list)
+        officialSQUADevalscript_mod.run_personalized_evaluation('./datasets/squad2/dev-v2_gold_answers.json',
+                                                                predictions_squad_for_official_eval_script)
 
     ''' ------------------ TRAINING WITH EARLY STOPPING ON METRICS/LOSS after N_BATCH_STEPS ------------------ '''
 
@@ -270,24 +240,34 @@ if __name__ == '__main__':
             if global_steps_counter % EVALUATE_EVERY_N_STEPS == 0 and global_steps_counter != 0:
                 print(f"\nBATCH STEP {global_steps_counter} reached: EVALUATING ON VALIDATION SET ...\n")
 
-                current_step_loss_eval, model_outputs_for_metrics = inference_EQA_MS.run_inference(model, eval_dataloader).values()
+                current_step_loss_eval, model_outputs_for_metrics = inference_EQA_MS.run_inference(model,
+                                                                                                   eval_dataloader).values()
 
                 print("BATCH STEP {} validation loss {:.7f}".format(global_steps_counter, current_step_loss_eval))
                 validation_loss_every_N_batch_steps.append(current_step_loss_eval.cpu())
 
                 # extracting answers from model output logits per passage and aggregating them per document level
-                question_on_document_predicted_answers_list = inference_EQA_MS.extract_answers_per_passage_from_logits(max_ans_length_in_tokens=MAX_ANS_LENGTH_IN_TOKENS,
-                                                                                                                       batch_step=global_steps_counter,
-                                                                                                                       print_json_every_batch_steps=EVALUATE_EVERY_N_STEPS*4,
-                                                                                                                       fold_name="validation",
-                                                                                                                       tokenizer=tokenizer,
-                                                                                                                       datasetdict_MSEQA_format=dataset_MSEQA_format,
-                                                                                                                       model_outputs_for_metrics=model_outputs_for_metrics)
+                question_on_document_predicted_answers_list = inference_EQA_MS.extract_answers_per_passage_from_logits(
+                    max_ans_length_in_tokens=MAX_ANS_LENGTH_IN_TOKENS,
+                    batch_step=global_steps_counter,
+                    print_json_every_batch_steps=EVALUATE_EVERY_N_STEPS * 4,
+                    fold_name="validation",
+                    tokenizer=tokenizer,
+                    datasetdict_MSEQA_format=dataset_MSEQA_format,
+                    model_outputs_for_metrics=model_outputs_for_metrics)
+
                 # computing metrics
+                print("\nAutomatically emerged answers (sum of logits > 0) with metrics_EQA_MS (strict == on char intervals):")
                 micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
-                print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
+                print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100,
+                                                                             micro_metrics['recall'] * 100,
+                                                                             micro_metrics['f1'] * 100))
                 # metrics_per_question_on_validation_every_N_batch_steps.append(metrics_per_question)
                 metrics_overall_on_validation_every_N_batch_steps.append(micro_metrics)
+                # running official evaluation script (softer text level match against list of gold answers)
+                print("\nManually picking 1st top answer and using official squad2 evaluation script: \n")
+                predictions_squad_for_official_eval_script = metrics_EQA_MS.get_predictions_squad_for_official_eval_script(question_on_document_predicted_answers_list)
+                officialSQUADevalscript_mod.run_personalized_evaluation('./datasets/squad2/dev-v2_gold_answers.json', predictions_squad_for_official_eval_script)
 
                 sys.stdout.flush()
 
@@ -298,7 +278,8 @@ if __name__ == '__main__':
                     model.load_state_dict(early_stopping.best_weights)
                     print("\n-----------------------------------\n")
                     print("Early stopping occurred at global step count: {}".format(global_steps_counter))
-                    print("Retrieving best model weights from step count: {}".format(global_steps_counter - EARLY_STOPPING_PATIENCE * EVALUATE_EVERY_N_STEPS))
+                    print("Retrieving best model weights from step count: {}".format(
+                        global_steps_counter - EARLY_STOPPING_PATIENCE * EVALUATE_EVERY_N_STEPS))
                     model.save_pretrained(os.path.join("./finetunedModels", name_finetuned_model), from_pt=True)
 
             global_steps_counter += 1
@@ -339,25 +320,14 @@ if __name__ == '__main__':
     )
     # compute metrics
     micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
-    print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
+    print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100,
+                                                                 micro_metrics['recall'] * 100,
+                                                                 micro_metrics['f1'] * 100))
 
-    # compute all other metrics
-    overall_metrics, metrics_per_tagName = metrics_EQA_MS.compute_all_metrics(
-        question_on_document_predicted_answers_list)
-
-    print("\nOverall metrics (100%):")
-    print("\n------------------------------------------")
-    for metric_name, value in overall_metrics.items():
-        print("{}: {:.2f}".format(metric_name, value * 100))
-    print("------------------------------------------\n")
-
-    print("\nMetrics per NE category (100%):\n")
-    for tagName, m in metrics_per_tagName.items():
-        print("{} --> support: {}".format(tagName, m['tp'] + m['fn']))
-        print("{} --> TP: {}, FN: {}, FP: {}, TN: {}".format(tagName, m['tp'], m['fn'], m['fp'], m['tn']))
-        print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, m['precision'] * 100,
-                                                                            m['recall'] * 100, m['f1'] * 100))
-        print("------------------------------------------")
+    print("\nManually picking 1st top answer and using official squad2 evaluation script: \n")
+    predictions_squad_for_official_eval_script = metrics_EQA_MS.get_predictions_squad_for_official_eval_script(question_on_document_predicted_answers_list)
+    officialSQUADevalscript_mod.run_personalized_evaluation('./datasets/squad2/dev-v2_gold_answers.json',
+                                                            predictions_squad_for_official_eval_script)
 
     print("\nDONE :)")
     sys.stdout.flush()

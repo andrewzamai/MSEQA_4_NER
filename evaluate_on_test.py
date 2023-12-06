@@ -20,11 +20,11 @@ if __name__ == '__main__':
 
     """ -------------------- Evaluation parameters -------------------- """
 
-    import data_handler_uniNER as data_handler_MSEQA_dataset
+    from data_handlers import data_handler_uniNER as data_handler_MSEQA_dataset
 
-    path_to_dataset_MSEQA_format = './datasets/uniNER_MSEQA_min_occurrences_100'
+    path_to_dataset_MSEQA_format = './datasets/pileNER/full_MSEQA'
     tokenizer_to_use = "roberta-base"
-    path_to_model = "./finetunedModels/MSEQA_uniNER_pretrained"
+    path_to_model = "./finetunedModels/MSEQA_pileNER_fullds"
 
     MAX_SEQ_LENGTH = 256  # question + context + special tokens
     DOC_STRIDE = 64  # overlap between 2 consecutive passages from same document
@@ -39,9 +39,9 @@ if __name__ == '__main__':
     print("Loading train/validation/test Datasets in MS-EQA format...")
     if not os.path.exists(path_to_dataset_MSEQA_format):
         print(" ...building Datasets from huggingface repository in MS-EQA format")
-        dataset_MSEQA_format = data_handler_MSEQA_dataset.build_uniNER_dataset_MSEQA_format()
+        dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format()
         # removing outliers
-        dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
+        # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
         dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)
     else:
         print(" ...using already existing Datasets in MS-EQA format")
@@ -103,6 +103,8 @@ if __name__ == '__main__':
 
     print("\nMetrics per NE category (100%):\n")
     for tagName, m in metrics_per_tagName.items():
+        print("{} --> support: {}".format(tagName, m['tp']+m['fn']))
+        print("{} --> TP: {}, FN: {}, FP: {}, TN: {}".format(tagName, m['tp'], m['fn'], m['fp'], m['tn']))
         print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, m['precision'] * 100, m['recall'] * 100, m['f1'] * 100))
         print("------------------------------------------")
 
