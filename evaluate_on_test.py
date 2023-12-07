@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     """ -------------------- Evaluation parameters -------------------- """
 
-    from data_handlers import data_handler_uniNER as data_handler_MSEQA_dataset
+    from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
     path_to_dataset_MSEQA_format = './datasets/pileNER/full_MSEQA'
     tokenizer_to_use = "roberta-base"

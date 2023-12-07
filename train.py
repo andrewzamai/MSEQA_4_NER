@@ -74,13 +74,13 @@ if __name__ == '__main__':
     """
     # pre-training on universalNER gpt conversations
     
-    import data_handler_uniNER as data_handler_MSEQA_dataset
+    import data_handler_pileNER as data_handler_MSEQA_dataset
 
-    path_to_dataset_MSEQA_format = './datasets/uniNER_MSEQA'
+    path_to_dataset_MSEQA_format = './datasets/pileNER_MSEQA'
     tokenizer_to_use = "roberta-base"
     pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
 
-    name_finetuned_model = "MSEQA_uniNER_all_dataset_pretrained"
+    name_finetuned_model = "MSEQA_pileNER_all_dataset_pretrained"
 
     MAX_SEQ_LENGTH = 256  # question + context + special tokens
     DOC_STRIDE = 64  # overlap between 2 consecutive passages from same document
