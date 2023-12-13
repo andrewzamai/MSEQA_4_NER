@@ -3,8 +3,10 @@ import json
 import re
 import math
 import random
+import string
 from collections import OrderedDict
 from datasets import Dataset, DatasetDict, load_dataset
+
 
 # given an UniversalNER conversation sample extract context (text passage) + questions-gold_answers
 def extract_context_quests_answers(conversation):
@@ -222,34 +224,13 @@ def count_target_words(sentence, target_words):
     return occurrences_count, target_words_found
 
 
-def get_one_sentence_from_sample(sample):
-    document_context = sample['document_context']
-    answers = sample['answers']
-    sentences = split_into_sentences(document_context)
-    target_words = answers['text']
-    # print(target_words)
-    # count the occurrences of target words in each sentence
-    target_word_counts = []
-    for sentence in sentences:
-        occurrences_count, target_words_found = count_target_words(sentence, target_words)
-        target_word_counts.append({"occurrences_count": occurrences_count,
-                                   "target_words_found": target_words_found})
-
-    print(target_word_counts)
-    # print(target_word_counts)
-    # identify the sentence with the highest count of target words
-    max_count_index = target_word_counts.index(max(target_word_counts, key=lambda x: x["occurrences_count"]))
-    selected_sentence = sentences[max_count_index]
-
-    return {"sentence": selected_sentence, "target_words_in_it": target_word_counts[max_count_index]["target_words_found"]}
-
-
 def has_too_many_whitespaces(sentence, threshold=4):
     # count consecutive whitespaces
     consecutive_whitespaces = re.findall(r'\s+', sentence)
 
     # check if the count exceeds the threshold
     return any(len(whitespace) > threshold for whitespace in consecutive_whitespaces)
+
 
 def has_too_many_newline(sentence, threshold=2):
     # count consecutive newline
@@ -259,16 +240,65 @@ def has_too_many_newline(sentence, threshold=2):
     return any(len(whitespace) >= threshold for whitespace in consecutive_newline)
 
 
-def has_more_than_n_foreign_chars(sentence, n=2):
+def has_more_than_n_foreign_chars(sentence, threshold=2):
     foreign_char_count = sum(1 for char in sentence if ord(char) > 127)
-    return foreign_char_count
+    return foreign_char_count > threshold
+
+def has_too_many_punctuations_and_digits(sentence, threshold=5):
+    # discard sentences like B [**\\#1**]{} (19\\#2) \\#3]{} \\#1\\#2
+    # define the set of allowed punctuations
+    allowed_punctuations = set(string.punctuation)
+    # count the number of punctuations and digits in the sentence
+    punctuation_count = sum(1 for char in sentence if char in allowed_punctuations or char.isdigit())
+    return punctuation_count > threshold
+
+
+def get_one_sentence_from_sample(sample):
+    document_context = sample['document_context']
+    answers = sample['answers']
+    ne_type = sample['tagName']
+    # split in sentences according to punctuation .?!
+    sentences = split_into_sentences(document_context)
+    target_words = answers['text']
+    # print(target_words)
+    # count the occurrences of target words in each sentence
+    # to return the one with at least 1/highest number of occ.
+    target_word_counts = []
+    for sentence in sentences:
+        occurrences_count, target_words_found = count_target_words(sentence, target_words)
+        target_word_counts.append({"sentence": sentence,
+                                   "target_words_in_it": target_words_found,
+                                   "occurrences_count": occurrences_count
+                                   })
+
+    # sort sentences by decreasing occurrences_count
+    target_word_counts = sorted(target_word_counts, key=lambda x: x['occurrences_count'], reverse=True)
+    # returning the sentence with highest number of occurrences, but with some contraints
+    sentence_to_ret = None
+    i = 0
+    while i < len(target_word_counts):
+        if target_word_counts[i]['occurrences_count'] != 0:
+            if 50 < len(target_word_counts[i]['sentence']) < 100:
+                if not has_too_many_whitespaces(target_word_counts[i]['sentence'], 4):
+                    if not has_too_many_newline(target_word_counts[i]['sentence'], 1):
+                        if not has_more_than_n_foreign_chars(target_word_counts[i]['sentence'], 2):
+                            if not has_too_many_punctuations_and_digits(target_word_counts[i]['sentence'], 10):
+                                sentence_to_ret = target_word_counts[i]
+                                break
+            elif ne_type in ['namespace', 'import', 'keyword', 'surname', 'file name', 'header file', 'related art', 'boolean', 'struct', 'html attribute', 'protein domain', 'fieldterminology', 'constant', 'legal citation'] and len(target_word_counts[i]['sentence']) < 200:
+                sentence_to_ret = target_word_counts[i]
+                break
+
+        i += 1
+
+    return sentence_to_ret
 
 
 def get_n_sentences_per_ne_type(dataset_MSEQA_format, ne_types_list, n_sentences_per_ne=3):
     # getting from training set n_sentences_per_ne as positive examples from which to let gpt infer NE definition
     sentences_per_ne_type = {ne: [] for ne in ne_types_list}
     trainDataset = dataset_MSEQA_format['train'].to_list()
-    random.seed(23)
+    random.seed(0)
     random.shuffle(trainDataset)
     for ne_type in ne_types_list:
         i = 0
@@ -276,23 +306,63 @@ def get_n_sentences_per_ne_type(dataset_MSEQA_format, ne_types_list, n_sentences
             sample = trainDataset[i]
             if sample['tagName'] == ne_type and len(sample['answers']['text']) != 0:
                 sentence_target_words = get_one_sentence_from_sample(sample)
-                sentence = sentence_target_words['sentence']
-                target_words_in_it = sentence_target_words['target_words_in_it']
-                if 50 < len(sentence) < 100 and not has_too_many_whitespaces(sentence, 4) and not has_too_many_newline(sentence, 1) and not has_more_than_n_foreign_chars(
-                        sentence, 2):
-                    sentence_target_words['target_words_in_it'] = list(set(target_words_in_it))
+                if sentence_target_words is not None:
+                    # removing duplicates in list of target words
+                    sentence_target_words['target_words_in_it'] = list(set(sentence_target_words['target_words_in_it']))
                     sentences_per_ne_type[ne_type].append(sentence_target_words)
             i += 1
 
     not_enough_sentences = []
     for ne_type, sentences in sentences_per_ne_type.items():
         if len(sentences) < n_sentences_per_ne:
-            #raise ValueError(f"not enough sentences for {ne_type}")
+            # raise ValueError(f"not enough sentences for {ne_type}")
             not_enough_sentences.append((ne_type, len(sentences)))
     print(f"NE types with less than n_sentences_per_ne: {len(not_enough_sentences)}")
     print(not_enough_sentences)
 
     return sentences_per_ne_type
+
+
+def generate_prompt(ne_type, example_sentences):
+    sentences_to_text = ""
+    for sto in example_sentences:
+        sentence = sto['sentence']
+        target_words_in_it = sto['target_words_in_it']
+        if len(target_words_in_it) == 1:
+            sentences_to_text = sentences_to_text + "\"" + target_words_in_it[0] + "\""
+            sentences_to_text += f" is \"{ne_type}\" in the sentence \"{sentence}\""
+        else:
+            for index, tw in enumerate(target_words_in_it):
+                if index == len(target_words_in_it) - 1:
+                    sentences_to_text = sentences_to_text + ' and ' + "\"" + tw + "\""
+                elif index == len(target_words_in_it) - 2:
+                    sentences_to_text = sentences_to_text + "\"" + tw + "\""
+                else:
+                    sentences_to_text = sentences_to_text + "\"" + tw + "\"" + ', '
+            sentences_to_text += f" are \"{ne_type}\" in the sentence \"{sentence}\""
+        sentences_to_text += '; '
+
+    #prompt = "You are a helpful NER data annotator designed to output JSON. Given in input a NE and few sentences in which it appear as examples, I want you to provide an output structured in the following way: "
+    #prompt += "{'Definition': use your knowledge and the example sentences to infer a short but clear definition of what this NE type defines, 'What not to label': provide a short description of what should not be labeled as this NE}. "
+    #prompt += "Here is the input 'NE': {}, 'example sentences': {}".format(ne_type, sentences_to_text)
+    # prompt += "Be as concise as possible limiting the output length to a maximum of 100 tokens."
+
+    #prompt = "Given a Named Entity and a few exemplary sentences in input, provide in no more than 100 tokens both a definition of what this Named Entity defines "
+    #prompt += "and warnings about what should not be labelled as this Named Entity. "
+    #prompt += "Here is the input: 'Named Entity': {}, 'exemplary sentences': {}".format(ne_type, sentences_to_text)
+
+    #prompt = "Given a Named Entity and a few exemplary sentences in input, provide, concisely, in no more than 50 tokens, "
+    #prompt += "both a definition and warnings about what should not be labelled for this Named Entity. "
+    #prompt += "Here is the input: 'Named Entity': {}, 'exemplary sentences': {}".format(ne_type, sentences_to_text)
+
+    #prompt = "Define the Named Entity \"{}\" based on the examplary sentences: {}Output in JSON format: {{\"Definition\": \"\", \"Do not label\": \"\"}}. Limit response to 50 tokens.".format(ne_type, sentences_to_text)
+
+    prompt = "Given a Named Entity and some exemplary sentences in input, provide, concisely, "
+    prompt += "both a definition and warnings about what should not be labelled for this Named Entity. "
+    prompt += "Here is the input: 'Named Entity': {}, 'exemplary sentences': {}".format(ne_type, sentences_to_text)
+    prompt += "Output in JSON format: {{\"Definition\": \"\", \"Do not label\": \"\"}}. Limit response to 50 tokens."
+
+    return prompt
 
 
 if __name__ == "__main__":
@@ -317,11 +387,8 @@ if __name__ == "__main__":
     # uniNER_dataset_MSEQA_format.save_to_disk("../../../datasets/uniNER_dataset_MSEQA_format")
     uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/uniNER_dataset_MSEQA_format")
 
-    print("\u041e\u0434\u0438\u043d \u043a\u0430\u0442\u0435\u0440 \u0431\u0435\u0440\u0435\u0433\u043e\u0432\u043e")
-    print(has_more_than_n_foreign_chars(
-        "\u041e\u0434\u0438\u043d \u043a\u0430\u0442\u0435\u0440 \u0431\u0435\u0440\u0435\u0433\u043e\u0432\u043e"))
-    #for i in range(10):
-        #print(uniNER_dataset_MSEQA_format['train'][i])
+    # for i in range(10):
+    # print(uniNER_dataset_MSEQA_format['train'][i])
 
     """
     ne_types = {split: {} for split in uniNER_dataset_MSEQA_format.keys()}
@@ -338,7 +405,7 @@ if __name__ == "__main__":
     with open("./questions/ne_types_list.json", 'r') as file:
         ne_types_list = json.load(file)
 
-    print("NE types which number of occurrences is > 100")
+    print("NE types which number of occurrences is > 100:")
     print(len(ne_types_list))
     print(ne_types_list)
 
@@ -350,9 +417,22 @@ if __name__ == "__main__":
         print("-------------")
     """
 
+    """
     sentences_per_ne_type = get_n_sentences_per_ne_type(uniNER_dataset_MSEQA_format, ne_types_list, n_sentences_per_ne=3)
-    for ne, sentences in sentences_per_ne_type.items():
-        print(ne, sentences)
+    #for ne, sentences in sentences_per_ne_type.items():
+    #print(ne, sentences)
 
     with open("./questions/sentences_per_ne_type.json", 'w') as f:
         json.dump(sentences_per_ne_type, f, indent=2)
+    """
+
+    with open("./questions/sentences_per_ne_type.json", 'r') as file:
+        sentences_per_ne_type = json.load(file)
+
+    #print(sentences_per_ne_type)
+
+    ne_type = 'element'
+    ex_sentences = sentences_per_ne_type[ne_type]
+    prompt = generate_prompt(ne_type, ex_sentences)
+    print("\n")
+    print(prompt)
