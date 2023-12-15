@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     # pre-training on universalNER gpt conversations WITH GPT definitions prefix
 
-    import data_handler_pileNER as data_handler_MSEQA_dataset
+    from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
     path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
     tokenizer_to_use = "roberta-base"
@@ -114,14 +114,14 @@ if __name__ == '__main__':
 
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
-    name_finetuned_model = "MSEQA_pileNER_prefix_pretrained"
+    name_finetuned_model = "MSEQA_pileNER_prefix_pretrained_bb"
 
     MAX_SEQ_LENGTH = 512  # question + context + special tokens
-    DOC_STRIDE = 256  # overlap between 2 consecutive passages from same document
-    MAX_QUERY_LENGTH = 150  # not used, but questions must not be too long given a chosen DOC_STRIDE
+    DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
+    MAX_QUERY_LENGTH = 150  # not used, average prefix (task instruction, definition, guidelines)
 
-    BATCH_SIZE = 32
-    EVAL_BATCH_SIZE = 128
+    BATCH_SIZE = 16  # 16
+    EVAL_BATCH_SIZE = 32  # 32
 
     learning_rate = 3e-5
     num_train_epochs = 10

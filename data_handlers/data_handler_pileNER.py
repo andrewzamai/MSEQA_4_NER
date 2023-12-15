@@ -501,7 +501,8 @@ if __name__ == "__main__":
     """
     # uniNER_dataset_MSEQA_format = build_dataset_MSEQA_format()
     # uniNER_dataset_MSEQA_format.save_to_disk("../../../datasets/uniNER_dataset_MSEQA_format")
-    #uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/uniNER_dataset_MSEQA_format")
+    uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format")
+    print(uniNER_dataset_MSEQA_format['train'][0])
 
     # for i in range(10):
     # print(uniNER_dataset_MSEQA_format['train'][i])
@@ -554,7 +555,7 @@ if __name__ == "__main__":
     print(prompt)
 
     print("\n")
-    dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines('../experiments/definitions/all_423_NE_definitions.json')
+    # dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines('../experiments/definitions/all_423_NE_definitions.json')
     print(dataset_MSEQA_format_with_guidelines)
     print(dataset_MSEQA_format_with_guidelines['train'][0])
     print(dataset_MSEQA_format_with_guidelines['train'][1])
