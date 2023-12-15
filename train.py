@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
-    name_finetuned_model = "MSEQA_pileNER_prefix_pretrained_bb"
+    name_finetuned_model = "MSEQA_pileNER_prefix_pretrained_bb_ga"
 
     MAX_SEQ_LENGTH = 512  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     EARLY_STOPPING_PATIENCE = 5
     EVALUATE_EVERY_N_STEPS = 1000
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
-    GRADIENT_ACCUMULATION_STEPS = 1
+    GRADIENT_ACCUMULATION_STEPS = 2
 
     MAX_ANS_LENGTH_IN_TOKENS = 10
 
@@ -199,11 +199,6 @@ if __name__ == '__main__':
 
     optimizer = AdamW(model.parameters(), lr=learning_rate)
 
-    accelerator = Accelerator(cpu=False, mixed_precision='fp16')
-    model, optimizer, train_dataloader, eval_dataloader, test_dataloader = accelerator.prepare(
-        model, optimizer, train_dataloader, eval_dataloader, test_dataloader
-    )
-
     num_update_steps_per_epoch = len(train_dataloader)
     num_training_steps = num_train_epochs * num_update_steps_per_epoch
 
@@ -212,6 +207,11 @@ if __name__ == '__main__':
         optimizer=optimizer,
         num_warmup_steps=warmup_ratio * num_training_steps,
         num_training_steps=num_training_steps,
+    )
+
+    accelerator = Accelerator(cpu=False, mixed_precision='fp16', gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS)
+    model, optimizer, lr_scheduler, train_dataloader, eval_dataloader, test_dataloader = accelerator.prepare(
+        model, optimizer, lr_scheduler, train_dataloader, eval_dataloader, test_dataloader
     )
 
     ''' ------------------ ZERO-SHOT EVALUATION ------------------ '''
@@ -282,23 +282,19 @@ if __name__ == '__main__':
             if early_stopping_occurred:
                 break
             model.train()
-            outputs = model(input_ids=batch['input_ids'],
-                            attention_mask=batch['attention_mask'],
-                            start_positions=batch['start_positions'],
-                            end_positions=batch['end_positions'],
-                            sequence_ids=batch['sequence_ids'])
-            loss = outputs.loss
-            epoch_loss_train += loss
+            with accelerator.accumulate(model):
+                outputs = model(input_ids=batch['input_ids'],
+                                attention_mask=batch['attention_mask'],
+                                start_positions=batch['start_positions'],
+                                end_positions=batch['end_positions'],
+                                sequence_ids=batch['sequence_ids'])
+                loss = outputs.loss
+                epoch_loss_train += loss
 
-            gradient_accumulation_count += 1
-
-            # perform optimization after accumulation_steps
-            if gradient_accumulation_count == GRADIENT_ACCUMULATION_STEPS:
                 accelerator.backward(loss)
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
-                gradient_accumulation_count = 0  # reset accumulation count
 
             # evaluate every N BATCH STEPS (if not first batch step)
             if global_steps_counter % EVALUATE_EVERY_N_STEPS == 0 and global_steps_counter != 0:
