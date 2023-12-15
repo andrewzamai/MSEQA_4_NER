@@ -2,6 +2,7 @@
 
 
 import collections
+import json
 from typing import Tuple, List
 
 
@@ -109,6 +110,8 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
     fp = 0
     tn = 0
 
+    false_positives = []
+
     for sample in pred_answers_for_a_quest_on_doc_list:
 
         gold_answers = sample['gold_answers']  # text and start_char indices
@@ -148,6 +151,15 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
                 else:
                     fp += 1  # error, but we do not count here FNs
 
+                    # TODO: extracting FPs
+                    # we don't care about FPs that are so only because of not perfect start/end match, but real FPs
+                    if not any([compute_overlap_char_indices(pred['start_end_indices'], ga['start_end_indices']) > 0 for ga in gold_answers_with_char_intervals]):
+                        false_positives.append({'doc_question_pairID': sample['doc_question_pairID'],
+                                                'tagName': sample['tagName'],
+                                                'text': pred['text'],
+                                                'start_end_indices': pred['start_end_indices']
+                                                })
+
             # FNs is the number of missed GAs not hit by any prediction
             missed_ga = set(range(len(gold_answers_with_char_intervals))) - set(hit_gold_answers_indices)
             # when pred is some FP but GA was '' then len(missed_ga) = 1, we don't have to count it as fn
@@ -162,6 +174,10 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
     f1 = 0 if (precision + recall) == 0 else (2 * precision * recall) / (precision + recall)
 
     metrics = {'precision': precision, 'recall': recall, 'f1': f1}
+
+    # TODO: saving FPs
+    with open('./predictions/false_positives.json', 'w', encoding='utf-8') as f:
+        json.dump(false_positives, f, ensure_ascii=False, indent=4)
 
     return metrics
 

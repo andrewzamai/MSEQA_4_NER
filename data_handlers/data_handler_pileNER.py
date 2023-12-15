@@ -1,3 +1,9 @@
+"""
+--- Pile-NER dataset gpt annotated ---
+https://huggingface.co/datasets/Universal-NER/Pile-NER-type
+https://universal-ner.github.io/
+"""
+
 import ast
 import json
 import re
@@ -8,7 +14,7 @@ from collections import OrderedDict
 from datasets import Dataset, DatasetDict, load_dataset
 
 
-# given an UniversalNER conversation sample extract context (text passage) + questions-gold_answers
+# given an UniversalNER conversation sample extract context (text passage) + (questions-gold_answers) list
 def extract_context_quests_answers(conversation):
     # first element in the conversation list is the passage of text (context) provided by the human
     context = conversation.pop(0)
@@ -30,6 +36,7 @@ def extract_context_quests_answers(conversation):
             # NE type being extracted
             start_char_ne_type = len("What describes ")
             end_char_ne_type = question.find("in the text?") - 1
+            # extracting NE type and lowering so PERSON/Person/person are same
             ne_type = question[start_char_ne_type:end_char_ne_type].lower()
             # lower casing NE e.g. Person, PERSON to be both person
             question = "What describes " + ne_type + " in the text?"
@@ -76,7 +83,7 @@ def extract_context_quests_answers(conversation):
 
                     return start_positions
 
-                # TODO: for now subword disabled
+                # TODO: for now sub-word disabled
                 if ne_type.lower() == "person":
                     start_positions = find_start_positions(context, ans, find_subwords=False)
                 else:
@@ -181,8 +188,7 @@ def remove_outlier_ne_types(dataset_QA_format, min_num_samples_per_ne_type=10):
             else:
                 filtered_dataset_MSEQA_format_list[split] = filtered_dataset_MSEQA_format_list[split][:1000]
         """
-    return DatasetDict(
-        {split: Dataset.from_list(values) for split, values in filtered_dataset_MSEQA_format_list.items()})
+    return DatasetDict({split: Dataset.from_list(values) for split, values in filtered_dataset_MSEQA_format_list.items()})
 
 
 def get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type=100):
@@ -201,6 +207,9 @@ def get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type=100):
         json.dump(ne_types, f, indent=2)
 
     return ne_types
+
+
+""" --- functions to extract n sentences per NE type as examples to build definitions through GPT prompting --- """
 
 
 def split_into_sentences(passage):
@@ -298,7 +307,7 @@ def get_n_sentences_per_ne_type(dataset_MSEQA_format, ne_types_list, n_sentences
     # getting from training set n_sentences_per_ne as positive examples from which to let gpt infer NE definition
     sentences_per_ne_type = {ne: [] for ne in ne_types_list}
     trainDataset = dataset_MSEQA_format['train'].to_list()
-    random.seed(0)
+    random.seed(4)
     random.shuffle(trainDataset)
     for ne_type in ne_types_list:
         i = 0
@@ -342,27 +351,85 @@ def generate_prompt(ne_type, example_sentences):
             sentences_to_text += f" are \"{ne_type}\" in the sentence \"{sentence}\""
         sentences_to_text += '; '
 
-    #prompt = "You are a helpful NER data annotator designed to output JSON. Given in input a NE and few sentences in which it appear as examples, I want you to provide an output structured in the following way: "
-    #prompt += "{'Definition': use your knowledge and the example sentences to infer a short but clear definition of what this NE type defines, 'What not to label': provide a short description of what should not be labeled as this NE}. "
-    #prompt += "Here is the input 'NE': {}, 'example sentences': {}".format(ne_type, sentences_to_text)
-    # prompt += "Be as concise as possible limiting the output length to a maximum of 100 tokens."
-
-    #prompt = "Given a Named Entity and a few exemplary sentences in input, provide in no more than 100 tokens both a definition of what this Named Entity defines "
-    #prompt += "and warnings about what should not be labelled as this Named Entity. "
-    #prompt += "Here is the input: 'Named Entity': {}, 'exemplary sentences': {}".format(ne_type, sentences_to_text)
-
-    #prompt = "Given a Named Entity and a few exemplary sentences in input, provide, concisely, in no more than 50 tokens, "
-    #prompt += "both a definition and warnings about what should not be labelled for this Named Entity. "
-    #prompt += "Here is the input: 'Named Entity': {}, 'exemplary sentences': {}".format(ne_type, sentences_to_text)
-
-    #prompt = "Define the Named Entity \"{}\" based on the examplary sentences: {}Output in JSON format: {{\"Definition\": \"\", \"Do not label\": \"\"}}. Limit response to 50 tokens.".format(ne_type, sentences_to_text)
-
     prompt = "Given a Named Entity and some exemplary sentences in input, provide, concisely, "
     prompt += "both a definition and warnings about what should not be labelled for this Named Entity. "
-    prompt += "Here is the input: 'Named Entity': {}, 'exemplary sentences': {}".format(ne_type, sentences_to_text)
+    prompt += "Here is the input: 'Named Entity': {}, 'examples of {}': {}".format(ne_type, ne_type, sentences_to_text)
     prompt += "Output in JSON format: {{\"Definition\": \"\", \"Do not label\": \"\"}}. Limit response to 50 tokens."
 
     return prompt
+
+
+def generate_prompt_json(ne_type, example_sentences):
+    ex_sentences_json = []
+    for exsent in example_sentences:
+        ex_sentences_json.append({'sentence': exsent['sentence'], 'entities in it': exsent['target_words_in_it']})
+
+    prompt = "Given a Named Entity and some exemplary sentences in input, provide, concisely, "
+    prompt += "both a definition and warnings about what should not be labelled for this Named Entity. "
+    prompt += "Here is the input: 'Named Entity': \'{}\', 'examples': {}".format(ne_type, ex_sentences_json)
+    prompt += " Output in JSON format: {{\"Definition\": \"\", \"Do not label\": \"\"}}. Limit response to 50 tokens."
+
+    return prompt
+
+
+def generate_structured_prompt(ne_type, example_sentences):
+    # unpacking sentences
+    ex_sentences_json = []
+    for exsent in example_sentences:
+        ex_sentences_json.append({'sentence': exsent['sentence'], 'entities': exsent['target_words_in_it']})
+
+    prompt = f"Named Entity: \'{ne_type}\'. Examples: {ex_sentences_json}.\n"
+    prompt += f"Instructions: 1. Provide a concise definition for the named entity \'{ne_type}\' in the context of NER. 2. Provide guidelines by specifying what entities should not be labeled as \'{ne_type}\' and include potential pitfalls to avoid. Go beyond generic terms and delve into nuanced scenarios. Be explicit about potential ambiguities and provide guidance on distinguishing \'{ne_type}\' from similar entities.\n"
+    prompt += "Output in JSON format: {\"Definition\": \"\", \"Guidelines\": \"\"}."
+    return prompt
+
+
+def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json):
+    dataset_MSEQA_format = build_dataset_MSEQA_format()
+    dataset_MSEQA_format = remove_outlier_ne_types(dataset_MSEQA_format, min_num_samples_per_ne_type=100)
+
+    new_ne_type_list = {
+        "misc": None,
+        "miscellaneous": None,
+        "other": None,
+        "unknown": None,
+        "general": None,
+        "entity type not specified": None,
+        "entity type": None,
+        "entity": None,
+        "text": None,
+        "import": None,
+
+        "bacteria": "bacterium",
+        "biological": "biological entity",
+        "cell": "cell type",
+        "cellular component": "cell component",
+        "governmental body": "government body",
+        "movie": "film",
+        "work": "work of art",
+        "musical group": "music group",
+        "org": "organization",
+
+        "anatomical_structure": "anatomical structure",
+        "anatomicalstructure": "anatomical structure",
+        "biological_process": "biological process",
+        "body_part": "body part",
+        "gpe": "geopolitical entity",
+        "gene/protein": "gene",
+        "work_of_art": "work of art",
+        "job_title": "job title",
+        "organisation": "organization",
+        "chemical_substance": "chemical substance",
+        "medical_condition": "medical condition",
+        "medicalcondition": "medical condition",
+
+        "fieldterminology": None,
+        "cryptocurrency": "cryptocurrency",
+        "demonym": "demonym",
+        "norp": "norp"
+    }
+
+
 
 
 if __name__ == "__main__":
@@ -431,8 +498,8 @@ if __name__ == "__main__":
 
     #print(sentences_per_ne_type)
 
-    ne_type = 'element'
+    ne_type = 'location'
     ex_sentences = sentences_per_ne_type[ne_type]
-    prompt = generate_prompt(ne_type, ex_sentences)
+    prompt = generate_structured_prompt(ne_type, ex_sentences)
     print("\n")
     print(prompt)

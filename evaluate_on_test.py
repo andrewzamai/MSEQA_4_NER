@@ -22,9 +22,9 @@ if __name__ == '__main__':
 
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
-    path_to_dataset_MSEQA_format = './datasets/pileNER/full_MSEQA'
+    path_to_dataset_MSEQA_format = './datasets/pileNER/min_occur_100_MSEQA'
     tokenizer_to_use = "roberta-base"
-    path_to_model = "./finetunedModels/MSEQA_pileNER_fullds"
+    path_to_model = "./finetunedModels/MSEQA_pileNER_min_occ_100"
 
     MAX_SEQ_LENGTH = 256  # question + context + special tokens
     DOC_STRIDE = 64  # overlap between 2 consecutive passages from same document
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     )
     # compute metrics
     micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
-    print("\n\nmicro (100%) - Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100,micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
+    print("\n\nmicro (100%) - Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
 
     # compute all other metrics
     overall_metrics, metrics_per_tagName = metrics_EQA_MS.compute_all_metrics(question_on_document_predicted_answers_list)
