@@ -39,7 +39,7 @@ if __name__ == '__main__':
     """ -------------------- Training parameters -------------------- """
 
     # fine-tuning on BUSTER default permutation 123-4-5
-
+    """
     from data_handlers import data_handler_BUSTER as data_handler_MSEQA_dataset
 
     path_to_dataset_MSEQA_format = './datasets/BUSTER_def_perm'  # if already existing, otherwise will be saved when first created
@@ -72,8 +72,9 @@ if __name__ == '__main__':
     EVALUATE_ZERO_SHOT = True
 
     """
+
     # pre-training on universalNER gpt conversations
-    
+    """
     import data_handler_pileNER as data_handler_MSEQA_dataset
 
     path_to_dataset_MSEQA_format = './datasets/pileNER_MSEQA'
@@ -103,6 +104,38 @@ if __name__ == '__main__':
     EVALUATE_ZERO_SHOT = False
     """
 
+    # pre-training on universalNER gpt conversations WITH GPT definitions prefix
+
+    import data_handler_pileNER as data_handler_MSEQA_dataset
+
+    path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
+    tokenizer_to_use = "roberta-base"
+    pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
+
+    path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
+
+    name_finetuned_model = "MSEQA_pileNER_prefix_pretrained"
+
+    MAX_SEQ_LENGTH = 512  # question + context + special tokens
+    DOC_STRIDE = 256  # overlap between 2 consecutive passages from same document
+    MAX_QUERY_LENGTH = 150  # not used, but questions must not be too long given a chosen DOC_STRIDE
+
+    BATCH_SIZE = 32
+    EVAL_BATCH_SIZE = 128
+
+    learning_rate = 3e-5
+    num_train_epochs = 10
+    warmup_ratio = 0.2
+
+    EARLY_STOPPING_PATIENCE = 5
+    EVALUATE_EVERY_N_STEPS = 1000
+    EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
+    GRADIENT_ACCUMULATION_STEPS = 1
+
+    MAX_ANS_LENGTH_IN_TOKENS = 10
+
+    EVALUATE_ZERO_SHOT = False
+
     """ -------------------- Loading Datasets in MS-EQA format -------------------- """
 
     print(f"Training MS-EQA model on {path_to_dataset_MSEQA_format.split('/')[-1]} dataset\n")
@@ -110,7 +143,8 @@ if __name__ == '__main__':
     print("Loading train/validation/test Datasets in MS-EQA format...")
     if not os.path.exists(path_to_dataset_MSEQA_format):
         print(" ...building Datasets from huggingface repository in MS-EQA format")
-        dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(path_to_dataset_NER_format, path_to_questions)
+        #dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(path_to_dataset_NER_format, path_to_questions)
+        dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format_with_guidelines(path_to_pileNER_definitions_json)
         # removing outliers
         # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
         dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)

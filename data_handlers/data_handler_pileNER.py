@@ -203,8 +203,8 @@ def get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type=100):
     ne_types = [a[0] for a in sorted(ne_types.items(), key=lambda item: item[1], reverse=True) if
                 a[1] >= min_num_samples_per_ne_type]
 
-    with open("./questions/ne_types_list.json", 'w') as f:
-        json.dump(ne_types, f, indent=2)
+    #with open("./questions/ne_types_list.json", 'w') as f:
+    #json.dump(ne_types, f, indent=2)
 
     return ne_types
 
@@ -386,9 +386,20 @@ def generate_structured_prompt(ne_type, example_sentences):
 
 def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json):
     dataset_MSEQA_format = build_dataset_MSEQA_format()
-    dataset_MSEQA_format = remove_outlier_ne_types(dataset_MSEQA_format, min_num_samples_per_ne_type=100)
+    # dataset_MSEQA_format = remove_outlier_ne_types(dataset_MSEQA_format, min_num_samples_per_ne_type=100)
+    # dataset_MSEQA_format.save_to_disk("../../../datasets/pileNER_dataset_MSEQA_format")
+    # dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format")
 
-    new_ne_type_list = {
+    ne_types_list = get_ne_types_list(dataset_MSEQA_format, 100)
+    print(len(ne_types_list))
+    print(ne_types_list)
+    # if the pileNER dataset is built by retaining only those NE which number of occurrences is > 100
+    # the total number of NEs now should be 455
+    # by plotting the dendrogram of the word embeddings using plot_word_emb.ipynb
+    # we produce this mapping to a new list of NEs
+    # by removing some bad NE categories or merging some
+    # now the new list of NEs should be of length 423
+    new_ne_type_list_mapping = {
         "misc": None,
         "miscellaneous": None,
         "other": None,
@@ -429,7 +440,45 @@ def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json):
         "norp": "norp"
     }
 
+    # definition and guidelines for each NE in new_NE_type_list
+    # obtained by prompting gpt, check prompt_tests.ipynb
+    with open(path_to_NE_guidelines_json, 'r') as file:
+        all_NEs_guidelines = json.load(file)
 
+    # new dataset with re-mapped Named Entities and definition+guidelines+question
+    new_dataset_MSEQA_format_list = {split: [] for split in dataset_MSEQA_format.keys()}
+    for split in dataset_MSEQA_format.keys():
+        for sample in dataset_MSEQA_format[split]:
+            ne_type = sample['tagName']
+            if ne_type in new_ne_type_list_mapping:
+                ne_type = new_ne_type_list_mapping[ne_type]  # new NE name or None if to be removed
+            # if has not been remove and the new mapping is in the list of NEs for which we have the gpt definition
+            if ne_type is not None and ne_type in ne_types_list:
+                # new NE type
+                sample['tagName'] = ne_type
+                # from string to dict
+                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+                # print(gpt_definition.strip())
+                # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
+                if not gpt_definition.endswith("}"):
+                    if not gpt_definition.endswith("\""):
+                        gpt_definition += "\""
+                    gpt_definition += "}"
+                # print(gpt_definition)
+                this_ne_guidelines = eval(gpt_definition)
+                # replacing ne types occurrences between single quotes to their UPPERCASE
+                pattern = re.compile(rf'\'{re.escape(ne_type)}\'')
+                this_ne_guidelines = {k: pattern.sub(f'{ne_type.upper()}', v) for k, v in this_ne_guidelines.items()}
+
+                question = f"Your task is to extract the Named Entities of type {ne_type.upper()} from an input TEXT. "
+                question += "You are given a DEFINITION and some GUIDELINES.\n"
+                question += "DEFINITION: " + this_ne_guidelines['Definition'] + "\nGUIDELINES: " + this_ne_guidelines['Guidelines'] + "\n"
+                question += f"TEXT: "
+                sample['question'] = question
+
+                new_dataset_MSEQA_format_list[split].append(sample)
+
+    return DatasetDict({split: Dataset.from_list(values) for split, values in new_dataset_MSEQA_format_list.items()})
 
 
 if __name__ == "__main__":
@@ -452,7 +501,7 @@ if __name__ == "__main__":
     """
     # uniNER_dataset_MSEQA_format = build_dataset_MSEQA_format()
     # uniNER_dataset_MSEQA_format.save_to_disk("../../../datasets/uniNER_dataset_MSEQA_format")
-    uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/uniNER_dataset_MSEQA_format")
+    #uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/uniNER_dataset_MSEQA_format")
 
     # for i in range(10):
     # print(uniNER_dataset_MSEQA_format['train'][i])
@@ -503,3 +552,11 @@ if __name__ == "__main__":
     prompt = generate_structured_prompt(ne_type, ex_sentences)
     print("\n")
     print(prompt)
+
+    print("\n")
+    dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines('../experiments/definitions/all_423_NE_definitions.json')
+    print(dataset_MSEQA_format_with_guidelines)
+    print(dataset_MSEQA_format_with_guidelines['train'][0])
+    print(dataset_MSEQA_format_with_guidelines['train'][1])
+    print(dataset_MSEQA_format_with_guidelines['train'][23])
+    print(dataset_MSEQA_format_with_guidelines['train'][100])
