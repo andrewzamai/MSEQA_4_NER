@@ -6,15 +6,19 @@ Contains 1 general domain NER dataset CoNLL2003, and 5 domain specific datasets:
 - politics, science, literature, music, ai
 Each domain specific dataset has its own defined set of NE categories.
 """
-import json
+
+
 # importing packages
+import json
 import os
 import random
 import re
 
 from datasets import Dataset, DatasetDict
-
-from data_handlers.data_handler_pileNER import has_more_than_n_foreign_chars, has_too_many_newline, has_too_many_whitespaces, has_too_many_punctuations_and_digits, split_into_sentences, count_target_words
+try:
+    from data_handlers.data_handler_pileNER import has_more_than_n_foreign_chars, has_too_many_newline, has_too_many_whitespaces, has_too_many_punctuations_and_digits, split_into_sentences, count_target_words
+except:
+    from data_handler_pileNER import has_more_than_n_foreign_chars, has_too_many_newline, has_too_many_whitespaces, has_too_many_punctuations_and_digits, split_into_sentences, count_target_words
 
 # read sentences with BIO labelling from txt file
 def read_bio_file(path_to_bio_txt):
@@ -238,7 +242,7 @@ def get_one_sentence_from_sample(ne_type, document_context, ne_occurrences):
                             if not has_too_many_punctuations_and_digits(target_word_counts[i]['sentence'], 10):
                                 sentence_to_ret = target_word_counts[i]
                                 break
-            elif ne_type in ['misc', 'musicalinstrument', 'person']:
+            elif ne_type in ['chemicalelement', 'country', 'theory']:
                 sentence_to_ret = target_word_counts[i]
                 break
         i += 1
@@ -247,13 +251,13 @@ def get_one_sentence_from_sample(ne_type, document_context, ne_occurrences):
 
 def get_n_sentences_per_ne_type(dataset_BIO_format, ne_types_list, n_sentences_per_ne=3):
     # getting from training set n_sentences_per_ne as positive examples from which to let gpt infer NE definition
-    sentences_per_ne_type = {ne: [] for ne in ne_types_list}
+    sentences_per_ne_type = {ne: {'real_name': "", 'Hints': "", "sentences": []} for ne in ne_types_list}
     trainDataset = dataset_BIO_format['train'].to_list()
     random.seed(4)
     random.shuffle(trainDataset)
     for ne_type in ne_types_list:
         i = 0
-        while len(sentences_per_ne_type[ne_type]) < n_sentences_per_ne and i < len(trainDataset):
+        while len(sentences_per_ne_type[ne_type]['sentences']) < n_sentences_per_ne and i < len(trainDataset):
             sample = trainDataset[i]
             doc_ID, tokens, labels = sample.values()
             doc_metadata = get_doc_metadata_with_start_end_char_indexes(dataset_BIO_format, tokens, labels)
@@ -264,18 +268,39 @@ def get_n_sentences_per_ne_type(dataset_BIO_format, ne_types_list, n_sentences_p
                 if sentence_target_words is not None:
                     # removing duplicates in list of target words
                     sentence_target_words['target_words_in_it'] = list(set(sentence_target_words['target_words_in_it']))
-                    sentences_per_ne_type[ne_type].append(sentence_target_words)
+                    sentences_per_ne_type[ne_type]['sentences'].append(sentence_target_words)
             i += 1
 
     not_enough_sentences = []
-    for ne_type, sentences in sentences_per_ne_type.items():
-        if len(sentences) < n_sentences_per_ne:
+    for ne_type, values in sentences_per_ne_type.items():
+        if len(values['sentences']) < n_sentences_per_ne:
             # raise ValueError(f"not enough sentences for {ne_type}")
-            not_enough_sentences.append((ne_type, len(sentences)))
+            not_enough_sentences.append((ne_type, len(values['sentences'])))
     print(f"NE types with less than n_sentences_per_ne: {len(not_enough_sentences)}")
     print(not_enough_sentences)
 
     return sentences_per_ne_type
+
+
+def generate_structured_prompt(exemplary_data):
+    ne_name = exemplary_data['real_name']
+    sentences = exemplary_data['sentences']
+    # unpacking sentences
+    ex_sentences_json = []
+    for exsent in sentences:
+        ex_sentences_json.append({'sentence': exsent['sentence'], 'entities': exsent['target_words_in_it']})
+
+    # TODO: hints from CrossNER paper annotation guidelines
+    hints = exemplary_data['Hints']
+
+    prompt = f"Named Entity: \'{ne_name}\'. Examples: {ex_sentences_json}."
+    if hints != "":
+        prompt += f" Hints: {hints}\n"
+    else:
+        prompt += "\n"
+    prompt += f"Instructions: 1. Provide a concise definition for the named entity \'{ne_name}\' in the context of NER. 2. Provide guidelines by specifying what entities should not be labeled as \'{ne_name}\' and include potential pitfalls to avoid. Go beyond generic terms and delve into nuanced scenarios. Be explicit about potential ambiguities and provide guidance on distinguishing \'{ne_name}\' from similar entities.\n"
+    prompt += "Output in JSON format: {\"Definition\": \"\", \"Guidelines\": \"\"}."
+    return prompt
 
 
 def build_dataset_MSEQA_format_with_guidelines(path_to_crosNER_datasets, subdataset_name, path_to_ne_definitions_json):
@@ -286,6 +311,9 @@ def build_dataset_MSEQA_format_with_guidelines(path_to_crosNER_datasets, subdata
     # definitions for each ne
     with open(path_to_ne_definitions_json, 'r') as file:
         subdataset_NEs_guidelines = json.load(file)
+
+    if isinstance(subdataset_NEs_guidelines, list):
+        subdataset_NEs_guidelines = {x['named_entity']: x for x in subdataset_NEs_guidelines}
 
     newDataset_dict = {splitName: [] for splitName in dataset_BIO_format.keys() if splitName != "dataset_name"}
     newDataset_Dataset = {splitName: None for splitName in dataset_BIO_format.keys() if splitName != "dataset_name"}
@@ -307,7 +335,7 @@ def build_dataset_MSEQA_format_with_guidelines(path_to_crosNER_datasets, subdata
                     # print(gpt_definition)
                     this_ne_guidelines = eval(gpt_definition)
                     # replacing ne types occurrences between single quotes to their UPPERCASE
-                    tagName_in_guidelines = subdataset_NEs_guidelines[tagName]['named_entity']
+                    tagName_in_guidelines = subdataset_NEs_guidelines[tagName]['real_name']
                     pattern = re.compile(rf'\'{re.escape(tagName_in_guidelines)}\'')
                     this_ne_guidelines = {k: pattern.sub(f'{tagName_in_guidelines.upper()}', v) for k, v in this_ne_guidelines.items()}
 
@@ -350,47 +378,48 @@ if __name__ == '__main__':
     # sentences = read_bio_file(os.path.join(path_to_cross_NER_datasets, 'music', 'dev.txt'))
     # print(sentences)
 
-    dataset_name = "music"
+    dataset_name = "science"
     print(f"\nHandling data from dataset: {dataset_name}")
-    music_dataset = build_dataset_from_txt(os.path.join(path_to_cross_NER_datasets, dataset_name))
+    dataset_BIO_format = build_dataset_from_txt(os.path.join(path_to_cross_NER_datasets, dataset_name))
     print("Dataset features: ")
-    print(music_dataset["train"].features)
+    print(dataset_BIO_format["train"].features)
 
     #print("dataset_name")
     #print(music_dataset["dataset_name"])
 
     print("\nNE categories: ")
-    ne_categories_music = get_ne_categories_labels_unique(music_dataset)
-    print(len(ne_categories_music))
-    print(ne_categories_music)
+    ne_categories = get_ne_categories_labels_unique(dataset_BIO_format)
+    print(len(ne_categories))
+    print(ne_categories)
 
-    ne_types_list = get_ne_categories_only(music_dataset)
+    print(f"\n{dataset_name} NE categories:")
+    ne_types_list = get_ne_categories_only(dataset_BIO_format)
     print(ne_types_list)
 
     print("\nSplits statistics (number of occurrences per NE category): ")
-    ne_categories_statistics = get_ne_categories_statistics(music_dataset)
+    ne_categories_statistics = get_ne_categories_statistics(dataset_BIO_format)
     for split in splits:
         print(split)
         print(ne_categories_statistics[split])
 
     print("\nOne document example: ")
-    doc_ID, tokens, labels = get_document_id_tokens_labels(music_dataset, "train", 25)
+    doc_ID, tokens, labels = get_document_id_tokens_labels(dataset_BIO_format, "train", 25)
     print(doc_ID)
     print(tokens)
     print(labels)
     # converting BIO labeling to QA metedata
-    print(get_doc_metadata_with_start_end_char_indexes(music_dataset, tokens, labels))
+    print(get_doc_metadata_with_start_end_char_indexes(dataset_BIO_format, tokens, labels))
 
-    #sentences_per_ne_type = get_n_sentences_per_ne_type(music_dataset, ne_types_list, n_sentences_per_ne=3)
+    #sentences_per_ne_type = get_n_sentences_per_ne_type(dataset_BIO_format, ne_types_list, n_sentences_per_ne=3)
     #print(sentences_per_ne_type)
-    #with open("./questions/crossNER/sentences_per_ne_type_music.json", 'w') as f:
+    #with open(f"./questions/crossNER/sentences_per_ne_type_{dataset_name}.json", 'w') as f:
         #json.dump(sentences_per_ne_type, f, indent=2)
 
-    music_dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines(path_to_cross_NER_datasets, 'music', "./questions/crossNER/music_NE_definitions.json")
-    print(music_dataset_MSEQA_format_with_guidelines)
-    print(music_dataset_MSEQA_format_with_guidelines['train'][0])
-    print(music_dataset_MSEQA_format_with_guidelines['train'][1])
-    print(music_dataset_MSEQA_format_with_guidelines['train'][23])
+    dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines(path_to_cross_NER_datasets, dataset_name, f"./questions/crossNER/{dataset_name}_NE_definitions.json")
+    print(dataset_MSEQA_format_with_guidelines)
+    print(dataset_MSEQA_format_with_guidelines['train'][0])
+    print(dataset_MSEQA_format_with_guidelines['train'][1])
+    print(dataset_MSEQA_format_with_guidelines['train'][23])
 
     """
     path_to_questions = os.path.join("./cross_ner_questions/", dataset_name + ".txt")

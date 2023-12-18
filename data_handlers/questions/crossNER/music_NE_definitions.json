@@ -51,7 +51,7 @@
     ],
     "prompt_length": 425,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'award' refers to a recognition or honor given to individuals, groups, or organizations in various fields, such as sports, entertainment, academia, and business.\", \"Guidelines\": \"Avoid labeling non-official titles or generic terms like 'best', 'top', 'favorite'. Exercise caution with ambiguous terms like 'Oscar' (could refer to a person or the award) or 'Nobel' (could refer to the organization or the prize). Ensure the distinction between the award",
+    "gpt_answer": "{\"Definition\": \"'award' refers to a recognition or honor given to individuals, groups, or organizations in various fields, such as sports, entertainment, academia, and business.\", \"Guidelines\": \"Avoid labeling non-official titles or generic terms like 'best', 'top', 'favorite'. Exercise caution with ambiguous terms like 'Oscar' (could refer to a person or the award) or 'Nobel' (could refer to the organization or the prize).",
     "finish_reason": "length"
   },
   "band": {
@@ -134,7 +134,7 @@
     ],
     "prompt_length": 397,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'event' refers to occurrences or happenings, such as competitions, meetings, or incidents, that take place at a specific time and place.\", \"Guidelines\": \"Avoid labeling general or vague terms like 'activity' or 'loss'. Exercise caution with terms that are part of named events but could also refer to other entities, such as 'Maui Invitational' (also a location) or 'Demo GmbH' (a company). Be mindful of distinguishing between events and their related",
+    "gpt_answer": "{\"Definition\": \"'event' refers to occurrences or happenings, such as competitions, meetings, or incidents, that take place at a specific time and place.\", \"Guidelines\": \"Avoid labeling general or vague terms like 'activity' or 'loss'. Exercise caution with terms that are part of named events but could also refer to other entities, such as 'Maui Invitational' (also a location) or 'Demo GmbH' (a company).",
     "finish_reason": "length"
   },
   "location": {
@@ -291,7 +291,7 @@
 	],
 	"prompt_length": 395,
 	"output_length": 72,
-	"gpt_answer": "{\"Definition\": \"'person but not musical artist' denotes people that are non musical artists like managers, journalists, music technicians, music agents.\", \"Guidelines\": \"In this context do not label entities that are also musical artists.\"}",
+	"gpt_answer": "{\"Definition\": \"'person but not musical artist' denotes people that are non musical artists like managers, journalists, music technicians, music agents.\", \"Guidelines\": \"In this context do not label people that are also musical artists.\"}",
 	"finish_reason": "stop"
   },
   "song": {

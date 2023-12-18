@@ -28,6 +28,7 @@ import os
 
 # my libraries
 from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering
+from models.MultiSpanRobertaQuestionAnswering_from_scratch import MultiSpanRobertaQuestionAnswering_from_scratch
 from utils.EarlyStopping import EarlyStopping
 from collator_MSEQA import collate_fn_MSEQA
 import inference_EQA_MS
@@ -110,15 +111,16 @@ if __name__ == '__main__':
 
     path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
     tokenizer_to_use = "roberta-base"
-    pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
+    # pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
+    pretrained_model_relying_on = "roberta-base"
 
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
-    name_finetuned_model = "MSEQA_pileNER_prefix_pretrained_bb_ga"
+    name_finetuned_model = "MSEQA_pileNER_prefix_pt_from_scratch"
 
     MAX_SEQ_LENGTH = 512  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
-    MAX_QUERY_LENGTH = 150  # not used, average prefix (task instruction, definition, guidelines)
+    MAX_QUERY_LENGTH = 150  # not used, average prefix length in tokens (task instruction, definition, guidelines)
 
     BATCH_SIZE = 16  # 16
     EVAL_BATCH_SIZE = 32  # 32
@@ -130,7 +132,7 @@ if __name__ == '__main__':
     EARLY_STOPPING_PATIENCE = 5
     EVALUATE_EVERY_N_STEPS = 1000
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
-    GRADIENT_ACCUMULATION_STEPS = 2
+    GRADIENT_ACCUMULATION_STEPS = 5  #2
 
     MAX_ANS_LENGTH_IN_TOKENS = 10
 
@@ -139,6 +141,7 @@ if __name__ == '__main__':
     """ -------------------- Loading Datasets in MS-EQA format -------------------- """
 
     print(f"Training MS-EQA model on {path_to_dataset_MSEQA_format.split('/')[-1]} dataset\n")
+    print(f"Fine-tuned model will be named: {name_finetuned_model}\n")
 
     print("Loading train/validation/test Datasets in MS-EQA format...")
     if not os.path.exists(path_to_dataset_MSEQA_format):
@@ -172,6 +175,7 @@ if __name__ == '__main__':
 
     print("BATCH_SIZE for training: {}".format(BATCH_SIZE))
     print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
+    print("Gradient accumulation steps: {}".format(GRADIENT_ACCUMULATION_STEPS))
 
     train_dataloader = DataLoader(
         dataset_MSEQA_format['train'],
@@ -195,7 +199,8 @@ if __name__ == '__main__':
     )
 
     # loading MS-EQA model with weights pretrained on SQuAD2
-    model = MultiSpanRobertaQuestionAnswering.from_pretrained(pretrained_model_relying_on)
+    # model = MultiSpanRobertaQuestionAnswering.from_pretrained(pretrained_model_relying_on)
+    model = MultiSpanRobertaQuestionAnswering_from_scratch.from_pretrained(pretrained_model_relying_on)
 
     optimizer = AdamW(model.parameters(), lr=learning_rate)
 

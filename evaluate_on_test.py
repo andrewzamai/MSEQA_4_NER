@@ -38,13 +38,13 @@ if __name__ == '__main__':
 
     from data_handlers import data_handler_cross_NER as data_handler_MSEQA_dataset
 
-    subdataset_name = 'music'
+    subdataset_name = 'science'
     path_to_cross_NER_datasets = './datasets/crossNER/BIO_format'
     path_to_subdataset_guidelines = f"./MSEQA_4_NER/data_handlers/questions/crossNER/{subdataset_name}_NE_definitions.json"
 
-    path_to_dataset_MSEQA_format = './datasets/crossNER/MSEQA_format_guidelines/music'
+    path_to_dataset_MSEQA_format = f"./datasets/crossNER/MSEQA_format_guidelines/subdataset_name"
     tokenizer_to_use = "roberta-base"
-    path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pretrained_bb_CP"
+    path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pretrained_bb_ga_2"
 
     MAX_SEQ_LENGTH = 512  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
