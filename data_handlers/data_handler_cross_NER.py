@@ -242,7 +242,7 @@ def get_one_sentence_from_sample(ne_type, document_context, ne_occurrences):
                             if not has_too_many_punctuations_and_digits(target_word_counts[i]['sentence'], 10):
                                 sentence_to_ret = target_word_counts[i]
                                 break
-            elif ne_type in ['chemicalelement', 'country', 'theory']:
+            elif ne_type in ['conference', 'country', 'location', 'person', 'university']:
                 sentence_to_ret = target_word_counts[i]
                 break
         i += 1
@@ -250,7 +250,9 @@ def get_one_sentence_from_sample(ne_type, document_context, ne_occurrences):
     return sentence_to_ret
 
 def get_n_sentences_per_ne_type(dataset_BIO_format, ne_types_list, n_sentences_per_ne=3):
-    # getting from training set n_sentences_per_ne as positive examples from which to let gpt infer NE definition
+    """ getting from training set n_sentences_per_ne as positive examples from which to let gpt infer NE definition """
+    # field real_name contains NE name in natural language format, e.g. BUYING_COMPANY --> BUYING COMPANY
+    # medicalcondition --> medical condition, since not always automatically deducible we let it empty and then manually add it in the json
     sentences_per_ne_type = {ne: {'real_name': "", 'Hints': "", "sentences": []} for ne in ne_types_list}
     trainDataset = dataset_BIO_format['train'].to_list()
     random.seed(4)
@@ -378,7 +380,7 @@ if __name__ == '__main__':
     # sentences = read_bio_file(os.path.join(path_to_cross_NER_datasets, 'music', 'dev.txt'))
     # print(sentences)
 
-    dataset_name = "science"
+    dataset_name = "ai"
     print(f"\nHandling data from dataset: {dataset_name}")
     dataset_BIO_format = build_dataset_from_txt(os.path.join(path_to_cross_NER_datasets, dataset_name))
     print("Dataset features: ")
@@ -413,25 +415,23 @@ if __name__ == '__main__':
     #sentences_per_ne_type = get_n_sentences_per_ne_type(dataset_BIO_format, ne_types_list, n_sentences_per_ne=3)
     #print(sentences_per_ne_type)
     #with open(f"./questions/crossNER/sentences_per_ne_type_{dataset_name}.json", 'w') as f:
-        #json.dump(sentences_per_ne_type, f, indent=2)
+    #json.dump(sentences_per_ne_type, f, indent=2)
 
-    dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines(path_to_cross_NER_datasets, dataset_name, f"./questions/crossNER/{dataset_name}_NE_definitions.json")
-    print(dataset_MSEQA_format_with_guidelines)
-    print(dataset_MSEQA_format_with_guidelines['train'][0])
-    print(dataset_MSEQA_format_with_guidelines['train'][1])
-    print(dataset_MSEQA_format_with_guidelines['train'][23])
+    # dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines(path_to_cross_NER_datasets, dataset_name, f"./questions/crossNER/{dataset_name}_NE_definitions.json")
+    #print(dataset_MSEQA_format_with_guidelines)
+    #print(dataset_MSEQA_format_with_guidelines['train'][0])
+    #print(dataset_MSEQA_format_with_guidelines['train'][1])
+    #print(dataset_MSEQA_format_with_guidelines['train'][23])
 
-    """
-    path_to_questions = os.path.join("./cross_ner_questions/", dataset_name + ".txt")
+    path_to_questions = os.path.join("./questions/crossNER/what_describes_questions", dataset_name + ".txt")
     questions = load_questions_from_txt(path_to_questions)
     print(questions)
 
-    print(sorted(questions.keys()) == get_ne_categories_only(music_dataset))
+    print(sorted(questions.keys()) == get_ne_categories_only(dataset_BIO_format))
 
-    dataset_QA_format = build_dataset_QA_format(music_dataset, path_to_questions)
+    dataset_QA_format = build_dataset_MSEQA_format(dataset_BIO_format, path_to_questions)
     print(dataset_QA_format)
 
     print(dataset_QA_format["train"][0])
     print(dataset_QA_format["train"][1])
     print(dataset_QA_format["train"][23])
-    """

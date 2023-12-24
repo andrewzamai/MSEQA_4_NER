@@ -11,7 +11,9 @@ import math
 import random
 import string
 from collections import OrderedDict
-from datasets import Dataset, DatasetDict, load_dataset
+from typing import List
+
+from datasets import Dataset, DatasetDict, load_dataset, concatenate_datasets
 
 
 # given an UniversalNER conversation sample extract context (text passage) + (questions-gold_answers) list
@@ -386,7 +388,6 @@ def generate_structured_prompt(ne_type, example_sentences):
 
 def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json):
     dataset_MSEQA_format = build_dataset_MSEQA_format()
-    # dataset_MSEQA_format = remove_outlier_ne_types(dataset_MSEQA_format, min_num_samples_per_ne_type=100)
     # dataset_MSEQA_format.save_to_disk("../../../datasets/pileNER_dataset_MSEQA_format")
     # dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format")
 
@@ -481,6 +482,153 @@ def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json):
     return DatasetDict({split: Dataset.from_list(values) for split, values in new_dataset_MSEQA_format_list.items()})
 
 
+def add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_w_guidelines, path_to_NE_guidelines_json):
+
+    # loading gpt guidelines for each NE type in pileNER (only of top frequent NEs)
+    with open(path_to_NE_guidelines_json, 'r') as file:
+        all_NEs_guidelines = json.load(file)
+
+    # everything is done in each split independently
+    splits = ['train', 'validation', 'test']
+
+    # for each Dataset split count how many positive samples (i.e. how many questions) of a ne_type exist
+    # e.g. {'train': {'gene': 5, 'sports team': 4, 'norp': 3, 'disease': 9,...}
+    # --> there are 5 MSEQA samples which question is about 'gene' NE type and have a non-empty answer
+    number_positive_questions_per_ne_type = {split: {} for split in splits}
+    for split in dataset_MSEQA_format_w_guidelines.keys():
+        for sample in dataset_MSEQA_format_w_guidelines[split]:
+            ne_type = sample['tagName']
+            if ne_type in number_positive_questions_per_ne_type[split]:
+                number_positive_questions_per_ne_type[split][ne_type] += 1
+            else:
+                number_positive_questions_per_ne_type[split][ne_type] = 1
+    print("Number of positive questions per NE type:")
+    print(number_positive_questions_per_ne_type)
+
+    # list of ne_types per split
+    # e.g. {'train': ['gene', 'sports team', 'norp', .. ]
+    ne_types_list_per_split = {split: list(values.keys()) for split, values in number_positive_questions_per_ne_type.items()}
+    print("List of positive NE types per split:")
+    print(ne_types_list_per_split)
+    # {'train': 423, 'validation': 416, 'test': 414}
+    print("Number of positive NE types per split: {}".format({split: len(values) for split, values in ne_types_list_per_split.items()}))
+
+    # for now are 0 (there are no new NEs never seen in train)
+    # TODO: add novel NEs
+    NEs_in_validation_but_not_train = list(set(ne_types_list_per_split['validation']) - set(ne_types_list_per_split['train']))
+    print("{} new NEs in validation but not in train: {}".format(len(NEs_in_validation_but_not_train), NEs_in_validation_but_not_train))
+    NEs_in_test_but_not_train = list(set(ne_types_list_per_split['test']) - set(ne_types_list_per_split['train']))
+    print("{} new NEs in test but not in train: {}".format(len(NEs_in_test_but_not_train), NEs_in_test_but_not_train))
+
+    # define a subset of valid ne_types for each passage of text from which to draw negative questions
+    # first find the already existing NE types on each passage of text
+    positive_NEs_per_passage = {split: {} for split in splits}
+    for split in dataset_MSEQA_format_w_guidelines.keys():
+        for sample in dataset_MSEQA_format_w_guidelines[split]:
+            passage_id = sample['doc_question_pairID'].split(':')[0]
+            if passage_id in positive_NEs_per_passage[split]:
+                positive_NEs_per_passage[split][passage_id].append(sample['tagName'])
+            else:
+                positive_NEs_per_passage[split][passage_id] = [sample['tagName']]
+    # now set for each passage the candidate ne_types (i.e. all_ne_types - positive_ne_types_for_this_passage)
+    candidate_NEs_subset_per_passage = {split: {} for split in splits}
+
+    # generating a negative sample for a generic NE as "concept" may confuse the model as many entities could be seen as "concept",
+    # but labeled in the samples as other more specific NEs
+    general_invalid_ne_types = ["concept", "location", "product", "technology", "object", "number", "attribute", "group", "process", "function",
+                                "material", "type", "quantity", "data type", "data", "biological entity", "task", "resource", "biomolecule", "unit", "physical quantity", "information", "year", "acronym"
+                                "group of people", "adjective", "string", "part", "landmark", "pronoun", "trait", "outcome", "financial", "verb", "keyword", "setting", "environment",
+                                "item", "mechanism", "entertainment", "term", "noun"]
+    for split in positive_NEs_per_passage.keys():
+        for passage_id, positive_ne_list_for_this_passage in positive_NEs_per_passage[split].items():
+            candidate_NEs_subset_per_passage[split][passage_id] = list((set(ne_types_list_per_split[split]) - set(general_invalid_ne_types)) - set(positive_ne_list_for_this_passage))
+
+    n_passages_per_split = {split: len(candidate_NEs_subset_per_passage[split]) for split in splits}
+    print("Number of passages per split: {}".format(n_passages_per_split))
+
+    #print("Candidate_NEs_subset_per_passage: ")
+    #print(candidate_NEs_subset_per_passage)
+
+    negative_NEs_to_add = {split: [] for split in splits}
+    for split in splits:
+        total_positive_examples = sum(number_positive_questions_per_ne_type[split].values())
+        for passage_id, candidate_NEs_as_negatives in candidate_NEs_subset_per_passage[split].items():
+            # compute sampling probabilities for candidate NEs as negative questions for this passage
+            sampling_probabilities = [number_positive_questions_per_ne_type['train'][ne] / total_positive_examples for ne in candidate_NEs_as_negatives]
+            # number of negative questions to add per passage
+            num_negative_questions_to_add_per_passage = 3
+            sampled_negative_NEs = random.choices(candidate_NEs_as_negatives, weights=sampling_probabilities, k=num_negative_questions_to_add_per_passage)
+            negative_NEs_to_add[split].append({"passage_id": passage_id, "negative_NEs_to_add": sampled_negative_NEs})
+
+    #print(negative_NEs_to_add)
+
+    document_contexts = {split: {} for split in splits}
+    for split in splits:
+        for sample in dataset_MSEQA_format_w_guidelines[split]:
+            passage_id = sample['doc_question_pairID'].split(':')[0]
+            if passage_id not in document_contexts[split]:
+                document_contexts[split][passage_id] = sample['document_context']
+
+    negative_samples_to_add_per_split = {split: [] for split in splits}
+    # now it's type to add to the exising positive samples the negatives ones
+    for split in splits:
+        for passage_id_negative_NEs_to_add_on_this_passage in negative_NEs_to_add[split]:
+            passage_id, negative_NEs_to_add_on_this_passage = passage_id_negative_NEs_to_add_on_this_passage.values()
+            for neg_ne_id, negative_ne in enumerate(negative_NEs_to_add_on_this_passage):
+                # constructing question with negative_ne
+                gpt_definition = all_NEs_guidelines[negative_ne]['gpt_answer'].strip()
+                # print(gpt_definition.strip())
+                # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
+                if not gpt_definition.endswith("}"):
+                    if not gpt_definition.endswith("\""):
+                        gpt_definition += "\""
+                    gpt_definition += "}"
+                # print(gpt_definition)
+                this_ne_guidelines = eval(gpt_definition)
+                # replacing ne types occurrences between single quotes to their UPPERCASE
+                pattern = re.compile(rf'\'{re.escape(negative_ne)}\'')
+                this_ne_guidelines = {k: pattern.sub(f'{negative_ne.upper()}', v) for k, v in this_ne_guidelines.items()}
+
+                question = f"Your task is to extract the Named Entities of type {negative_ne.upper()} from an input TEXT. "
+                question += "You are given a DEFINITION and some GUIDELINES.\n"
+                question += "DEFINITION: " + this_ne_guidelines['Definition'] + "\nGUIDELINES: " + this_ne_guidelines['Guidelines'] + "\n"
+                question += f"TEXT: "
+
+                negative_sample = {"doc_question_pairID": str(passage_id) + ":" + str(neg_ne_id) + "-neg",
+                                   "document_context": document_contexts[split][passage_id],
+                                   "tagName": negative_ne,
+                                   "question": question,
+                                   "answers": {
+                                            'answer_start': list(),
+                                            'text': list()
+                                        }
+                                   }
+                negative_samples_to_add_per_split[split].append(negative_sample)
+
+    from datasets import Features, Value, Sequence
+
+    # Define the features for each key
+    features = Features({
+        "doc_question_pairID": Value(dtype='string', id=None),
+        "document_context": Value(dtype='string', id=None),
+        "tagName": Value(dtype='string', id=None),
+        "question": Value(dtype='string', id=None),
+        "answers": {
+            'answer_start': Sequence(feature=Value(dtype='int64', id=None), length=-1, id=None),
+            'text': Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)
+        }
+    })
+
+    for split in splits:
+        positive_samples = dataset_MSEQA_format_w_guidelines[split]
+        negative_sample = Dataset.from_list(negative_samples_to_add_per_split[split], features=features)
+        concatenated_dataset = concatenate_datasets([positive_samples, negative_sample])
+        shuffled_ds = concatenated_dataset.shuffle()
+        dataset_MSEQA_format_w_guidelines[split] = shuffled_ds
+
+    return dataset_MSEQA_format_w_guidelines
+
+
 if __name__ == "__main__":
     """
     raw_dataset = load_dataset("Universal-NER/Pile-NER-type")
@@ -501,8 +649,8 @@ if __name__ == "__main__":
     """
     # uniNER_dataset_MSEQA_format = build_dataset_MSEQA_format()
     # uniNER_dataset_MSEQA_format.save_to_disk("../../../datasets/uniNER_dataset_MSEQA_format")
-    uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format")
-    print(uniNER_dataset_MSEQA_format['train'][0])
+    #uniNER_dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format")
+    #print(uniNER_dataset_MSEQA_format['train'][0])
 
     # for i in range(10):
     # print(uniNER_dataset_MSEQA_format['train'][i])
@@ -519,7 +667,7 @@ if __name__ == "__main__":
     ne_types = {split:dict(sorted(values.items(), key=lambda item: item[1], reverse=True)).keys() for split, values in ne_types.items()}
     """
 
-    with open("./questions/ne_types_list.json", 'r') as file:
+    with open("./questions/pileNER/ne_types_list.json", 'r') as file:
         ne_types_list = json.load(file)
 
     print("NE types which number of occurrences is > 100:")
@@ -543,7 +691,7 @@ if __name__ == "__main__":
         json.dump(sentences_per_ne_type, f, indent=2)
     """
 
-    with open("./questions/sentences_per_ne_type.json", 'r') as file:
+    with open("./questions/pileNER/sentences_per_ne_type.json", 'r') as file:
         sentences_per_ne_type = json.load(file)
 
     #print(sentences_per_ne_type)
@@ -555,9 +703,36 @@ if __name__ == "__main__":
     print(prompt)
 
     print("\n")
-    # dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines('../experiments/definitions/all_423_NE_definitions.json')
+    dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
+    #dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
     print(dataset_MSEQA_format_with_guidelines)
     print(dataset_MSEQA_format_with_guidelines['train'][0])
     print(dataset_MSEQA_format_with_guidelines['train'][1])
     print(dataset_MSEQA_format_with_guidelines['train'][23])
     print(dataset_MSEQA_format_with_guidelines['train'][100])
+
+    #dataset_MSEQA_format_with_guidelines.save_to_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
+    """
+    for split_name, split_dataset in dataset_MSEQA_format_with_guidelines.items():
+        # Keep only the first num_samples_to_keep samples
+        limited_dataset = split_dataset.select(range(1000))
+        # Replace the original split with the limited dataset
+        dataset_MSEQA_format_with_guidelines[split_name] = limited_dataset
+
+    print(dataset_MSEQA_format_with_guidelines)
+    """
+    print("\n")
+
+    """
+    for sample in dataset_MSEQA_format_with_guidelines['train']:
+        if sample['doc_question_pairID'].split(':')[0] == '12820':
+            print(sample)
+    """
+
+    dataset_MSEQA_format_with_guidelines_NEG_samples = add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_with_guidelines, "./questions/pileNER/all_423_NE_definitions.json")
+    print(dataset_MSEQA_format_with_guidelines_NEG_samples)
+
+    for sample in dataset_MSEQA_format_with_guidelines_NEG_samples['train']:
+        if sample['document_context'].endswith('-neg'):
+            print(sample)
+            break

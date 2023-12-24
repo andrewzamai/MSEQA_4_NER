@@ -1,6 +1,7 @@
-{
-	"album": {
+[
+	{
     "named_entity": "album",
+    "real_name": "album",
     "sentences_as_example": [
       {
         "sentence": "It is her first album of original songs since Love Sides in 1983.",
@@ -26,8 +27,9 @@
     "gpt_answer": "{\"Definition\": \"'album' in the context of NER refers to a collection of musical or artistic works released as a single unit.\", \"Guidelines\": \"Exclude generic references to albums in unrelated contexts - e.g., 'photo album'. Beware of ambiguity in cases where 'album' is used in a non-musical sense, such as 'family album' or 'stamp album'.\"}",
     "finish_reason": "stop"
   },
-  "award": {
+  {
     "named_entity": "award",
+    "real_name": "award",
     "sentences_as_example": [
       {
         "sentence": "The ABA Journal\u2018s Blawg 100 is an annual list of the best in blogs about lawyers and the law.",
@@ -54,8 +56,9 @@
     "gpt_answer": "{\"Definition\": \"'award' refers to a recognition or honor given to individuals, groups, or organizations in various fields, such as sports, entertainment, academia, and business.\", \"Guidelines\": \"Avoid labeling non-official titles or generic terms like 'best', 'top', 'favorite'. Exercise caution with ambiguous terms like 'Oscar' (could refer to a person or the award) or 'Nobel' (could refer to the organization or the prize).",
     "finish_reason": "length"
   },
-  "band": {
+  {
     "named_entity": "band",
+    "real_name": "band",
     "sentences_as_example": [
       {
         "sentence": "This was the last studio album released by Owen before the reunion of his band Take That.",
@@ -82,8 +85,9 @@
     "gpt_answer": "{\"Definition\": \"'band' refers to musical groups or musical acts consisting of multiple performers, typically including instrumentalists and vocalists.\", \"Guidelines\": \"Do not label solo artists, such as Beyonc\u00e9 or Elvis Presley, even if they are often referred to as a 'band' colloquially. Watch out for potential name clashes with other entities, such as 'Apple' (company versus music group).\"}",
     "finish_reason": "stop"
   },
-  "country": {
+  {
     "named_entity": "country",
+    "real_name": "country",
     "sentences_as_example": [
       {
         "sentence": "One in 6 persons in the United States will, at some point, suffer from major depression.",
@@ -109,8 +113,9 @@
     "gpt_answer": "{\"Definition\": \"'country' represents a sovereign state and should be labeled for names of specific countries and nation-states.\", \"Guidelines\": \"Do not label regions, cities, or territories unless they are independent countries. Exercise caution with ambiguous terms like 'Georgia' (a country and a U.S. state) or 'Belize City' (city within a country).\"}",
     "finish_reason": "stop"
   },
-  "event": {
+  {
     "named_entity": "event",
+    "real_name": "event",
     "sentences_as_example": [
       {
         "sentence": "A camera will record all activity and allow us to see what happens during a seizure.",
@@ -137,8 +142,9 @@
     "gpt_answer": "{\"Definition\": \"'event' refers to occurrences or happenings, such as competitions, meetings, or incidents, that take place at a specific time and place.\", \"Guidelines\": \"Avoid labeling general or vague terms like 'activity' or 'loss'. Exercise caution with terms that are part of named events but could also refer to other entities, such as 'Maui Invitational' (also a location) or 'Demo GmbH' (a company).",
     "finish_reason": "length"
   },
-  "location": {
+  {
     "named_entity": "location",
+    "real_name": "location",
     "sentences_as_example": [
       {
         "sentence": "According to onlookers, the communicant told the priest: \"You're in Ireland now\".",
@@ -165,24 +171,27 @@
     "gpt_answer": "{\"Definition\": \"'location' denotes geographic entities, such as cities, countries, and landmarks, that represent specific places on Earth.\", \"Guidelines\": \"Do not label abstract references. Be cautious with ambiguous terms like 'Paris Hilton' (person with a location name) or 'Amazon' (both a company and a river).\"}",
     "finish_reason": "stop"
   },
-  "misc": {
-    "named_entity": "miscellaneous",
+  {
+    "named_entity": "misc",
+    "real_name": "miscellaneous",
     "sentences_as_example": [],
     "prompt_length": 400,
     "output_length": 67,
-    "gpt_answer": "{\"Definition\": \"'miscellaneous' denotes relevant entities that do not fit into predefined named entity categories, encompassing a range of diverse and unrelated items, concepts, or themes.\", \"Guidelines\": \"Do not label entities that are 'person', 'location', 'organization', 'location', 'event', 'country'. In addition, in this music context, do not label entities that are 'album', 'award', 'band', 'musical artist', 'musical instrument', 'music genre' or 'song'.\"}",
+    "gpt_answer": "{\"Definition\": \"'miscellaneous' denotes relevant entities that do not fit into music-related named entity categories, encompassing a range of diverse and unrelated items, concepts, or themes.\", \"Guidelines\": \"Do not label entities that are 'person', 'location', 'organization', 'location', 'event', 'country'. In addition, in this music context, do not label entities that are 'album', 'award', 'band', 'musical artist', 'musical instrument', 'music genre' or 'song'.\"}",
     "finish_reason": "stop"
   },
-  "musicalartist":{
-  	"named_entity": "musical artist",
+  {
+  	"named_entity": "musicalartist",
+    "real_name": "musical artist",
     "sentences_as_example": [],
     "prompt_length": 400,
     "output_length": 67,
     "gpt_answer": "{\"Definition\": \"'musical artist' refers to individuals primarily known for their contributions to the field of music, including singers and musicians.\", \"Guidelines\": \"Exercise caution with terms that may have multiple meanings, such as 'John Denver' (could refer to a musical artist or a geographic location). Be mindful of context, as not all mentions of names in a musical context necessarily indicate a musical artist (e.g., 'Novoselic' might refer to a person but not necessarily a musical artist).\"}",
     "finish_reason": "stop"
   },
-  "musicalinstrument": {
-    "named_entity": "musical instrument",
+  {
+    "named_entity": "musicalinstrument",
+    "real_name": "musical instrument",
     "sentences_as_example": [
       {
         "sentence": "Just an organ, an electric piano and a set of drums.",
@@ -211,8 +220,9 @@
     "gpt_answer": "{\"Definition\": \"'musical instrument' refers to devices or tools intended for creating music, such as guitars, drums, pianos, etc.\", \"Guidelines\": \"Avoid labeling non-instrument references, be aware of ambiguous terms (e.g., 'string' may refer to a component of an instrument or other context), and consider context to differentiate actual references from metaphorical or non-literal ones.\"}",
     "finish_reason": "stop"
   },
-  "musicgenre": {
-    "named_entity": "music genre",
+  {
+    "named_entity": "musicgenre",
+    "real_name": "music genre",
     "sentences_as_example": [
       {
         "sentence": "In high school, he frequented jazz caf\u00e9s and started his own band.",
@@ -238,8 +248,9 @@
     "gpt_answer": "{\"Definition\": \"'music genre' refers to specific categories or styles of music, such as jazz, rock, pop, etc.\", \"Guidelines\": \"Avoid labeling individual song titles, album names, or generic musical terms like 'music' or 'song'. Take care with ambiguous terms like 'blues' (can refer to both a music genre and a feeling), and 'pop' (can refer to music genre and popular culture).\"}",
     "finish_reason": "stop"
   },
-  "organisation": {
-    "named_entity": "organization",
+  {
+    "named_entity": "organisation",
+    "real_name": "organization",
     "sentences_as_example": [
       {
         "sentence": "Kevin Hunter, president of Calty Design Research, is responsible for the exterior styling.",
@@ -266,8 +277,9 @@
     "gpt_answer": "{\"Definition\": \"'organization' refers to named entities that represent companies, institutions, associations, or any group of people with a particular purpose.\", \"Guidelines\": \"Avoid labeling generic terms like 'team' or 'group' unless they refer to specific organizations. Exercise caution with potentially ambiguous terms such as 'Apple' (company or fruit) or 'Red Cross' (organization or color). Be mindful of the context to accurately discern the entity as an organization.\"}",
     "finish_reason": "stop"
   },
-  "person": {
-	"named_entity": "person but not musical artist",
+  {
+	"named_entity": "person",
+  "real_name": "professionals proper name",
 	"sentences_as_example": [
 	  {
 	    "sentence": "Ken believes its further evidence that B.A. should be our second home.",
@@ -291,11 +303,12 @@
 	],
 	"prompt_length": 395,
 	"output_length": 72,
-	"gpt_answer": "{\"Definition\": \"'person but not musical artist' denotes people that are non musical artists like managers, journalists, music technicians, music agents.\", \"Guidelines\": \"In this context do not label people that are also musical artists.\"}",
+	"gpt_answer": "{\"Definition\": \"'professionals proper name' refers to proper names of non-artist individuals such as managers, journalists, music technicians or music agents.\", \"Guidelines\": \"In this context, refrain from labeling proper names of singers, composers, songwriters and DJs. Label proper names of non-artists only and do not label titles such as 'manager', 'technician'.\"}",
 	"finish_reason": "stop"
   },
-  "song": {
+  {
     "named_entity": "song",
+    "real_name": "song",
     "sentences_as_example": [
       {
         "sentence": "The new Barren Earth video for the song \u2018The Leer\u2019 is completed & can now be viewed HERE.",
@@ -321,4 +334,4 @@
     "gpt_answer": "{\"Definition\": \"'song' refers to a musical composition with lyrics and melody that can be performed or recorded.\", \"Guidelines\": \"Do not label general music-related terms like 'album' or 'lyrics'. Exercise caution with ambiguous cases like 'Billie Jean' (which can refer to a person or a song) or 'Guns N' Roses' (which can refer to a band or a song).\"}",
     "finish_reason": "stop"
   }
-}
+]

@@ -34,17 +34,49 @@ if __name__ == '__main__':
     EVAL_BATCH_SIZE = 128
 
     MAX_ANS_LENGTH_IN_TOKENS = 10
+    
+    
+    from data_handlers import data_handler_BUSTER as data_handler_MSEQA_dataset
+
+    dataset_name = "BUSTER"
+    path_to_BUSTER_dataset_BIO = f"./datasets/{dataset_name}/FULL_KFOLDS_BIO/123_4_5"
+    path_to_subdataset_guidelines = f"./MSEQA_4_NER/data_handlers/questions/{dataset_name}/{dataset_name}_NE_definitions.json"
+
+    path_to_dataset_MSEQA_format = f"./datasets/{dataset_name}/{dataset_name}_MSEQA_guidelines"
+
+    tokenizer_to_use = "roberta-base"
+    path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt_2_from_scratch"
+    #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pt_from_scratch"
+    # path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pretrained_bb_ga_2"
+
+    MAX_SEQ_LENGTH = 360  # question + context + special tokens
+    DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
+    MAX_QUERY_LENGTH = 150  # not used, but questions must not be too long given a chosen DOC_STRIDE
+
+    EVAL_BATCH_SIZE = 64
+
+    MAX_ANS_LENGTH_IN_TOKENS = 10
+
     """
 
     from data_handlers import data_handler_cross_NER as data_handler_MSEQA_dataset
 
-    subdataset_name = 'science'
-    path_to_cross_NER_datasets = './datasets/crossNER/BIO_format'
-    path_to_subdataset_guidelines = f"./MSEQA_4_NER/data_handlers/questions/crossNER/{subdataset_name}_NE_definitions.json"
+    WITH_DEFINITION = True
+    cross_ner_subdataset_names = ['ai', 'literature', 'music', 'politics', 'science']
+    path_to_cross_NER_datasets_BIO_format = './datasets/crossNER/BIO_format'
 
-    path_to_dataset_MSEQA_format = f"./datasets/crossNER/MSEQA_format_guidelines/subdataset_name"
+    path_to_subdataset_guidelines_folder = "./MSEQA_4_NER/data_handlers/questions/crossNER/gpt_guidelines"  # {subdataset_name}_NE_definitions.json
+    path_to_dataset_MSEQA_format_folder_with_def = "./datasets/crossNER/MSEQA_format_guidelines/"
+
+    path_to_subdataset_questions_folder = "./MSEQA_4_NER/data_handlers/questions/crossNER/what_describes_questions"
+    path_to_dataset_MSEQA_format_folder_no_def = f"./datasets/crossNER/MSEQA_format_no_def/"
+
     tokenizer_to_use = "roberta-base"
-    path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pretrained_bb_ga_2"
+    if WITH_DEFINITION:
+        path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pt_from_scratch"
+        # path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt_2_from_scratch"
+    else:
+        path_to_model = "./finetunedModels/MSEQA_pileNER_min_occ_100"
 
     MAX_SEQ_LENGTH = 512  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
@@ -54,80 +86,99 @@ if __name__ == '__main__':
 
     MAX_ANS_LENGTH_IN_TOKENS = 10
 
-    print(f"Evaluating MS-EQA model named {path_to_model.split('/')[-1]} on {path_to_dataset_MSEQA_format.split('/')[-1]} test set\n")
+    for subdataset_name in cross_ner_subdataset_names:
 
-    print("Loading train/validation/test Datasets in MS-EQA format...")
-    if not os.path.exists(path_to_dataset_MSEQA_format):
-        print(" ...building Datasets from huggingface repository in MS-EQA format")
-        # dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format()
-        dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format_with_guidelines(path_to_cross_NER_datasets, subdataset_name, path_to_subdataset_guidelines)
-        # removing outliers
-        # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
-        dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)
-    else:
-        print(" ...using already existing Datasets in MS-EQA format")
-        dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_dataset_MSEQA_format)
+        if WITH_DEFINITION:
+            path_to_subdataset_guidelines = os.path.join(path_to_subdataset_guidelines_folder, subdataset_name + '_NE_definitions.json')
+            path_to_dataset_MSEQA_format = os.path.join(path_to_dataset_MSEQA_format_folder_with_def, subdataset_name)
+        else:
+            path_to_subdataset_questions = os.path.join(path_to_subdataset_questions_folder, subdataset_name + '.txt')
+            path_to_dataset_MSEQA_format = os.path.join(path_to_dataset_MSEQA_format_folder_no_def, subdataset_name)
 
-    print("\nLoading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use)
-    assert isinstance(tokenizer, transformers.PreTrainedTokenizerFast)
-    MODEL_CONTEXT_WINDOW = tokenizer.model_max_length
-    print(f"Pretrained model relying on: {path_to_model} has context window size of {MODEL_CONTEXT_WINDOW}")
-    assert MAX_SEQ_LENGTH <= MODEL_CONTEXT_WINDOW, "MAX SEQ LENGTH must be smallerEqual than model context window"
-    print(f"MAX_SEQ_LENGTH used to chunk documents: {MAX_SEQ_LENGTH}")
-    assert DOC_STRIDE < (MAX_SEQ_LENGTH - MAX_QUERY_LENGTH), "DOC_STRIDE must be smaller, otherwise parts of the doc will be skipped"
-    print("DOC_STRIDE used: {}".format(DOC_STRIDE))
+        print(f"\n\nEvaluating MS-EQA model named {path_to_model.split('/')[-1]} on {path_to_dataset_MSEQA_format.split('/')[-1]} test set\n")
 
-    ''' ------------------ PREPARING MODEL & DATA FOR EVALUATION ------------------ '''
+        print("Loading train/validation/test Datasets in MS-EQA format...")
+        if not os.path.exists(path_to_dataset_MSEQA_format):
+            print(" ...building Datasets from huggingface repository in MS-EQA format")
+            sys.stdout.flush()
+            if WITH_DEFINITION:
+                dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format_with_guidelines(path_to_cross_NER_datasets_BIO_format, subdataset_name, path_to_subdataset_guidelines)
+            else:
+                dataset_BIO_format = data_handler_MSEQA_dataset.build_dataset_from_txt(os.path.join(path_to_cross_NER_datasets_BIO_format, subdataset_name))
+                dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(dataset_BIO_format, path_to_subdataset_questions)
 
-    print("\nPREPARING MODEL and DATA FOR EVALUATION ...")
+            # dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format()
+            # dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format_with_guidelines(path_to_BUSTER_dataset_BIO, path_to_subdataset_guidelines)
+            # removing outliers
+            # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
 
-    print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
+            dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)
+        else:
+            print(" ...using already existing Datasets in MS-EQA format")
+            dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_dataset_MSEQA_format)
 
-    test_dataloader = DataLoader(
-        dataset_MSEQA_format['test'],
-        shuffle=False,
-        batch_size=EVAL_BATCH_SIZE,
-        collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
-    )
+        print("\nLoading tokenizer...")
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use)
+        assert isinstance(tokenizer, transformers.PreTrainedTokenizerFast)
+        MODEL_CONTEXT_WINDOW = tokenizer.model_max_length
+        print(f"Pretrained model relying on: {path_to_model} has context window size of {MODEL_CONTEXT_WINDOW}")
+        assert MAX_SEQ_LENGTH <= MODEL_CONTEXT_WINDOW, "MAX SEQ LENGTH must be smallerEqual than model context window"
+        print(f"MAX_SEQ_LENGTH used to chunk documents: {MAX_SEQ_LENGTH}")
+        assert DOC_STRIDE < (MAX_SEQ_LENGTH - MAX_QUERY_LENGTH), "DOC_STRIDE must be smaller, otherwise parts of the doc will be skipped"
+        print("DOC_STRIDE used: {}".format(DOC_STRIDE))
 
-    # loading MS-EQA model with weights pretrained on SQuAD2
-    model = MultiSpanRobertaQuestionAnswering.from_pretrained(path_to_model)
+        ''' ------------------ PREPARING MODEL & DATA FOR EVALUATION ------------------ '''
 
-    accelerator = Accelerator(cpu=False, mixed_precision='fp16')
-    model, test_dataloader = accelerator.prepare(model, test_dataloader)
+        print("\nPREPARING MODEL and DATA FOR EVALUATION ...")
 
-    # run inference through the model
-    current_step_loss_eval, model_outputs_for_metrics = inference_EQA_MS.run_inference(model, test_dataloader).values()
-    # extract answers
-    question_on_document_predicted_answers_list = inference_EQA_MS.extract_answers_per_passage_from_logits(
-        max_ans_length_in_tokens=MAX_ANS_LENGTH_IN_TOKENS,
-        batch_step="test",
-        print_json_every_batch_steps=0,
-        fold_name="test",
-        tokenizer=tokenizer,
-        datasetdict_MSEQA_format=dataset_MSEQA_format,
-        model_outputs_for_metrics=model_outputs_for_metrics
-    )
-    # compute metrics
-    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
-    print("\n\nmicro (100%) - Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
+        print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
 
-    # compute all other metrics
-    overall_metrics, metrics_per_tagName = metrics_EQA_MS.compute_all_metrics(question_on_document_predicted_answers_list)
+        sys.stdout.flush()
 
-    print("\nOverall metrics (100%):")
-    print("\n------------------------------------------")
-    for metric_name, value in overall_metrics.items():
-        print("{}: {:.2f}".format(metric_name, value * 100))
-    print("------------------------------------------\n")
+        test_dataloader = DataLoader(
+            dataset_MSEQA_format['test'],
+            shuffle=False,
+            batch_size=EVAL_BATCH_SIZE,
+            collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+        )
 
-    print("\nMetrics per NE category (100%):\n")
-    for tagName, m in metrics_per_tagName.items():
-        print("{} --> support: {}".format(tagName, m['tp']+m['fn']))
-        print("{} --> TP: {}, FN: {}, FP: {}, TN: {}".format(tagName, m['tp'], m['fn'], m['fp'], m['tn']))
-        print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, m['precision'] * 100, m['recall'] * 100, m['f1'] * 100))
-        print("------------------------------------------")
+        # loading MS-EQA model with weights pretrained on SQuAD2
+        model = MultiSpanRobertaQuestionAnswering.from_pretrained(path_to_model)
+
+        accelerator = Accelerator(cpu=False, mixed_precision='fp16')
+        model, test_dataloader = accelerator.prepare(model, test_dataloader)
+
+        # run inference through the model
+        current_step_loss_eval, model_outputs_for_metrics = inference_EQA_MS.run_inference(model, test_dataloader).values()
+        # extract answers
+        question_on_document_predicted_answers_list = inference_EQA_MS.extract_answers_per_passage_from_logits(
+            max_ans_length_in_tokens=MAX_ANS_LENGTH_IN_TOKENS,
+            batch_step="test",
+            print_json_every_batch_steps=0,
+            fold_name="test",
+            tokenizer=tokenizer,
+            datasetdict_MSEQA_format=dataset_MSEQA_format,
+            model_outputs_for_metrics=model_outputs_for_metrics
+        )
+        # compute metrics
+        micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+        print("\n\nmicro (100%) - Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
+
+        # compute all other metrics
+        overall_metrics, metrics_per_tagName = metrics_EQA_MS.compute_all_metrics(question_on_document_predicted_answers_list)
+
+        print("\nOverall metrics (100%):")
+        print("\n------------------------------------------")
+        for metric_name, value in overall_metrics.items():
+            print("{}: {:.2f}".format(metric_name, value * 100))
+        print("------------------------------------------\n")
+
+        print("\nMetrics per NE category (100%):\n")
+        for tagName, m in metrics_per_tagName.items():
+            print("{} --> support: {}".format(tagName, m['tp']+m['fn']))
+            print("{} --> TP: {}, FN: {}, FP: {}, TN: {}".format(tagName, m['tp'], m['fn'], m['fp'], m['tn']))
+            print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, m['precision'] * 100, m['recall'] * 100, m['f1'] * 100))
+            print("------------------------------------------")
 
     print("\nDONE :)")
     sys.stdout.flush()

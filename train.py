@@ -109,24 +109,25 @@ if __name__ == '__main__':
 
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
-    path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
+    path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix_w_negatives_2'
     tokenizer_to_use = "roberta-base"
     # pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
-    pretrained_model_relying_on = "roberta-base"
+    #pretrained_model_relying_on = "roberta-base"
+    pretrained_model_relying_on = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt"
 
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
-    name_finetuned_model = "MSEQA_pileNER_prefix_pt_from_scratch"
+    name_finetuned_model = "MSEQA_pileNER_prefix_w_neg_pt_2b"
 
     MAX_SEQ_LENGTH = 512  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
     MAX_QUERY_LENGTH = 150  # not used, average prefix length in tokens (task instruction, definition, guidelines)
 
     BATCH_SIZE = 16  # 16
-    EVAL_BATCH_SIZE = 32  # 32
+    EVAL_BATCH_SIZE = 64  # 32
 
     learning_rate = 3e-5
-    num_train_epochs = 10
+    num_train_epochs = 5
     warmup_ratio = 0.2
 
     EARLY_STOPPING_PATIENCE = 5
@@ -138,6 +139,8 @@ if __name__ == '__main__':
 
     EVALUATE_ZERO_SHOT = False
 
+    METRICS_EVAL_AFTER_N = 5
+
     """ -------------------- Loading Datasets in MS-EQA format -------------------- """
 
     print(f"Training MS-EQA model on {path_to_dataset_MSEQA_format.split('/')[-1]} dataset\n")
@@ -148,6 +151,7 @@ if __name__ == '__main__':
         print(" ...building Datasets from huggingface repository in MS-EQA format")
         #dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(path_to_dataset_NER_format, path_to_questions)
         dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format_with_guidelines(path_to_pileNER_definitions_json)
+        dataset_MSEQA_format = data_handler_MSEQA_dataset.add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format, path_to_pileNER_definitions_json)
         # removing outliers
         # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
         dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)
@@ -155,7 +159,7 @@ if __name__ == '__main__':
         print(" ...using already existing Datasets in MS-EQA format")
         dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_dataset_MSEQA_format)
 
-    # print(uniNER_dataset_MSEQA_format['train'].features)
+    print(dataset_MSEQA_format)
 
     print(f"\nMS-EQA model relies on pre-trained model: {pretrained_model_relying_on}")
 
@@ -199,8 +203,8 @@ if __name__ == '__main__':
     )
 
     # loading MS-EQA model with weights pretrained on SQuAD2
-    # model = MultiSpanRobertaQuestionAnswering.from_pretrained(pretrained_model_relying_on)
-    model = MultiSpanRobertaQuestionAnswering_from_scratch.from_pretrained(pretrained_model_relying_on)
+    model = MultiSpanRobertaQuestionAnswering.from_pretrained(pretrained_model_relying_on)
+    #model = MultiSpanRobertaQuestionAnswering_from_scratch.from_pretrained(pretrained_model_relying_on)
 
     optimizer = AdamW(model.parameters(), lr=learning_rate)
 
@@ -214,7 +218,7 @@ if __name__ == '__main__':
         num_training_steps=num_training_steps,
     )
 
-    accelerator = Accelerator(cpu=False, mixed_precision='fp16', gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS)
+    accelerator = Accelerator(mixed_precision='fp16', gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS)
     model, optimizer, lr_scheduler, train_dataloader, eval_dataloader, test_dataloader = accelerator.prepare(
         model, optimizer, lr_scheduler, train_dataloader, eval_dataloader, test_dataloader
     )
@@ -310,19 +314,22 @@ if __name__ == '__main__':
                 print("BATCH STEP {} validation loss {:.7f}".format(global_steps_counter, current_step_loss_eval))
                 validation_loss_every_N_batch_steps.append(current_step_loss_eval.cpu())
 
-                # extracting answers from model output logits per passage and aggregating them per document level
-                question_on_document_predicted_answers_list = inference_EQA_MS.extract_answers_per_passage_from_logits(max_ans_length_in_tokens=MAX_ANS_LENGTH_IN_TOKENS,
-                                                                                                                       batch_step=global_steps_counter,
-                                                                                                                       print_json_every_batch_steps=EVALUATE_EVERY_N_STEPS*4,
-                                                                                                                       fold_name="validation",
-                                                                                                                       tokenizer=tokenizer,
-                                                                                                                       datasetdict_MSEQA_format=dataset_MSEQA_format,
-                                                                                                                       model_outputs_for_metrics=model_outputs_for_metrics)
-                # computing metrics
-                micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
-                print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
-                # metrics_per_question_on_validation_every_N_batch_steps.append(metrics_per_question)
-                metrics_overall_on_validation_every_N_batch_steps.append(micro_metrics)
+                if METRICS_EVAL_AFTER_N <= 0:
+                    # extracting answers from model output logits per passage and aggregating them per document level
+                    question_on_document_predicted_answers_list = inference_EQA_MS.extract_answers_per_passage_from_logits(max_ans_length_in_tokens=MAX_ANS_LENGTH_IN_TOKENS,
+                                                                                                                           batch_step=global_steps_counter,
+                                                                                                                           print_json_every_batch_steps=EVALUATE_EVERY_N_STEPS*4,
+                                                                                                                           fold_name="validation",
+                                                                                                                           tokenizer=tokenizer,
+                                                                                                                           datasetdict_MSEQA_format=dataset_MSEQA_format,
+                                                                                                                           model_outputs_for_metrics=model_outputs_for_metrics)
+                    # computing metrics
+                    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+                    print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
+                    # metrics_per_question_on_validation_every_N_batch_steps.append(metrics_per_question)
+                    metrics_overall_on_validation_every_N_batch_steps.append(micro_metrics)
+
+                METRICS_EVAL_AFTER_N -= 1
 
                 sys.stdout.flush()
 
@@ -336,6 +343,8 @@ if __name__ == '__main__':
                     print("Retrieving best model weights from step count: {}".format(global_steps_counter - EARLY_STOPPING_PATIENCE * EVALUATE_EVERY_N_STEPS))
                     model.save_pretrained(os.path.join("./finetunedModels", name_finetuned_model), from_pt=True)
 
+                model.save_pretrained(os.path.join("./finetunedModels", name_finetuned_model + "_CP"), from_pt=True)
+
             global_steps_counter += 1
 
         if early_stopping_occurred:
@@ -346,8 +355,6 @@ if __name__ == '__main__':
 
         print('\nEPOCH {} training loss: {:.7f}'.format(epoch, epoch_loss_train))
         sys.stdout.flush()
-
-        model.save_pretrained(os.path.join("./finetunedModels", name_finetuned_model + "_CP"), from_pt=True)
 
     # saving as pickle training logs
     losses_trends = {'name_finetuned_model': name_finetuned_model,

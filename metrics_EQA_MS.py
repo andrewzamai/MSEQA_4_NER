@@ -111,6 +111,8 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
     tn = 0
 
     false_positives = []
+    true_positives = []
+    false_negatives = []
 
     for sample in pred_answers_for_a_quest_on_doc_list:
 
@@ -132,6 +134,14 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
                 tn += 1
             elif pred_answers_for_doc['text'] == '' and gold_answers_with_char_intervals[0]['text'] != '':
                 fn += len(gold_answers_with_char_intervals)  # FNs: number of missed GAs by predicting ''
+                # adding to false negatives list
+                for fn_occ in gold_answers_with_char_intervals:
+                    sentence_fn = sample['document_context'][max(0, fn_occ['start_end_indices'][0] - 50): min(len(sample['document_context']), fn_occ['start_end_indices'][1] + 50)]
+                    false_negatives.append({'doc_question_pairID': sample['doc_question_pairID'],
+                                            'tagName': sample['tagName'],
+                                            'missed_entity': fn_occ['text'],
+                                            'start_end_indices': fn_occ['start_end_indices'],
+                                            'sentence': sentence_fn})
         else:
             # one (!= '') or more predicted answers
             for pred in pred_answers_for_doc:
@@ -146,6 +156,12 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
                     # but a '' answer may still appear as answer in a list of non empty answers (with low score)
                     if pred['text'] != '':
                         tp += 1
+                        sentence_tp = sample['document_context'][max(0, pred['start_end_indices'][0] - 50): min(len(sample['document_context']), pred['start_end_indices'][1] + 50)]
+                        true_positives.append({'doc_question_pairID': sample['doc_question_pairID'],
+                                               'tagName': sample['tagName'],
+                                               'pred_text': pred['text'],
+                                               'start_end_indices': pred['start_end_indices'],
+                                               'sentence': sentence_tp})
                     else:
                         tn += 1  # TN if a '' prediction hits '' GA
                 else:
@@ -154,10 +170,12 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
                     # TODO: extracting FPs
                     # we don't care about FPs that are so only because of not perfect start/end match, but real FPs
                     if not any([compute_overlap_char_indices(pred['start_end_indices'], ga['start_end_indices']) > 0 for ga in gold_answers_with_char_intervals]):
+                        sentence_fp = sample['document_context'][max(0, pred['start_end_indices'][0] - 50): min(len(sample['document_context']), pred['start_end_indices'][1] + 50)]
                         false_positives.append({'doc_question_pairID': sample['doc_question_pairID'],
                                                 'tagName': sample['tagName'],
-                                                'text': pred['text'],
-                                                'start_end_indices': pred['start_end_indices']
+                                                'pred_text': pred['text'],
+                                                'start_end_indices': pred['start_end_indices'],
+                                                'sentence': sentence_fp
                                                 })
 
             # FNs is the number of missed GAs not hit by any prediction
@@ -165,6 +183,16 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
             # when pred is some FP but GA was '' then len(missed_ga) = 1, we don't have to count it as fn
             if gold_answers_with_char_intervals[0]['text'] != '':
                 fn += len(missed_ga)
+
+            # adding to false negatives list
+            for i, ga in enumerate(gold_answers_with_char_intervals):
+                if i not in hit_gold_answers_indices and ga['text'] != '':
+                    sentence_fn = sample['document_context'][max(0, ga['start_end_indices'][0] - 50): min(len(sample['document_context']), ga['start_end_indices'][1] + 50)]
+                    false_negatives.append({'doc_question_pairID': sample['doc_question_pairID'],
+                                            'tagName': sample['tagName'],
+                                            'missed_entity': ga['text'],
+                                            'start_end_indices': ga['start_end_indices'],
+                                            'sentence': sentence_fn})
 
     print("TP: {}, FN: {}, FP: {}, TN: {}".format(tp, fn, fp, tn))
 
@@ -178,6 +206,10 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
     # TODO: saving FPs
     with open('./predictions/false_positives.json', 'w', encoding='utf-8') as f:
         json.dump(false_positives, f, ensure_ascii=False, indent=4)
+    with open('./predictions/true_positives.json', 'w', encoding='utf-8') as f:
+        json.dump(true_positives, f, ensure_ascii=False, indent=4)
+    with open('./predictions/false_negatives.json', 'w', encoding='utf-8') as f:
+        json.dump(false_negatives, f, ensure_ascii=False, indent=4)
 
     return metrics
 
