@@ -109,22 +109,23 @@ if __name__ == '__main__':
 
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
-    path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix_w_negatives_2'
-    tokenizer_to_use = "roberta-base"
+    path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
+    #path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix_w_negatives_2'
+    tokenizer_to_use = "roberta-large"
     # pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
-    #pretrained_model_relying_on = "roberta-base"
-    pretrained_model_relying_on = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt"
+    pretrained_model_relying_on = "roberta-large"
+    #pretrained_model_relying_on = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt"
 
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
-    name_finetuned_model = "MSEQA_pileNER_prefix_w_neg_pt_2b"
+    name_finetuned_model = "MSEQA_pileNER_prefix_large_1_8"
 
-    MAX_SEQ_LENGTH = 512  # question + context + special tokens
+    MAX_SEQ_LENGTH = 380  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
     MAX_QUERY_LENGTH = 150  # not used, average prefix length in tokens (task instruction, definition, guidelines)
 
-    BATCH_SIZE = 16  # 16
-    EVAL_BATCH_SIZE = 64  # 32
+    BATCH_SIZE = 1  # 16
+    EVAL_BATCH_SIZE = 16  # 32
 
     learning_rate = 3e-5
     num_train_epochs = 5
@@ -133,13 +134,13 @@ if __name__ == '__main__':
     EARLY_STOPPING_PATIENCE = 5
     EVALUATE_EVERY_N_STEPS = 1000
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
-    GRADIENT_ACCUMULATION_STEPS = 5  #2
+    GRADIENT_ACCUMULATION_STEPS = 8  #2
 
     MAX_ANS_LENGTH_IN_TOKENS = 10
 
     EVALUATE_ZERO_SHOT = False
 
-    METRICS_EVAL_AFTER_N = 5
+    METRICS_EVAL_AFTER_N = 10
 
     """ -------------------- Loading Datasets in MS-EQA format -------------------- """
 
@@ -149,9 +150,10 @@ if __name__ == '__main__':
     print("Loading train/validation/test Datasets in MS-EQA format...")
     if not os.path.exists(path_to_dataset_MSEQA_format):
         print(" ...building Datasets from huggingface repository in MS-EQA format")
+        sys.stdout.flush()
         #dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(path_to_dataset_NER_format, path_to_questions)
         dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format_with_guidelines(path_to_pileNER_definitions_json)
-        dataset_MSEQA_format = data_handler_MSEQA_dataset.add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format, path_to_pileNER_definitions_json)
+        # dataset_MSEQA_format = data_handler_MSEQA_dataset.add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format, path_to_pileNER_definitions_json)
         # removing outliers
         # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
         dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)
@@ -203,8 +205,8 @@ if __name__ == '__main__':
     )
 
     # loading MS-EQA model with weights pretrained on SQuAD2
-    model = MultiSpanRobertaQuestionAnswering.from_pretrained(pretrained_model_relying_on)
-    #model = MultiSpanRobertaQuestionAnswering_from_scratch.from_pretrained(pretrained_model_relying_on)
+    #model = MultiSpanRobertaQuestionAnswering.from_pretrained(pretrained_model_relying_on)
+    model = MultiSpanRobertaQuestionAnswering_from_scratch.from_pretrained(pretrained_model_relying_on)
 
     optimizer = AdamW(model.parameters(), lr=learning_rate)
 
