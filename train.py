@@ -15,6 +15,7 @@ The answer_start are the starting positions in characters from the beginning of 
 
 """
 
+from torch.nn.utils.rnn import pad_sequence
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
@@ -23,6 +24,7 @@ from accelerate import Accelerator
 from torch.optim import AdamW
 from functools import partial
 import transformers
+import torch
 import sys
 import os
 
@@ -31,6 +33,7 @@ from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAns
 from models.MultiSpanRobertaQuestionAnswering_from_scratch import MultiSpanRobertaQuestionAnswering_from_scratch
 from utils.EarlyStopping import EarlyStopping
 from collator_MSEQA import collate_fn_MSEQA
+from preprocess_MSEQA import tokenize_and_preprocess
 import inference_EQA_MS
 import metrics_EQA_MS
 
@@ -118,13 +121,13 @@ if __name__ == '__main__':
 
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
-    name_finetuned_model = "MSEQA_pileNER_prefix_large_1_8"
+    name_finetuned_model = "MSEQA_pileNER_prefix_large_4_8_p5"
 
     MAX_SEQ_LENGTH = 380  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
     MAX_QUERY_LENGTH = 150  # not used, average prefix length in tokens (task instruction, definition, guidelines)
 
-    BATCH_SIZE = 1  # 16
+    BATCH_SIZE = 4  # 16
     EVAL_BATCH_SIZE = 16  # 32
 
     learning_rate = 3e-5
@@ -132,7 +135,7 @@ if __name__ == '__main__':
     warmup_ratio = 0.2
 
     EARLY_STOPPING_PATIENCE = 5
-    EVALUATE_EVERY_N_STEPS = 1000
+    EVALUATE_EVERY_N_STEPS = 2000
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
     GRADIENT_ACCUMULATION_STEPS = 8  #2
 
@@ -179,29 +182,71 @@ if __name__ == '__main__':
 
     print("\nPREPARING MODEL and DATA FOR TRAINING ...")
 
+    print("Tokenizing and preprocessing MSEQA dataset for trainining...")
+
+    if not os.path.exists(path_to_dataset_MSEQA_format + '_tokenized'):
+        print(" ...tokenizing dataset for training")
+        sys.stdout.flush()
+        dataset_MSEQA_format_tokenized = dataset_MSEQA_format.map(
+            lambda examples_batch: tokenize_and_preprocess(examples_batch, tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE),
+            batched=True,
+            remove_columns=dataset_MSEQA_format["train"].column_names
+        )
+
+        dataset_MSEQA_format_tokenized.save_to_disk(path_to_dataset_MSEQA_format + '_tokenized')
+    else:
+        print(" ...using already existing tokenized dataset")
+        dataset_MSEQA_format_tokenized = DatasetDict.load_from_disk(path_to_dataset_MSEQA_format + '_tokenized')
+
+    print(dataset_MSEQA_format_tokenized)
+
+    # Datacollator with padding over already tokenized dataset
+    def collate_fn(batch):
+        collated_batch = {key: [] for key in batch[0].keys()}
+        for item in batch:
+            for key, value in item.items():
+                collated_batch[key].append(value)
+
+        # padding and returning
+        max_len = max(len(seq) for seq in collated_batch['offset_mapping'])
+        padded_offset_mapping = [seq + [(-1, -1)] * (max_len - len(seq)) for seq in collated_batch['offset_mapping']]
+
+        return {
+            'input_ids': pad_sequence([torch.tensor(t) for t in collated_batch['input_ids']], batch_first=True, padding_value=tokenizer.pad_token_id),
+            'attention_mask': pad_sequence([torch.tensor(t) for t in collated_batch['attention_mask']], batch_first=True, padding_value=0),
+            'start_positions': pad_sequence([torch.tensor(t) for t in collated_batch['start_positions']], batch_first=True, padding_value=0),
+            'end_positions': pad_sequence([torch.tensor(t) for t in collated_batch['end_positions']], batch_first=True, padding_value=0),
+            'sequence_ids': pad_sequence([torch.tensor(t) for t in collated_batch['sequence_ids']], batch_first=True, padding_value=0),
+            'passage_id': collated_batch['passage_id'],
+            'offset_mapping': torch.tensor(padded_offset_mapping)
+        }
+
     print("BATCH_SIZE for training: {}".format(BATCH_SIZE))
     print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
     print("Gradient accumulation steps: {}".format(GRADIENT_ACCUMULATION_STEPS))
 
     train_dataloader = DataLoader(
-        dataset_MSEQA_format['train'],
+        dataset_MSEQA_format_tokenized['train'],
         shuffle=True,
         batch_size=BATCH_SIZE,
-        collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+        collate_fn=collate_fn
+        #collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
     )
 
     eval_dataloader = DataLoader(
-        dataset_MSEQA_format['validation'],
+        dataset_MSEQA_format_tokenized['validation'],
         shuffle=False,
         batch_size=EVAL_BATCH_SIZE,
-        collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+        collate_fn=collate_fn
+        # collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
     )
 
     test_dataloader = DataLoader(
-        dataset_MSEQA_format['test'],
+        dataset_MSEQA_format_tokenized['test'],
         shuffle=False,
         batch_size=EVAL_BATCH_SIZE,
-        collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+        collate_fn=collate_fn
+        # collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
     )
 
     # loading MS-EQA model with weights pretrained on SQuAD2

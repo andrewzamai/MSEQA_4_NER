@@ -1,13 +1,6 @@
 import torch
-from torch.nn.utils.rnn import pad_sequence
-def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
-    # batch is a List(of len=BATCH_SIZE) of dictionaries (with keys() the features in the Dataset)
-    # let's convert it to a dictionary of lists since tokenize requires lists of strings in input
-    collated_batch = {key: [] for key in batch[0].keys()}
-    for item in batch:
-        for key, value in item.items():
-            collated_batch[key].append(value)
 
+def tokenize_and_preprocess(examples_MSEQA_format, tokenizer, max_seq_length, doc_stride):
     # concatenate the question;document_context and tokenize (adding also tokenizer special tokens)
     # overflows will be automatically treated by using a sliding window approach with stride=doc_stride
     # questions are concatenated to the left of the document_context, so truncation="only_second" used
@@ -15,8 +8,8 @@ def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
     # setting padding=longest, padding to the longest sequence in the batch
     # if concatenated input does not fit in max_seq_length stride approach applied
     tokenized_examples = tokenizer(
-        collated_batch["question"],
-        collated_batch["document_context"],
+        examples_MSEQA_format["question"],
+        examples_MSEQA_format["document_context"],
         truncation='only_second',  # longest_first
         max_length=max_seq_length,
         stride=doc_stride,
@@ -51,7 +44,7 @@ def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
     for i, offsets in enumerate(offset_mapping):
         # giving to passageID the ID of the doc-question pair that generated it
         sample_index = sample_mapping[i]
-        tokenized_examples["passage_id"].append(collated_batch["doc_question_pairID"][sample_index])
+        tokenized_examples["passage_id"].append(examples_MSEQA_format["doc_question_pairID"][sample_index])
 
         # Labeling impossible answers with the index of the CLS token
         input_ids = tokenized_examples["input_ids"][i]
@@ -60,7 +53,8 @@ def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
         # creating mask with 1 marking valid CLS and passage tokens
         # cannot infer None typer when doing torch.tensor(), so we do it before with list comprehension
         sequence_ids = [x if x == 1 else 0 for x in tokenized_examples.sequence_ids(i)]  # i is batch index
-        sequence_ids[0] = 1  # CLS token will be used for not_answerable questions then its token must be treated as passage token
+        sequence_ids[
+            0] = 1  # CLS token will be used for not_answerable questions then its token must be treated as passage token
         tokenized_examples["sequence_ids"][i] = torch.tensor(sequence_ids)
 
         tokenized_examples["offset_mapping"][i] = [
@@ -69,7 +63,7 @@ def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
         ]
 
         # sample_index = sample_mapping[i]
-        answers = collated_batch["answers"][sample_index]
+        answers = examples_MSEQA_format["answers"][sample_index]
         # If no answers at document level are given, set the cls_index as answer.
         if len(answers["answer_start"]) == 0:
             tokenized_examples["start_positions"][i][cls_index] = 1
@@ -117,19 +111,14 @@ def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
                 tokenized_examples["start_positions"][i][cls_index] = 0
                 tokenized_examples["end_positions"][i][cls_index] = 0
 
-    # padding and returning
-    max_len = max(len(seq) for seq in tokenized_examples['offset_mapping'])
-    padded_offset_mapping = [seq + [(-1, -1)] * (max_len - len(seq)) for seq in tokenized_examples['offset_mapping']]
+    # not padding here
 
     return {
-        'input_ids': pad_sequence([torch.tensor(t) for t in tokenized_examples['input_ids']], batch_first=True, padding_value=tokenizer.pad_token_id),
-        'attention_mask': pad_sequence([torch.tensor(t) for t in tokenized_examples['attention_mask']], batch_first=True, padding_value=0),
-        'start_positions': pad_sequence(tokenized_examples['start_positions'], batch_first=True, padding_value=0),
-        'end_positions': pad_sequence(tokenized_examples['end_positions'], batch_first=True, padding_value=0),
-        'sequence_ids': pad_sequence(tokenized_examples['sequence_ids'], batch_first=True, padding_value=0),
+        'input_ids': tokenized_examples['input_ids'],
+        'attention_mask': tokenized_examples['attention_mask'],
+        'start_positions': tokenized_examples['start_positions'],
+        'end_positions': tokenized_examples['end_positions'],
+        'sequence_ids': tokenized_examples['sequence_ids'],
         'passage_id': tokenized_examples['passage_id'],
-        'offset_mapping': torch.tensor(padded_offset_mapping)
+        'offset_mapping': tokenized_examples['offset_mapping']
     }
-
-
-
