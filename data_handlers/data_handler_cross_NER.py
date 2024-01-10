@@ -380,7 +380,7 @@ if __name__ == '__main__':
     # sentences = read_bio_file(os.path.join(path_to_cross_NER_datasets, 'music', 'dev.txt'))
     # print(sentences)
 
-    dataset_name = "ai"
+    dataset_name = "science"
     print(f"\nHandling data from dataset: {dataset_name}")
     dataset_BIO_format = build_dataset_from_txt(os.path.join(path_to_cross_NER_datasets, dataset_name))
     print("Dataset features: ")

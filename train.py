@@ -112,7 +112,8 @@ if __name__ == '__main__':
 
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
-    path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
+    #path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
+    path_to_dataset_MSEQA_format = './datasets/pileNER/min_occur_100_MSEQA'
     #path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix_w_negatives_2'
     tokenizer_to_use = "roberta-large"
     # pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
@@ -121,7 +122,8 @@ if __name__ == '__main__':
 
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
-    name_finetuned_model = "MSEQA_pileNER_prefix_large_4_8_p5"
+    #name_finetuned_model = "MSEQA_pileNER_prefix_large_4_32_10000"
+    name_finetuned_model = "MSEQA_pileNER_nodef_large_4_32_2000"
 
     MAX_SEQ_LENGTH = 380  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
@@ -135,9 +137,9 @@ if __name__ == '__main__':
     warmup_ratio = 0.2
 
     EARLY_STOPPING_PATIENCE = 5
-    EVALUATE_EVERY_N_STEPS = 2000
+    EVALUATE_EVERY_N_STEPS = 2000 # 2000
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
-    GRADIENT_ACCUMULATION_STEPS = 8  #2
+    GRADIENT_ACCUMULATION_STEPS = 32  #8
 
     MAX_ANS_LENGTH_IN_TOKENS = 10
 
@@ -154,7 +156,7 @@ if __name__ == '__main__':
     if not os.path.exists(path_to_dataset_MSEQA_format):
         print(" ...building Datasets from huggingface repository in MS-EQA format")
         sys.stdout.flush()
-        #dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(path_to_dataset_NER_format, path_to_questions)
+        # dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format(path_to_dataset_NER_format, path_to_questions)
         dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format_with_guidelines(path_to_pileNER_definitions_json)
         # dataset_MSEQA_format = data_handler_MSEQA_dataset.add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format, path_to_pileNER_definitions_json)
         # removing outliers
