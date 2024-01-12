@@ -29,7 +29,7 @@
     ],
     "prompt_length": 578,
     "output_length": 83,
-    "gpt_answer": "{\"Definition\": \"'academic journal' refers to scholarly publications or periodicals that serve as mediums for sharing research and academic discourse.\", \"Guidelines\": \"Exercise caution with ambiguous titles that could also refer to non-academic entities, such as 'Nature' (a journal and a concept). Consider the context to discern if the term is being used to denote an academic journal or a general concept.\" \n}",
+    "gpt_answer": "{\n  \"Definition\": \"'academic journal' refers to scholarly publications or periodicals that serve as mediums for sharing research and academic discourse.\",\n  \"Guidelines\": \"Exercise caution with ambiguous titles that could also refer to non-academic entities, such as 'Nature' (a journal and a concept). Consider the context to discern if the term is being used to denote an academic journal or a general concept.\" \n}",
     "finish_reason": "stop"
   },
   {
@@ -92,7 +92,7 @@
     ],
     "prompt_length": 567,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'award' refers to recognitions, honors, or prizes given to individuals or entities in recognition of their achievements or contributions in various fields such as arts, sciences, and humanities.\", \"Guidelines\": \"Do not label generic terms like 'prize' or 'recognition'. Consider labeling also recognitions such as 'fellow of society' as 'award'. Avoid labeling entities that are not specifically a type of award, such as 'Ceremony'.",
+    "gpt_answer": "{\"Definition\": \"'award' refers to recognitions, honors, or prizes given to individuals or entities in recognition of their achievements or contributions in various fields such as arts, sciences, and humanities.\", \"Guidelines\": \"Do not label generic terms like 'prize' or 'recognition'. Exercise caution with ambiguous terms like 'Nobel' (which could refer to the Nobel Prize or another entity). Avoid labeling entities that are not specifically a type of award, such as 'Ceremony'",
     "finish_reason": "length"
   },
   {
@@ -214,7 +214,7 @@
     ],
     "prompt_length": 555,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'discipline' refers to a field of study or area of expertise within academia or research, often associated with a specific branch of science, technology, or humanities.\", \"Guidelines\": \"Exercise caution when labeling generic terms like 'science' or 'technology' that can encompass a wide range of disciplines. Take into account the specific subarea or expertise being referred to.",
+    "gpt_answer": "{\"Definition\": \"'discipline' refers to a field of study or area of expertise within academia or research, often associated with a specific branch of science, technology, or humanities.\", \"Guidelines\": \"Exercise caution when labeling generic terms like 'science' or 'technology' that can encompass a wide range of disciplines. Take into account the specific subarea or expertise being referred to, and be mindful of potential overlaps between disciplines, such as 'bioinformatics' (biology and computer science). '",
     "finish_reason": "length"
   },
   {
@@ -243,7 +243,7 @@
     ],
     "prompt_length": 600,
     "output_length": 86,
-    "gpt_answer": "{\"Definition\": \"'enzyme' refers to a specific type of protein that acts as a biological catalyst to facilitate biochemical reactions.\", \"Guidelines\": \"If a protein entity is known to function as a catalyst for biochemical reactions, it should be labeled as an 'enzyme' entity. Be cautious with proteins that have dual functions, as not all proteins are 'enzymes'.\"}",
+    "gpt_answer": "{\"Definition\": \"'enzyme' refers to a specific type of protein that acts as a biological catalyst to facilitate biochemical reactions.\", \"Guidelines\": \"If a protein entity is known to function as a catalyst for biochemical reactions, it should be labeled as an 'enzyme' entity. Be cautious with proteins that have dual functions, as not all proteins are enzymes, and ensure to distinguish between general proteins and those with enzymatic activity.\"}",
     "finish_reason": "stop"
   },
   {
@@ -272,7 +272,7 @@
     ],
     "prompt_length": 557,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"event' refers to occurrences or happenings, such as competitions, meetings, or incidents, that take place at a specific time and place.\", \"Guidelines\": \"Do not label general time references (e.g., 'yesterday,' 'tomorrow'). Be cautious when distinguishing between event and organization names.\"}",
+    "gpt_answer": "{\"Definition\": \"'event' refers to occurrences or happenings of significance, typically within a specific timeframe and context.\", \"Guidelines\": \"Do not label general time references (e.g., 'yesterday,' 'tomorrow'). Exercise caution with ambiguous terms like 'World Cup' (can refer to sports or technology events) or 'Olympics' (can refer to the sporting event or theatrical performances). Be vigilant when distinguishing between event and organization names, ensuring you prioritize the event interpretation.\"}",
     "finish_reason": "length"
   },
   {
@@ -428,7 +428,7 @@
     ],
     "prompt_length": 601,
     "output_length": 97,
-    "gpt_answer": "{\"Definition\": \"'protein' refers to biological macromolecules composed of amino acid chains that perform various functions in living organisms, such as structural components, and signaling molecules.\", \"Guidelines\": \"If a protein entity is an enzyme, avoid labeling it as 'protein'.\"}",
+    "gpt_answer": "{\"Definition\": \"'protein' refers to biological macromolecules composed of amino acid chains that perform various functions in living organisms, such as enzymes, structural components, and signaling molecules.\", \"Guidelines\": \"If a protein entity is an enzyme, label it as an enzyme entity. Exercise caution when labeling ambiguous terms like 'catalytic activity' (functionality associated with proteins) and 'discovery of new mechanism' (may infer the identification of a protein variant or type).\"}",
     "finish_reason": "stop"
   },
   {
@@ -492,7 +492,7 @@
     ],
     "prompt_length": 618,
     "output_length": 84,
-    "gpt_answer": "{\"Definition\": \"'theory' refers to a comprehensive and well-substantiated explanation of natural phenomena or a set of related observations\", \"Guidelines\": \"Consider labeling comprehensive and well-substantiated explanations or frameworks that integrate empirical evidence, supporting predictions and contributing significantly to the understanding of natural phenomena in a given scientific context.\"}",
+    "gpt_answer": "{\"Definition\": \"'theory' refers to a systematic and formalized expression of concepts within a specific domain, such as scientific, philosophical, or sociological frameworks for understanding particular phenomena.\", \"Guidelines\": \"Do not confuse 'theory' with related terms like 'hypothesis', 'law', 'methodology', or specific scientific principles. Exercise caution when labeling compound terms, which may encompass multiple concepts or entities.\"}",
     "finish_reason": "stop"
   },
   {

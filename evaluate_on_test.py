@@ -73,17 +73,17 @@ if __name__ == '__main__':
     print("ZERO-SHOT EVALUATIONS:\n")
 
     to_eval_on = [
-        {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
-        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
-        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_MIT, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        #{'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        #{'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        #{'datasets_cluster_name': 'MIT', 'data_handler': data_handler_MIT, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
         {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10}
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = True
     print(f"With definition: {WITH_DEFINITION}")
 
-    tokenizer_to_use = "roberta-base"
-    #tokenizer_to_use = "roberta-large"
+    #tokenizer_to_use = "roberta-base"
+    tokenizer_to_use = "roberta-large"
 
     if WITH_DEFINITION:
         if tokenizer_to_use == "roberta-base":
@@ -91,7 +91,10 @@ if __name__ == '__main__':
             # path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt_2_from_scratch"
         else:
             #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_large_4_8_p5"
-            path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_large_4_32"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_large_4_32"  # this good
+            # path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_32_50000_CP"  # this super good
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_nodef_large_4_32_w_neg"
+            path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_32_15000"
     else:
         if tokenizer_to_use == "roberta-base":
             path_to_model = "./finetunedModels/MSEQA_pileNER_min_occ_100"
@@ -128,7 +131,7 @@ if __name__ == '__main__':
 
             dataset_MSEQA_format = load_or_build_dataset_MSEQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION, load_from_disk=True)
 
-            EVAL_BATCH_SIZE = 64
+            EVAL_BATCH_SIZE = 128
             print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
             sys.stdout.flush()
 

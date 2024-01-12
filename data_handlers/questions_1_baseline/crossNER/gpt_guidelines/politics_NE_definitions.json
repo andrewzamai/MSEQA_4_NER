@@ -82,7 +82,7 @@
     ],
     "prompt_length": 524,
     "output_length": 97,
-    "gpt_answer": "{\"Definition\": \"'event' represents instances of occurrences or happenings, such as festivals, wars, summits, campaigns, and etc.\", \"Guidelines\": \"Avoid labeling 'election' events.\"}",
+    "gpt_answer": "{\"Definition\": \"'event' represents instances of occurrences or happenings, such as festivals, wars, summits, campaigns, and etc.\", \"Guidelines\": \"If an event entity is an 'election' event, do not label it as an 'event' entity.\"}",
     "finish_reason": "stop"
   },
   {
@@ -177,7 +177,7 @@
     ],
     "prompt_length": 558,
     "output_length": 85,
-    "gpt_answer": "{\"Definition\": \"'organization' refers to named entities that represent companies, institutions, associations, or any group of people with a particular purpose.\", \"Guidelines\": \"Avoid labeling 'political parties' as 'organization' entities. Exercise caution when identifying acronyms or ambiguous terms like 'WHO' (World Health Organization or the pronoun 'who').\"}",
+    "gpt_answer": "{\"Definition\": \"'organization' refers to groups, institutions, or associations with a distinct name, such as companies, non-profits, governmental bodies, and academic societies.\", \"Guidelines\": \"Avoid labeling 'political parties' as 'organization' entities. Exercise caution when identifying acronyms or ambiguous terms like 'WHO' (World Health Organization or the pronoun 'who').\"}",
     "finish_reason": "stop"
   },
   {
@@ -206,7 +206,7 @@
     ],
     "prompt_length": 559,
     "output_length": 65,
-    "gpt_answer": "{\"Definition\": \"'person' refers to individual human beings, but who are not politicians.\", \"Guidelines\": \"In this political context, avoid labelling as 'person' people who are 'politicians'.\"}",
+    "gpt_answer": "{\"Definition\": \"'person' signifies individual human beings, and their proper names.\", \"Guidelines\": \"In this political context, avoid labelling people who are 'politicians' as 'person'.\"}",
     "finish_reason": "stop"
   },
   {

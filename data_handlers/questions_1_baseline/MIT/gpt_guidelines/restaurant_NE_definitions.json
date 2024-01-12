@@ -24,7 +24,7 @@
     ],
     "prompt_length": 448,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'amenity' refers to services, facilities, or features that enhance the convenience, comfort, or enjoyment of a location.\", \"Guidelines\": \"When annotating 'amenity', focus on tangible or accessible services and facilities. Avoid labeling abstract concepts, such as 'ambiance' or 'vibe', that are not clearly associated with a specific amenity. Examples of 'amenity' are 'steampunk flavored', 'upscale place' and 'reservation'.\"}",
+    "gpt_answer": "{\"Definition\": \"'amenity' refers to services, facilities, or features that enhance the convenience, comfort, or enjoyment of a location.\", \"Guidelines\": \"When annotating 'amenity', focus on tangible or accessible services and facilities. Avoid labeling abstract concepts, such as 'ambiance' or 'vibe', that are not clearly associated with a specific amenity. Pay attention to nuanced references, such as 'steampunk flavored', that might describe a specific type of amenity rather than a general concept.\"}",
     "finish_reason": "length"
   },
   {
@@ -52,7 +52,7 @@
     ],
     "prompt_length": 431,
     "output_length": 73,
-    "gpt_answer": "{\"Definition\": \"'cuisine' refers to specific styles or types of food preparation, often associated with a particular cultural or regional identity.\", \"Guidelines\": \"Annotate the specific type of cuisine mentioned in the text. This could include terms like 'Italian', 'Chinese', 'Mediterranean', or any other culinary style. Consider also 'establishments' such as 'bar', 'steakhouse' and the like as 'cuisine'.\"}",
+    "gpt_answer": "{\"Definition\": \"'cuisine' refers to specific styles or types of food preparation, often associated with a particular cultural or regional identity.\", \"Guidelines\": \"Avoid vague references like 'food'. Exercise caution with ambiguous terms like 'burger' (can denote both a type of cuisine and a specific food item). Be mindful of cultural context when identifying cuisine references.\"}",
     "finish_reason": "stop"
   },
   {
@@ -108,7 +108,7 @@
     ],
     "prompt_length": 440,
     "output_length": 99,
-    "gpt_answer": "{\"Definition\": \"'hours' refers to specific time expressions, including clock times, periods of the day, days of the week, and recurring schedules.\", \"Guidelines\": \"Examples of 'hours' are '5 pm', 'late at night' and 'daily lunch'.\"}",
+    "gpt_answer": "{\"Definition\": \"'hours' refers to specific time expressions, including clock times, periods of the day, days of the week, and recurring schedules.\", \"Guidelines\": \"Do not label general references to time (e.g., 'now', 'then'). Differentiate between specific times and general time frames, e.g., '5 pm' vs. 'evening'. Be cautious with ambiguous terms like 'daily' (which can refer to any time frame, not strictly 'hours').\"}",
     "finish_reason": "stop"
   },
   {
@@ -137,7 +137,7 @@
     ],
     "prompt_length": 445,
     "output_length": 78,
-    "gpt_answer": "{\"Definition\": \"'location' denotes geographic entities, such as cities, countries, and landmarks, that represent specific places on Earth.\", \"Guidelines\": \"Also consider labelling as 'location' expressions such as 'around here', 'five miles from here', and similar.\"}",
+    "gpt_answer": "{\"Definition\": \"'location' denotes geographic entities, such as cities, countries, and landmarks, that represent specific places on Earth.\", \"Guidelines\": \"Do not label ambiguous terms like 'place' when it does not refer to a specific geographic entity. Exercise caution when labeling relative distances like 'around here' or 'five miles from here', as they may not represent specific locations.\"}",
     "finish_reason": "stop"
   },
   {
@@ -165,7 +165,7 @@
     ],
     "prompt_length": 419,
     "output_length": 86,
-    "gpt_answer": "{\"Definition\": \"'price' represents the cost or value of a product or service in a given context.\", \"Guidelines\": \"Also consider labeling terms like 'cheap', 'inexpensive' and similar, when referring to a product or service.\"}",
+    "gpt_answer": "{\"Definition\": \"'price' represents the cost or value of a product or service in a given context.\", \"Guidelines\": \"Avoid labeling generic terms like 'cheap' or 'inexpensive' without clear context of a specific product or service. Be cautious of homonyms that can denote other meanings rather than a monetary value, such as 'cheap' as in low quality, or 'can' as in a container.\"}",
     "finish_reason": "stop"
   },
   {
@@ -193,7 +193,7 @@
     ],
     "prompt_length": 438,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'rating' refers to a qualitative assessment or score given to a product, service, or establishment to indicate its quality, performance, or standard.\", \"Guidelines\": \"Also consider labeling terms like 'best', 'nice' and similar, while focusing on specific rating systems (e.g., Michelin star) or actual numerical ratings.\"}",
+    "gpt_answer": "{\"Definition\": \"'rating' refers to a qualitative assessment or score given to a product, service, or establishment to indicate its quality, performance, or standard.\", \"Guidelines\": \"Avoid labeling comparative terms like 'best' or 'nice', and focus on specific rating systems (e.g., Michelin star) or actual numerical ratings when identifying 'rating' entities. Exercise caution when interpreting ambiguous terms and consider the context to accurately distinguish 'rating' entities from similar terms such as 'good'.\"}",
     "finish_reason": "length"
   },
   {
@@ -221,7 +221,7 @@
     ],
     "prompt_length": 434,
     "output_length": 78,
-    "gpt_answer": "{\"Definition\": \"'restaurant name' refers to the specific name of a dining establishment or eatery.\", \"Guidelines\": \"Do not label generic references to food or dining, such as 'pizza place' or 'fine dining'.\"}",
+    "gpt_answer": "{\"Definition\": \"'restaurant name' refers to the specific name of a dining establishment or eatery.\", \"Guidelines\": \"Do not label generic references to food or dining, such as 'pizza place' or 'fine dining'. Exercise caution with ambiguous names that may also refer to other entities, like 'The River Cafe' (could be a restaurant or a venue by a river).\"}",
     "finish_reason": "stop"
   }
 ]

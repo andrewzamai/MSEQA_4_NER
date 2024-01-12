@@ -80,7 +80,7 @@
     ],
     "prompt_length": 434,
     "output_length": 82,
-    "gpt_answer": "{\"Definition\": \"'director' refers to individuals responsible for the artistic aspects and excecution of a film.\", \"Guidelines\": \"Do not label job titles or other entities associated with directing but not specifically a film director such as 'corporate director'.\"}",
+    "gpt_answer": "{\"Definition\": \"'director' refers to individuals responsible for the artistic and dramatic aspects of a film or other production and is typically associated with the film industry.\", \"Guidelines\": \"Do not label job titles or other entities associated with directing but not specifically a film director such as 'corporate director'.\"}",
     "finish_reason": "stop"
   },
   {
@@ -108,7 +108,7 @@
     ],
     "prompt_length": 422,
     "output_length": 95,
-    "gpt_answer": "{\"Definition\": \"'genre' refers to a category or classification characterized by specific stylistic, thematic, or content elements.\", \"Guidelines\": \"Avoid labeling general terms like 'film', 'book', or 'music' as 'genre'. Focus on labeling genres such as 'science ficiton', 'romance', 'horror' and similar. Exercise caution with ambiguous terms that can belong to multiple genres, such as 'drama' (which can refer to a genre or a situation within a story).\"}",
+    "gpt_answer": "{\"Definition\": \"'genre' refers to a category or style of artistic works, typically in the context of literature, film, or music, characterized by certain themes, motifs, or conventions.\", \"Guidelines\": \"Avoid labeling general terms like 'film', 'book', or 'music' as 'genre'. Exercise caution with ambiguous terms that can belong to multiple genres, such as 'drama' (which can refer to a genre or a situation within a story).\"}",
     "finish_reason": "stop"
   },
   {
@@ -136,7 +136,7 @@
     ],
     "prompt_length": 459,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'plot' refers to words in the text that summarize the content or narrative of a movie.\", \"Guidelines\": \"Ensure the identified entities are key plot elements.\"}",
+    "gpt_answer": "{\"Definition\": \"'plot' refers to the storyline or narrative of a movie, book, or other creative work, encompassing the sequence of events and the interactions of characters.\", \"Guidelines\": \"Ensure the identified entities are components of the narrative storyline, such as character names or key plot elements, and not abstract concepts that are not directly relevant to the narrative.\"}",
     "finish_reason": "length"
   },
   {
@@ -192,7 +192,7 @@
     ],
     "prompt_length": 453,
     "output_length": 93,
-    "gpt_answer": "{\"Definition\": \"'ratings average' refers to the average score or evaluation given to a movie, TV show, or other media content based on audience or critic reviews.\", \"Guidelines\": \"Avoid labeling generic terms like 'good' or 'bad' as 'ratings average'. Recognize that 'received well' or 'high rating' can indicate positive average ratings.\"}",
+    "gpt_answer": "{\"Definition\": \"'ratings average' refers to the average score or evaluation given to a movie, TV show, or other media content based on audience or critic reviews.\", \"Guidelines\": \"Avoid labeling generic terms like 'good' or 'bad' as 'ratings average'. Recognize that 'received well' or 'high rating' can indicate positive reviews but not necessarily a numerical average. Be cautious of confusing mentions of ratings with subjective opinions or qualitative assessments.\"}",
     "finish_reason": "stop"
   },
   {
@@ -220,7 +220,7 @@
     ],
     "prompt_length": 439,
     "output_length": 87,
-    "gpt_answer": "{\"Definition\": \"'review' refers to personal or collective assessments, evaluations, or opinions about a specific movie, book, product, or service.\", \"Guidelines\": \"When labeling 'review', consider expressions of subjective judgment, critique, or appraisal related to a specific movie, book, product, or service. Consider labeling general descriptive words like 'classic' or 'must see' when used as 'review'.\"}",
+    "gpt_answer": "{\"Definition\": \"'review' refers to personal or collective assessments, evaluations, or opinions about a specific movie, book, product, or service.\", \"Guidelines\": \"When labeling 'review', consider expressions of subjective judgment, critique, or appraisal related to a specific movie, book, product, or service. Avoid labeling general descriptive words like 'classic' or 'must see' unless they are directly used in a reviewing context.\"}",
     "finish_reason": "stop"
   },
   {
@@ -248,7 +248,7 @@
     ],
     "prompt_length": 434,
     "output_length": 86,
-    "gpt_answer": "{\"Definition\": \"'song' refers to a musical composition with lyrics and melody that can be performed or recorded.\", \"Guidelines\": \"Do not label general music-related terms like 'album' or 'lyrics'. Exercise caution with ambiguous cases like 'Billie Jean' (which can refer to a person or a song) or 'Guns N' Roses' (which can refer to a band or a song).\"}",
+    "gpt_answer": "{\"Definition\": \"'song' refers to titles or specific references to musical compositions, typically with lyrics and melody, from various genres.\", \"Guidelines\": \"Avoid labeling generic terms commonly used in everyday language, like 'love song' or 'popular song'. Exercise caution when identifying ambiguous references, such as 'Alicia Keys' (artist with song titles) or 'Apple' (both a brand and a musical group).\"}",
     "finish_reason": "stop"
   },
   {
@@ -304,7 +304,7 @@
     ],
     "prompt_length": 430,
     "output_length": 83,
-    "gpt_answer": "{\"Definition\": \"'trailer' refers to a short promotional video that provides a preview or teaser of a forthcoming movie.\",\n  \"Guidelines\": \"Label general entertainment terms like 'preview' or 'teaser'.\"}",
+    "gpt_answer": "{\"Definition\": \"'trailer' refers to a short promotional video that provides a preview or teaser of a forthcoming movie or video game.\",\n  \"Guidelines\": \"Label general entertainment terms like 'preview' or 'teaser'. Be mindful of potential synonym usage, such as 'teaser' and 'preview', as they may refer to a 'trailer' but not exclusively.\"}",
     "finish_reason": "stop"
   },
   {
@@ -332,7 +332,7 @@
     ],
     "prompt_length": 442,
     "output_length": 65,
-    "gpt_answer": "{\"Definition\": \"'year' refers to specific numerical values or expressions representing a particular calendar year, decade, or time period.\", \"Guidelines\": \"Avoid labeling ambiguous terms that refer to time periods, such as 'roaring twenties' (not a specific year) or 'back in the day' (vague time reference).\"}",
+    "gpt_answer": "{\"Definition\": \"'year' refers to specific numerical values representing a particular calendar year, decade, or time period.\", \"Guidelines\": \"Avoid labeling ambiguous terms that refer to time periods, such as 'roaring twenties' (not a specific year) or 'back in the day' (vague time reference).\"}",
     "finish_reason": "stop"
   }
 ]

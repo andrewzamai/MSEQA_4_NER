@@ -112,8 +112,8 @@ if __name__ == '__main__':
 
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
-    #path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
-    path_to_dataset_MSEQA_format = './datasets/pileNER/min_occur_100_MSEQA'
+    path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'
+    #path_to_dataset_MSEQA_format = './datasets/pileNER/min_occur_100_MSEQA'
     #path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix_w_negatives_2'
     tokenizer_to_use = "roberta-large"
     # pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
@@ -123,29 +123,31 @@ if __name__ == '__main__':
     path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
 
     #name_finetuned_model = "MSEQA_pileNER_prefix_large_4_32_10000"
-    name_finetuned_model = "MSEQA_pileNER_nodef_large_4_32_2000"
+    name_finetuned_model = "MSEQA_pileNER_yesDef_large_8_32_5000"
 
     MAX_SEQ_LENGTH = 380  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
     MAX_QUERY_LENGTH = 150  # not used, average prefix length in tokens (task instruction, definition, guidelines)
 
-    BATCH_SIZE = 4  # 16
-    EVAL_BATCH_SIZE = 16  # 32
+    BATCH_SIZE = 8  # 16
+    EVAL_BATCH_SIZE = 32  # 32
 
     learning_rate = 3e-5
     num_train_epochs = 5
     warmup_ratio = 0.2
 
     EARLY_STOPPING_PATIENCE = 5
-    EVALUATE_EVERY_N_STEPS = 2000 # 2000
+    EVALUATE_EVERY_N_STEPS = 5000  # 2000
+    print(f"EVALUATE_EVERY_N_STEPS: {EVALUATE_EVERY_N_STEPS}")
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
     GRADIENT_ACCUMULATION_STEPS = 32  #8
+    print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
 
     MAX_ANS_LENGTH_IN_TOKENS = 10
 
     EVALUATE_ZERO_SHOT = False
 
-    METRICS_EVAL_AFTER_N = 10
+    METRICS_EVAL_AFTER_N = 0  #10
 
     """ -------------------- Loading Datasets in MS-EQA format -------------------- """
 
