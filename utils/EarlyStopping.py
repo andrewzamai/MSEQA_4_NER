@@ -47,6 +47,6 @@ class EarlyStopping:
         # (set the flag to False)
         if self.n_iter_no_improvements >= self.patience:
             self.stop_training = True
-            print(f"Early Stopping: monitored quantity did not improved in the last {self.patience} epochs.")
+            print(f"\nEarly Stopping: monitored quantity did not improved in the last {self.patience} evaluations.")
 
         return self.stop_training

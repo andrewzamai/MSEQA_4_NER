@@ -1,0 +1,34 @@
+# fine-tuning on BUSTER default permutation 123-4-5
+
+from data_handlers import data_handler_BUSTER as data_handler_MSEQA_dataset
+
+path_to_dataset_MSEQA_format = './datasets/BUSTER_def_perm'  # if already existing, otherwise will be saved when first created
+path_to_dataset_NER_format = './datasets/BUSTER/FULL_KFOLDS/123_4_5'
+path_to_questions = './MSEQA_4_NER/data_handlers/questions/BUSTER_describes.txt'
+
+tokenizer_to_use = "roberta-base"
+pretrained_model_relying_on = "./pretrainedModels/MS_EQA_on_SQUAD2_model_hasansf1_83"
+
+name_finetuned_model = "MSEQA_on_BUSTER_def_perm"
+
+MAX_SEQ_LENGTH = 384  # question + context + special tokens
+DOC_STRIDE = 128  # overlap between 2 consecutive passages from same document
+MAX_QUERY_LENGTH = 48  # not used, but questions must not be too long given a chosen DOC_STRIDE
+
+BATCH_SIZE = 8
+EVAL_BATCH_SIZE = 64
+
+learning_rate = 3e-5
+num_train_epochs = 20
+warmup_ratio = 0.2
+
+EARLY_STOPPING_PATIENCE = 5
+EVALUATE_EVERY_N_STEPS = 250
+EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
+GRADIENT_ACCUMULATION_STEPS = 1
+
+MAX_ANS_LENGTH_IN_TOKENS = 20
+
+EVALUATE_ZERO_SHOT = True
+
+METRICS_EVAL_AFTER_N = 0  #10
