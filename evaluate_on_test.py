@@ -73,9 +73,9 @@ if __name__ == '__main__':
     print("ZERO-SHOT EVALUATIONS:\n")
 
     to_eval_on = [
-        {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
-        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
         {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_MIT, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
         {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10}
     ]
 
@@ -87,7 +87,8 @@ if __name__ == '__main__':
 
     if WITH_DEFINITION:
         if tokenizer_to_use == "roberta-base":
-            path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pt_from_scratch"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pt_from_scratch"
+            path_to_model = "./finetunedModels/MSEQA_pileNER_TrueDef_base"
             # path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt_2_from_scratch"
         else:
             #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_large_4_8_p5"
@@ -101,13 +102,26 @@ if __name__ == '__main__':
             #path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_64_5000_cosine_2epochs_plr_CP"
 
             #path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_32_5000_linear_smaller_lr_5epochs"
-            path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_32_5000_cosine_smaller_lr1_3epochs_ET"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_32_5000_cosine_smaller_lr1_3epochs_ET"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_TrueDef_large"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_TrueDef_large_wgradclip1_lr3_ET"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_TrueDef_large_wogradclip1_lr3_ET"
+            #path_to_model = "./MSEQA_pileNER_TrueDef_large_wgradclip1_lr3_hf/checkpoint-1620" # good
+            #path_to_model = "./best_finetuned_models/MSEQA_pileNER_pt_yesDef_large"
+            #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_halfepoch_hf/checkpoint-810"
+
+            #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_halfepoch_hf_lr1/checkpoint-810"
+            #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_halfepoch_hf_lr5/checkpoint-810"
+            #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_hf/checkpoint-1620" # BEST :) :) 52 average
+            path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_wgradclip1_lr5/checkpoint-1620" # BEST :) :) 53 avg
 
     else:
         if tokenizer_to_use == "roberta-base":
-            path_to_model = "./finetunedModels/MSEQA_pileNER_min_occ_100"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_min_occ_100"
+            path_to_model = "./finetunedModels/MSEQA_pileNER_FalseDef_base_ET"
         else:
-            path_to_model = "./finetunedModels/MSEQA_pileNER_nodef_large_4_32_2000"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_nodef_large_4_32_2000"
+            path_to_model = "./finetunedModels/MSEQA_pileNER_FalseDef_large"
 
     print(f"Model name: {path_to_model.split('/')[-1]}")
 

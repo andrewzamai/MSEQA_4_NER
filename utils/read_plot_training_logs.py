@@ -7,6 +7,7 @@ def extract_f1_values(logs):
     toread_end = logs.find('EVALUATING ON TEST SET ...')
 
     pattern = r'F1: (\d+\.\d+)'
+    #pattern = r'BATCH STEP \d+ validation loss (\d+\.\d+)'
     f1_matches = re.finditer(pattern, logs)
     f1_values = []
 
@@ -54,7 +55,8 @@ def plot_f1_trend(f1_values, eval_every_batch_steps, title, lr_values=None):
 if __name__ == '__main__':
 
     path_to_training_logs = '../../../experiments_outputs/training_logs'
-    training_txt_filename = 'cosine_bs8_ga32_ep3_1e-5_wlr.txt'
+    #training_txt_filename = 'baseline_3/train_noDef_base.txt'
+    training_txt_filename = 'gradient_clipping/train_yesDef_large_1epoch_yesclipping.txt'
 
     # read txt file with training logs
     with open(os.path.join(path_to_training_logs, training_txt_filename), 'r') as file:

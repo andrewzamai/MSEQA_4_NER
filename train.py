@@ -75,7 +75,7 @@ if __name__ == '__main__':
     tokenizer_to_use = f"roberta-{roberta_base_or_large}"
     print(f"tokenizer_to_use: {tokenizer_to_use}")
 
-    name_finetuned_model = f"MSEQA_pileNER_{pileNER_dataset_with_def}Def_{roberta_base_or_large}"
+    name_finetuned_model = f"MSEQA_pileNER_{pileNER_dataset_with_def}Def_{roberta_base_or_large}_wgradclip1_lr3"
     print(f"finetuned_model will be saved as: {name_finetuned_model}")
 
     # TODO: if changing chunking parameters --> re-build tokenized dataset
@@ -93,14 +93,16 @@ if __name__ == '__main__':
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
-    learning_rate = 1e-5
-    num_train_epochs = 3
+    learning_rate = 3e-5
+    num_train_epochs = 1
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
+    MAX_GRAD_NORM = 1.0
     print(f"learning_rate: {learning_rate}")
     print(f"lr_scheduler_strategy: {lr_scheduler_strategy}")
     print(f"num_train_epochs: {num_train_epochs}")
     print(f"warmup_ratio: {warmup_ratio}")
+    print(f"MAX_GRAD_NORM: {MAX_GRAD_NORM}")
 
     EARLY_STOPPING_PATIENCE = 5
     EVALUATE_EVERY_N_STEPS = 5000
@@ -321,6 +323,11 @@ if __name__ == '__main__':
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
+
+            if MAX_GRAD_NORM and accelerator.sync_gradients:
+                accelerator.clip_grad_norm_(model.parameters(), MAX_GRAD_NORM)
+            optimizer.step()
+            lr_scheduler.step()
 
             # evaluate every N BATCH STEPS (if not first batch step)
             if global_steps_counter % EVALUATE_EVERY_N_STEPS == 0 and global_steps_counter != 0:
