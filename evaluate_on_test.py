@@ -79,17 +79,20 @@ if __name__ == '__main__':
         {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10}
     ]
 
-    WITH_DEFINITION = True
+    WITH_DEFINITION = False
     print(f"With definition: {WITH_DEFINITION}")
 
-    #tokenizer_to_use = "roberta-base"
-    tokenizer_to_use = "roberta-large"
+    tokenizer_to_use = "roberta-base"
+    #tokenizer_to_use = "roberta-large"
 
     if WITH_DEFINITION:
         if tokenizer_to_use == "roberta-base":
             #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pt_from_scratch"
-            path_to_model = "./finetunedModels/MSEQA_pileNER_TrueDef_base"
+            # path_to_model = "./finetunedModels/MSEQA_pileNER_TrueDef_base"
             # path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt_2_from_scratch"
+
+            #path_to_model = "./baseline_4/MSEQA_pileNER_TrueDef_base/checkpoint-1620"
+            path_to_model = "./baseline_4/MSEQA_pileNER_TrueDef_base/finetuned_model"
         else:
             #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_large_4_8_p5"
             #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_large_4_32"  # this good
@@ -113,17 +116,21 @@ if __name__ == '__main__':
             #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_halfepoch_hf_lr1/checkpoint-810"
             #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_halfepoch_hf_lr5/checkpoint-810"
             #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_hf/checkpoint-1620" # BEST :) :) 52 average
-            path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_wgradclip1_lr5/checkpoint-1620" # BEST :) :) 53 avg
+            # path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_wgradclip1_lr5/checkpoint-1620" # BEST :) :) 53 avg
+            path_to_model = "./baseline_4/MSEQA_pileNER_TrueDef_large/finetuned_model" # checkpoint-1620"
 
     else:
         if tokenizer_to_use == "roberta-base":
             #path_to_model = "./finetunedModels/MSEQA_pileNER_min_occ_100"
-            path_to_model = "./finetunedModels/MSEQA_pileNER_FalseDef_base_ET"
+            #path_to_model = "./finetunedModels/MSEQA_pileNER_FalseDef_base_ET"
+            #path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_base/checkpoint-1080"
+            path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_base/finetuned_model"
         else:
             #path_to_model = "./finetunedModels/MSEQA_pileNER_nodef_large_4_32_2000"
-            path_to_model = "./finetunedModels/MSEQA_pileNER_FalseDef_large"
+            #path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_large/checkpoint-1080"
+            path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_large/finetuned_model"
 
-    print(f"Model name: {path_to_model.split('/')[-1]}")
+    print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 
     for data in to_eval_on:
         for subdataset_name in data['subdataset_names']:

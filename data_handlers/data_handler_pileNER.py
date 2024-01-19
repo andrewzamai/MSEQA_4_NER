@@ -11,6 +11,7 @@ import math
 import random
 import string
 from collections import OrderedDict
+import numpy as np
 from typing import List
 
 from datasets import Dataset, DatasetDict, load_dataset, concatenate_datasets
@@ -104,6 +105,23 @@ def extract_context_quests_answers(conversation):
             raise ValueError("human-gpt non matched conversation")
 
     return {"context": context, "questions_answers": quests_answers}
+
+
+def get_dataset_statistics():
+    raw_dataset = load_dataset("Universal-NER/Pile-NER-type")
+
+    context_lengths = []
+    for raw_sample in raw_dataset['train']['conversations']:
+        # extract context and list of question-goldAnswers associated to each context
+        context, questions_answers_list = extract_context_quests_answers(raw_sample).values()
+
+        context_length = len(context.split())
+        context_lengths.append(context_length)
+
+    return {'contexts_average_number_words' : np.average(context_lengths),
+            'contexts_min_number_words': np.min(context_lengths),
+            'contexts_max_number_words': np.max(context_lengths)
+            }
 
 
 def build_dataset_MSEQA_format():
@@ -630,6 +648,9 @@ def add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_w_guidelines, pa
 
 
 if __name__ == "__main__":
+
+    pileNER_raw_statistics = get_dataset_statistics()
+    print(pileNER_raw_statistics)
     """
     raw_dataset = load_dataset("Universal-NER/Pile-NER-type")
     print(raw_dataset)
@@ -702,6 +723,7 @@ if __name__ == "__main__":
     print("\n")
     print(prompt)
 
+    """
     print("\n")
     dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
     #dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
@@ -710,6 +732,7 @@ if __name__ == "__main__":
     print(dataset_MSEQA_format_with_guidelines['train'][1])
     print(dataset_MSEQA_format_with_guidelines['train'][23])
     print(dataset_MSEQA_format_with_guidelines['train'][100])
+    """
 
     #dataset_MSEQA_format_with_guidelines.save_to_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
     """
@@ -729,6 +752,7 @@ if __name__ == "__main__":
             print(sample)
     """
 
+    """
     dataset_MSEQA_format_with_guidelines_NEG_samples = add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_with_guidelines, "./questions/pileNER/all_423_NE_definitions.json")
     print(dataset_MSEQA_format_with_guidelines_NEG_samples)
 
@@ -736,3 +760,4 @@ if __name__ == "__main__":
         if sample['document_context'].endswith('-neg'):
             print(sample)
             break
+    """

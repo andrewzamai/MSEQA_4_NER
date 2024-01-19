@@ -5,8 +5,7 @@ Dataset loading, document retrieval from ID, from BIO labeling to Multi-Span Ext
 ground truth metadata retrieval (non-positional labels) from BUSTER dataset (BIO positional labeling), etc ...
 
 """
-
-
+import numpy as np
 from datasets import load_dataset, Dataset, DatasetDict, concatenate_datasets
 import random
 import json
@@ -57,6 +56,22 @@ def loadDataset(pathToDir):
                   "validation": os.path.join(pathToDir, "validation.json")} 
     # , "silver": os.path.join(pathToDir, "silver.json")}
     return load_dataset("json", data_files=data_files)
+
+
+def get_dataset_statistics():
+    BUSTER_BIO = loadDataset('../../../datasets/BUSTER/FULL_KFOLDS/123_4_5')
+
+    per_split_statistics = {split: {} for split in BUSTER_BIO.keys()}
+    for split in per_split_statistics:
+        context_lengths = []
+        for sample in BUSTER_BIO[split]:
+            context_length = len(sample['tokens'])
+            context_lengths.append(context_length)
+        per_split_statistics[split]['contexts_average_number_words'] = np.average(context_lengths)
+        per_split_statistics[split]['min_average_number_words'] = np.min(context_lengths)
+        per_split_statistics[split]['max_average_number_words'] = np.max(context_lengths)
+
+    return per_split_statistics
 
 
 # get document at position i in the split (train/validation/test/silver)
@@ -360,6 +375,9 @@ if __name__ == "__main__":
 
     BUSTER_BIO = loadDataset('../../../datasets/BUSTER/FULL_KFOLDS/123_4_5')
     print(BUSTER_BIO)
+
+    BUSTER_BIO_statistics = get_dataset_statistics()
+    print(BUSTER_BIO_statistics)
 
     ne_types_list = get_ne_categories_only(BUSTER_BIO)
     print(ne_types_list)
