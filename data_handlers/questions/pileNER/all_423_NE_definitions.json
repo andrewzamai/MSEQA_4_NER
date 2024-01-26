@@ -2844,7 +2844,7 @@
     ],
     "prompt_length": 425,
     "output_length": 100,
-    "gpt_answer": "{\"Definition\": \"'award' refers to a recognition or honor given to individuals, groups, or organizations in various fields, such as sports, entertainment, academia, and business.\", \"Guidelines\": \"Avoid labeling non-official titles or generic terms like 'best', 'top', 'favorite'. Exercise caution with ambiguous terms like 'Oscar' (could refer to a person or the award) or 'Nobel' (could refer to the organization or the prize). Ensure the distinction between the award",
+    "gpt_answer": "{\"Definition\": \"'award' refers to a recognition or honor given to individuals, groups, or organizations in various fields, such as sports, entertainment, academia, and business.\", \"Guidelines\": \"Avoid labeling non-official titles or generic terms like 'best', 'top', 'favorite'. Exercise caution with ambiguous terms like 'Oscar' (could refer to a person or the award) or 'Nobel' (could refer to the organization or the prize).",
     "finish_reason": "length"
   },
   "tv show": {

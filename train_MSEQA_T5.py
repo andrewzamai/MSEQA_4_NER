@@ -1,4 +1,9 @@
 """
+MSEQA model based on T5 model's encoder.
+
+T5EncoderModelForQuestionAnswering model inherits from T5EncoderModel
+Train only in FP32, no FP16 as it gives NaN (T5 known problem)
+
 Train from scratch or fine-tune a Multi-Span Extractive Question Answering (MS-EQA) model for Named Entity Recognition (NER) tasks.
 
 1) Data Handling:
@@ -20,7 +25,7 @@ Train from scratch or fine-tune a Multi-Span Extractive Question Answering (MS-E
 from torch.nn.utils.rnn import pad_sequence
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, get_scheduler
 from accelerate import Accelerator
 import transformers
 import torch
@@ -28,7 +33,7 @@ import sys
 import os
 
 # my libraries
-from preprocess_MSEQA import tokenize_and_preprocess
+from preprocess_MSEQA import tokenize_and_preprocess_T5  # TODO: T5 specific!
 import inference_EQA_MS
 import metrics_EQA_MS
 
@@ -42,15 +47,16 @@ if __name__ == '__main__':
     # pre-training on universalNER GPT conversations (i.e. pileNER corpus)
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
-    # train from scratch or continue fine-tuning an already existing MSEQA model ?
+    # train from scratch or continue fine-tuning an already existing MSEQA model
     start_training_from_scratch = True
     print(f"start_training_from_scratch: {start_training_from_scratch}")
     if start_training_from_scratch:
-        # to load a MSEQA with only Roberta pre-trained weights, but newly initialized qa_classifier weights
-        from models.MultiSpanRobertaQuestionAnswering_from_scratch import MultiSpanRobertaQuestionAnswering_from_scratch as MSEQA_model
+        # to load a MSEQA with only T5 encoder pre-trained weights, but newly initialized qa_classifier weights
+        from models.MSEQA_T5_ENCODER import T5EncoderModelForQuestionAnswering as MSEQA_model
     else:
         # to load a MSEQA model with pre-trained weights
-        from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
+        raise NotImplementedError
+        # from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
     pileNER_dataset_with_def = True
@@ -62,13 +68,12 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    roberta_base_or_large = 'large'
-    pretrained_model_relying_on = f"roberta-{roberta_base_or_large}"
+    pretrained_model_relying_on = "t5-3b"
     print(f"pretrained_model_relying_on: {pretrained_model_relying_on}")
-    tokenizer_to_use = f"roberta-{roberta_base_or_large}"
+    tokenizer_to_use = "t5-3b"
     print(f"tokenizer_to_use: {tokenizer_to_use}")
 
-    output_dir = f"./baseline_5/MSEQA_pileNER_{pileNER_dataset_with_def}Def_{roberta_base_or_large}"
+    output_dir = f"./baseline_T5_e/T5MSEQA_pileNER_{pileNER_dataset_with_def}Def"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -79,14 +84,14 @@ if __name__ == '__main__':
     print(f"DOC_STRIDE: {DOC_STRIDE}")
     print(f"MAX_QUERY_LENGTH: {MAX_QUERY_LENGTH}")
 
-    BATCH_SIZE = 8
-    GRADIENT_ACCUMULATION_STEPS = 32
+    BATCH_SIZE = 4
+    GRADIENT_ACCUMULATION_STEPS = 64
     EVAL_BATCH_SIZE = 64
     print(f"BATCH_SIZE: {BATCH_SIZE}")
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
-    learning_rate = 3e-5
+    learning_rate = 3e-5 #1e-3
     num_train_epochs = 1
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
@@ -98,7 +103,7 @@ if __name__ == '__main__':
     print(f"MAX_GRAD_NORM: {MAX_GRAD_NORM}")
 
     EARLY_STOPPING_PATIENCE = 5
-    EVALUATE_EVERY_N_STEPS = 180  # len(trainDataloader)/10
+    EVALUATE_EVERY_N_STEPS = 200  # len(trainDataloader)/10
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
     print(f"EARLY_STOPPING_PATIENCE: {EARLY_STOPPING_PATIENCE}")
     print(f"EVALUATE_EVERY_N_STEPS: {EVALUATE_EVERY_N_STEPS}")
@@ -139,7 +144,7 @@ if __name__ == '__main__':
     print(dataset_MSEQA_format)
 
     print("\nLoading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir')
     assert isinstance(tokenizer, transformers.PreTrainedTokenizerFast)
     MODEL_CONTEXT_WINDOW = tokenizer.model_max_length
     print(f"Pretrained model relying on: {pretrained_model_relying_on} has context window size of {MODEL_CONTEXT_WINDOW}")
@@ -154,12 +159,12 @@ if __name__ == '__main__':
 
     print("Tokenizing and preprocessing MSEQA dataset for trainining...")
 
-    path_to_already_tokenized_dataset = path_to_dataset_MSEQA_format + '_tokenized_' + roberta_base_or_large + '_' + str(MAX_SEQ_LENGTH) + '_' + str(DOC_STRIDE)
+    path_to_already_tokenized_dataset = path_to_dataset_MSEQA_format + '_tokenized_' + 't5_3b' + '_' + str(MAX_SEQ_LENGTH) + '_' + str(DOC_STRIDE)
     if not os.path.exists(path_to_already_tokenized_dataset):
         print(" ...tokenizing dataset for training")
         sys.stdout.flush()
         dataset_MSEQA_format_tokenized = dataset_MSEQA_format.map(
-            lambda examples_batch: tokenize_and_preprocess(examples_batch, tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE),
+            lambda examples_batch: tokenize_and_preprocess_T5(examples_batch, tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE),
             batched=True,
             remove_columns=dataset_MSEQA_format["train"].column_names
         )
@@ -202,7 +207,7 @@ if __name__ == '__main__':
             }
 
     # loading MS-EQA model
-    model = MSEQA_model.from_pretrained(pretrained_model_relying_on)
+    model = MSEQA_model.from_pretrained(pretrained_model_relying_on, cache_dir='./hf_cache_dir')
 
     training_arguments = transformers.TrainingArguments(
         output_dir=output_dir,
@@ -210,21 +215,31 @@ if __name__ == '__main__':
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=EVAL_BATCH_SIZE,
         gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS,
-        learning_rate=learning_rate,
+        # learning_rate=learning_rate,
         max_grad_norm=MAX_GRAD_NORM,
         num_train_epochs=num_train_epochs,
-        lr_scheduler_type=lr_scheduler_strategy,
-        warmup_ratio=warmup_ratio,
+        #lr_scheduler_type=lr_scheduler_strategy,
+        #warmup_ratio=warmup_ratio,
         logging_strategy='steps',
         logging_steps=EVALUATE_EVERY_N_STEPS,
-        fp16=True,
+        fp16=False,
         eval_steps=EVALUATE_EVERY_N_STEPS,
         load_best_model_at_end=True,
         save_steps=EVALUATE_EVERY_N_STEPS,
         save_total_limit=2,
-        metric_for_best_model="loss",
+        metric_for_best_model="eval_loss",  # TODO: change also in train_hf.py
         greater_is_better=False,
+        gradient_checkpointing=True,
         # remove_unused_columns=False,  # to pass also passage_id and offset_mapping for metrics computation
+    )
+
+    optimizer = transformers.Adafactor(params=model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False)
+
+    lr_scheduler = get_scheduler(
+        lr_scheduler_strategy,
+        optimizer=optimizer,
+        num_warmup_steps=warmup_ratio * (len(dataset_MSEQA_format_tokenized['train'])/(BATCH_SIZE*GRADIENT_ACCUMULATION_STEPS)),
+        num_training_steps=len(dataset_MSEQA_format_tokenized['train'])/(BATCH_SIZE*GRADIENT_ACCUMULATION_STEPS),
     )
 
     hf_trainer = transformers.Trainer(
@@ -232,7 +247,8 @@ if __name__ == '__main__':
         training_arguments,
         data_collator=collate_and_pad_already_tokenized_dataset,
         train_dataset=dataset_MSEQA_format_tokenized['train'],
-        eval_dataset=dataset_MSEQA_format_tokenized['validation']
+        eval_dataset=dataset_MSEQA_format_tokenized['validation'],
+        optimizers=(optimizer, lr_scheduler)
     )
 
     print("\nStarting training...\n")
@@ -250,7 +266,7 @@ if __name__ == '__main__':
         collate_fn=collate_and_pad_already_tokenized_dataset
     )
 
-    accelerator = Accelerator(mixed_precision='fp16')
+    accelerator = Accelerator(mixed_precision='no')
     test_dataloader = accelerator.prepare(test_dataloader)
 
     print(f"\n\nEVALUATING ON TEST SET ...\n")
@@ -294,7 +310,7 @@ if __name__ == '__main__':
     from data_handlers import data_handler_pileNER
     from data_handlers import data_handler_BUSTER
     from data_handlers import data_handler_MIT
-    from collator_MSEQA import collate_fn_MSEQA
+    from collator_MSEQA import collate_fn_MSEQA_T5
     from functools import partial
 
     def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition, load_from_disk=False):
@@ -378,7 +394,6 @@ if __name__ == '__main__':
 
             dataset_MSEQA_format = load_or_build_dataset_MSEQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], pileNER_dataset_with_def, load_from_disk=True)
 
-            EVAL_BATCH_SIZE = 64
             print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
             sys.stdout.flush()
 
@@ -386,14 +401,14 @@ if __name__ == '__main__':
                 dataset_MSEQA_format['test'],
                 shuffle=False,
                 batch_size=EVAL_BATCH_SIZE,
-                collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+                collate_fn=partial(collate_fn_MSEQA_T5, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
             )
 
             # loading MS-EQA model with weights pretrained on SQuAD2
             #from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
             #model = MSEQA_model.from_pretrained(os.path.join(output_dir, 'finetuned_model'))
 
-            accelerator = Accelerator(cpu=False, mixed_precision='fp16')
+            accelerator = Accelerator(cpu=False, mixed_precision='no')
             test_dataloader = accelerator.prepare(test_dataloader)
 
             # run inference through the model
