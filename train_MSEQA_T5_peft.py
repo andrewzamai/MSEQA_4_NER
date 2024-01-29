@@ -1,10 +1,10 @@
 """
-MSEQA model based on T5 model's encoder.
+LORA finetuning, through PEFT library, of a MSEQA model based on T5 model's encoder.
 
 T5EncoderModelForQuestionAnswering model inherits from T5EncoderModel
-Train only in FP32, no FP16 as it gives NaN (T5 known problem)
+Train only in FP32, no FP16/bf16 as they gives NaN (T5 known problem)
 
-Train from scratch or fine-tune a Multi-Span Extractive Question Answering (MS-EQA) model for Named Entity Recognition (NER) tasks.
+Train a Multi-Span Extractive Question Answering (MS-EQA) model for Named Entity Recognition (NER) tasks.
 
 1) Data Handling:
    - Implement a data_handler responsible for converting a NER dataset in BIO format to MS-EQA format.
@@ -21,6 +21,9 @@ Train from scratch or fine-tune a Multi-Span Extractive Question Answering (MS-E
    - Import the data_handler module, set your training parameters and execute this script.
 """
 
+
+# LORA fine-tuning
+from peft import PeftModelForQuestionAnswering, get_peft_config
 
 from torch.nn.utils.rnn import pad_sequence
 from datasets import Dataset, DatasetDict
@@ -40,11 +43,24 @@ import metrics_EQA_MS
 
 if __name__ == '__main__':
 
-    print(f"Number of GPUs: {torch.cuda.device_count()}")
-
     """ -------------------- Training parameters -------------------- """
 
     print("Training parameters:\n")
+
+    my_peft_config = {
+        "peft_type": "LORA",
+        "task_type": "QUESTION_ANS",
+        "inference_mode": False,
+        "r": 4,
+        "target_modules": ["q", "v"],
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "fan_in_fan_out": False,
+        "bias": "none"
+    }
+
+    print("PEFT config: ")
+    print(my_peft_config)
 
     # pre-training on universalNER GPT conversations (i.e. pileNER corpus)
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
@@ -61,7 +77,7 @@ if __name__ == '__main__':
         # from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
-    pileNER_dataset_with_def = False
+    pileNER_dataset_with_def = True
     if pileNER_dataset_with_def:
         path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
@@ -75,7 +91,7 @@ if __name__ == '__main__':
     tokenizer_to_use = "t5-3b"
     print(f"tokenizer_to_use: {tokenizer_to_use}")
 
-    output_dir = f"./baseline_T5/T5MSEQA_pileNER_{pileNER_dataset_with_def}Def"
+    output_dir = f"./baseline_T5/T5_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -211,17 +227,23 @@ if __name__ == '__main__':
     # loading MS-EQA model
     model = MSEQA_model.from_pretrained(pretrained_model_relying_on, cache_dir='./hf_cache_dir')
 
+    # peft wrapping
+    peft_config = get_peft_config(my_peft_config)
+    peft_model = PeftModelForQuestionAnswering(model, peft_config)
+    peft_model.print_trainable_parameters()
+
     training_arguments = transformers.TrainingArguments(
         output_dir=output_dir,
         evaluation_strategy="steps",
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=EVAL_BATCH_SIZE,
         gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS,
-        # learning_rate=learning_rate,
+        learning_rate=learning_rate,
+        weight_decay=0.01,
         max_grad_norm=MAX_GRAD_NORM,
         num_train_epochs=num_train_epochs,
-        #lr_scheduler_type=lr_scheduler_strategy,
-        #warmup_ratio=warmup_ratio,
+        lr_scheduler_type=lr_scheduler_strategy,
+        warmup_ratio=warmup_ratio,
         logging_strategy='steps',
         logging_steps=EVALUATE_EVERY_N_STEPS,
         fp16=False,
@@ -231,10 +253,11 @@ if __name__ == '__main__':
         save_total_limit=2,
         metric_for_best_model="eval_loss",  # TODO: change also in train_hf.py
         greater_is_better=False,
-        gradient_checkpointing=True,
+        # gradient_checkpointing=True,
         # remove_unused_columns=False,  # to pass also passage_id and offset_mapping for metrics computation
     )
 
+    """
     optimizer = transformers.Adafactor(params=model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False)
 
     lr_scheduler = get_scheduler(
@@ -243,21 +266,28 @@ if __name__ == '__main__':
         num_warmup_steps=warmup_ratio * (len(dataset_MSEQA_format_tokenized['train'])/(BATCH_SIZE*GRADIENT_ACCUMULATION_STEPS)),
         num_training_steps=len(dataset_MSEQA_format_tokenized['train'])/(BATCH_SIZE*GRADIENT_ACCUMULATION_STEPS),
     )
+    """
 
     hf_trainer = transformers.Trainer(
-        model,
+        peft_model,
         training_arguments,
         data_collator=collate_and_pad_already_tokenized_dataset,
         train_dataset=dataset_MSEQA_format_tokenized['train'],
         eval_dataset=dataset_MSEQA_format_tokenized['validation'],
-        optimizers=(optimizer, lr_scheduler)
+        # using default AdamW optimizer
+        # optimizers=(optimizer, lr_scheduler)
     )
 
     print("\nStarting training...\n")
+    print(hf_trainer.model)
+    print(hf_trainer.model_wrapped)
     sys.stdout.flush()
 
     hf_trainer.train()
-    hf_trainer.save_model(output_dir=os.path.join(output_dir, 'finetuned_model'))
+    peft_model.save_pretrained(save_directory=os.path.join(output_dir, 'finetuned_model'))
+
+    # getting peft model
+    model = peft_model
 
     """ ----------------- EVALUATION on TEST SET ----------------- """
 
