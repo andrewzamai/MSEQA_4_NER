@@ -16,7 +16,7 @@ class T5EncoderModelForQuestionAnswering(T5EncoderModel):
         # adding QA classifier head
         self.qa_outputs = nn.Linear(config.hidden_size, 2)
 
-        print("Old config:")
+        print("T5EncoderModel config:")
         print(config)
 
         config._name_or_path = 'MSEQA-' + config.__getattribute__('_name_or_path')

@@ -1,4 +1,4 @@
-""" EVALUATE a MS-EQA model on a Dataset's test fold """
+""" EVALUATE T5based-MS-EQA model on a Dataset's test fold """
 
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
@@ -10,8 +10,8 @@ import sys
 import os
 
 # my libraries
-from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering
-from collator_MSEQA import collate_fn_MSEQA
+from models.MSEQA_T5_ENCODER import T5EncoderModelForQuestionAnswering
+from collator_MSEQA import collate_fn_MSEQA_T5
 import inference_EQA_MS
 import metrics_EQA_MS
 
@@ -20,6 +20,7 @@ from data_handlers import data_handler_pileNER
 from data_handlers import data_handler_BUSTER
 from data_handlers import data_handler_MIT
 
+from peft import PeftModel, PeftConfig, PeftModelForQuestionAnswering
 
 def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition, load_from_disk=False):
 
@@ -79,42 +80,27 @@ if __name__ == '__main__':
         {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10}
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = True
     print(f"With definition: {WITH_DEFINITION}")
 
-    tokenizer_to_use = "roberta-base"
-    #tokenizer_to_use = "roberta-large"
+    tokenizer_to_use = "t5-3b"
 
     if WITH_DEFINITION:
-        if tokenizer_to_use == "roberta-base":
-            #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_pt_from_scratch"
-            # path_to_model = "./finetunedModels/MSEQA_pileNER_TrueDef_base"
-            # path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_w_neg_pt_2_from_scratch"
-
-            #path_to_model = "./baseline_4/MSEQA_pileNER_TrueDef_base/checkpoint-1620"
-            path_to_model = "./baseline_4/MSEQA_pileNER_TrueDef_base/finetuned_model"
-        else:
-            #path_to_model = "./finetunedModels/MSEQA_pileNER_prefix_large_4_32"  # this good
-            #path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_32_50000_CP"  # this super good
-            #path_to_model = "./finetunedModels/MSEQA_pileNER_nodef_large_4_32_w_neg"
-            # path_to_model = "./finetunedModels/MSEQA_pileNER_yesDef_large_8_32_5000_cosine_2epochs_plr_CP" # <--
-            #path_to_model = "./MSEQA_pileNER_TrueDef_large_wgradclip1_lr3_hf/checkpoint-1620" # good
-            #path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_hf/checkpoint-1620" # BEST :) :) 52 average
-            # path_to_model = "./hf_finetunedModels/MSEQA_pileNER_TrueDef_large_wgradclip1_lr5/checkpoint-1620" # BEST :) :) 53 avg
-            path_to_model = "./baseline_4/MSEQA_pileNER_TrueDef_large/finetuned_model" # = checkpoint-1620"
-
+        #path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA/checkpoint-1400"
+        path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA_smallr/checkpoint-1400"
     else:
-        if tokenizer_to_use == "roberta-base":
-            #path_to_model = "./finetunedModels/MSEQA_pileNER_min_occ_100"
-            #path_to_model = "./finetunedModels/MSEQA_pileNER_FalseDef_base_ET"
-            #path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_base/checkpoint-1080"
-            path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_base/finetuned_model"
-        else:
-            #path_to_model = "./finetunedModels/MSEQA_pileNER_nodef_large_4_32_2000"
-            #path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_large/checkpoint-1080"
-            path_to_model = "./baseline_4/MSEQA_pileNER_FalseDef_large/finetuned_model"
+        path_to_model = None
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
+
+    # loading LORA T5-MS-EQA model
+    config = PeftConfig.from_pretrained(path_to_model)
+    model = T5EncoderModelForQuestionAnswering.from_pretrained(config.base_model_name_or_path, cache_dir='./hf_cache_dir')
+    #model = PeftModel.from_pretrained(model, path_to_model)
+    model = PeftModelForQuestionAnswering.from_pretrained(model, path_to_model)
+
+    accelerator = Accelerator(mixed_precision='no')
+    model = accelerator.prepare(model)
 
     for data in to_eval_on:
         for subdataset_name in data['subdataset_names']:
@@ -127,7 +113,8 @@ if __name__ == '__main__':
             MAX_ANS_LENGTH_IN_TOKENS = data['MAX_ANS_LENGTH_IN_TOKENS']
 
             print("\nLoading tokenizer...")
-            tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use)
+            tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir')
+
             assert isinstance(tokenizer, transformers.PreTrainedTokenizerFast)
             MODEL_CONTEXT_WINDOW = tokenizer.model_max_length
             print(f"Pretrained model relying on: {path_to_model} has context window size of {MODEL_CONTEXT_WINDOW}")
@@ -152,14 +139,10 @@ if __name__ == '__main__':
                 dataset_MSEQA_format['test'],
                 shuffle=False,
                 batch_size=EVAL_BATCH_SIZE,
-                collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+                collate_fn=partial(collate_fn_MSEQA_T5, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
             )
 
-            # loading MS-EQA model with weights pretrained on SQuAD2
-            model = MultiSpanRobertaQuestionAnswering.from_pretrained(path_to_model)
-
-            accelerator = Accelerator(cpu=False, mixed_precision='fp16')
-            model, test_dataloader = accelerator.prepare(model, test_dataloader)
+            test_dataloader = accelerator.prepare(test_dataloader)
 
             # run inference through the model
             current_step_loss_eval, model_outputs_for_metrics = inference_EQA_MS.run_inference(model, test_dataloader).values()

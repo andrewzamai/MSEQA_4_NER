@@ -1,10 +1,8 @@
 """
-LORA finetuning, through PEFT library, of a MSEQA model based on T5 model's encoder.
+LORA finetuning of a MSEQA model based on T5-Encoder-only.
 
 T5EncoderModelForQuestionAnswering model inherits from T5EncoderModel
 Train only in FP32, no FP16/bf16 as they gives NaN (T5 known problem)
-
-Train a Multi-Span Extractive Question Answering (MS-EQA) model for Named Entity Recognition (NER) tasks.
 
 1) Data Handling:
    - Implement a data_handler responsible for converting a NER dataset in BIO format to MS-EQA format.
@@ -21,6 +19,9 @@ Train a Multi-Span Extractive Question Answering (MS-EQA) model for Named Entity
    - Import the data_handler module, set your training parameters and execute this script.
 """
 
+#import torch
+#torch.backends.cuda.matmul.allow_tf32 = True
+#torch.backends.cudnn.allow_tf32 = True
 
 # LORA fine-tuning
 from peft import PeftModelForQuestionAnswering, get_peft_config
@@ -51,12 +52,14 @@ if __name__ == '__main__':
         "peft_type": "LORA",
         "task_type": "QUESTION_ANS",
         "inference_mode": False,
-        "r": 4,
+        "r": 16,
         "target_modules": ["q", "v"],
-        "lora_alpha": 16,
+        "lora_alpha": 32,
         "lora_dropout": 0.05,
         "fan_in_fan_out": False,
         "bias": "none"
+        # layer_to_transform:
+        # module_to_save: "qa_outputs" automatically inferred from task_type, LORA modules saved by default
     }
 
     print("PEFT config: ")
@@ -86,12 +89,12 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    pretrained_model_relying_on = "t5-3b"
+    pretrained_model_relying_on = "t5-small"
     print(f"pretrained_model_relying_on: {pretrained_model_relying_on}")
-    tokenizer_to_use = "t5-3b"
+    tokenizer_to_use = pretrained_model_relying_on
     print(f"tokenizer_to_use: {tokenizer_to_use}")
 
-    output_dir = f"./baseline_T5/T5_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA"
+    output_dir = f"./baseline_T5/T5_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA_t5small"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -102,14 +105,14 @@ if __name__ == '__main__':
     print(f"DOC_STRIDE: {DOC_STRIDE}")
     print(f"MAX_QUERY_LENGTH: {MAX_QUERY_LENGTH}")
 
-    BATCH_SIZE = 4
-    GRADIENT_ACCUMULATION_STEPS = 64
-    EVAL_BATCH_SIZE = 64
+    BATCH_SIZE = 64
+    GRADIENT_ACCUMULATION_STEPS = 4
+    EVAL_BATCH_SIZE = 128 #64
     print(f"BATCH_SIZE: {BATCH_SIZE}")
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
-    learning_rate = 3e-5
+    learning_rate = 1e-3
     num_train_epochs = 1
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
@@ -177,7 +180,7 @@ if __name__ == '__main__':
 
     print("Tokenizing and preprocessing MSEQA dataset for trainining...")
 
-    path_to_already_tokenized_dataset = path_to_dataset_MSEQA_format + '_tokenized_' + 't5_3b' + '_' + str(MAX_SEQ_LENGTH) + '_' + str(DOC_STRIDE)
+    path_to_already_tokenized_dataset = path_to_dataset_MSEQA_format + '_tokenized_' + pretrained_model_relying_on + '_' + str(MAX_SEQ_LENGTH) + '_' + str(DOC_STRIDE)
     if not os.path.exists(path_to_already_tokenized_dataset):
         print(" ...tokenizing dataset for training")
         sys.stdout.flush()
@@ -247,12 +250,14 @@ if __name__ == '__main__':
         logging_strategy='steps',
         logging_steps=EVALUATE_EVERY_N_STEPS,
         fp16=False,
+        bf16=False,
         eval_steps=EVALUATE_EVERY_N_STEPS,
         load_best_model_at_end=True,
         save_steps=EVALUATE_EVERY_N_STEPS,
         save_total_limit=2,
         metric_for_best_model="eval_loss",  # TODO: change also in train_hf.py
         greater_is_better=False,
+        # optim="adamw_bnb_8bit"
         # gradient_checkpointing=True,
         # remove_unused_columns=False,  # to pass also passage_id and offset_mapping for metrics computation
     )
@@ -280,11 +285,11 @@ if __name__ == '__main__':
 
     print("\nStarting training...\n")
     print(hf_trainer.model)
-    print(hf_trainer.model_wrapped)
+    # print(hf_trainer.model_wrapped)
     sys.stdout.flush()
 
     hf_trainer.train()
-    peft_model.save_pretrained(save_directory=os.path.join(output_dir, 'finetuned_model'))
+    hf_trainer.model.save_pretrained(save_directory=os.path.join(output_dir, 'finetuned_model'))
 
     # getting peft model
     model = peft_model
@@ -440,7 +445,7 @@ if __name__ == '__main__':
             #from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
             #model = MSEQA_model.from_pretrained(os.path.join(output_dir, 'finetuned_model'))
 
-            accelerator = Accelerator(cpu=False, mixed_precision='no')
+            #accelerator = Accelerator(cpu=False, mixed_precision='no')
             test_dataloader = accelerator.prepare(test_dataloader)
 
             # run inference through the model

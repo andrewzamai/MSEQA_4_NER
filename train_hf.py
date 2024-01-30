@@ -222,7 +222,7 @@ if __name__ == '__main__':
         load_best_model_at_end=True,
         save_steps=EVALUATE_EVERY_N_STEPS,
         save_total_limit=2,
-        metric_for_best_model="loss",
+        metric_for_best_model="eval_loss",
         greater_is_better=False,
         # remove_unused_columns=False,  # to pass also passage_id and offset_mapping for metrics computation
     )
