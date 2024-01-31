@@ -73,8 +73,8 @@ class MultiSpanRobertaQuestionAnswering(RobertaForQuestionAnswering):
 
             loss_fct = BCEWithLogitsLoss(reduction='none')
             # with reduction='none' has shape (BATCH_SIZE, MAX_SEQ_LENGTH)
-            start_loss = loss_fct(start_logits, start_positions.to(torch.float16))
-            end_loss = loss_fct(end_logits, end_positions.to(torch.float16))
+            start_loss = loss_fct(start_logits, start_positions.to(start_logits.dtype))
+            end_loss = loss_fct(end_logits, end_positions.to(end_logits.dtype))
 
             # sequence_ids shape (BATCH_SIZE, MAX_SEQ_LENGTH)
             # 1 if CLS or passage token, 0 otherwise

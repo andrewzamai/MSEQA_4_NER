@@ -1,7 +1,7 @@
 """
 A long-document may be split in multiple passages {(question;chunkOfText)}, here:
 1) we exctract multiple predictions from each passage and collect them per document-question pair
-2) we aggregate separate passage prediction to document level predictions through 'merge_passage_answers' module
+2) we aggregate separate passage predictions to document level predictions through 'merge_passage_answers' module
 3) we compute metrics performance on each question (i.e. for each NE category) and overall
 
 Input:
@@ -12,24 +12,25 @@ Output:
 """
 
 import collections
-import json
 import torch
+import json
 
 # my libraries
 import merge_passage_answers
 
-"""
-Extract a list of answers per passage from model's logits, group and merge them per document level
-this will give a list of predicted answers for each document-question pair
-little post-processing within a passage list of preds (decreasing score sort and threshold on pair score>0) 
-"""
+
 def extract_answers_per_passage_from_logits(max_ans_length_in_tokens,
                                             batch_step,
                                             print_json_every_batch_steps,
-                                            fold_name, # validation or test
-                                            tokenizer, # to decode back input_ids
+                                            fold_name,  # validation or test
+                                            tokenizer,  # to decode back input_ids
                                             datasetdict_MSEQA_format,
                                             model_outputs_for_metrics):
+    """
+    Extract a list of answers per passage from model's logits, group and merge them per document level
+    this will give a list of predicted answers for each document-question pair
+    little post-processing within a passage list of preds (decreasing score sort and threshold on pair score>0)
+    """
 
     # unpacking prediction outputs
     all_start_logits = model_outputs_for_metrics['all_start_logits']
@@ -122,7 +123,7 @@ def extract_answers_per_passage_from_logits(max_ans_length_in_tokens,
 
             # if top answer within a passage is no-answer '' then the overall answer to that passage is ''
             # may be [] if no predictions survived to threshold
-            if valid_answers_passage == []:
+            if not valid_answers_passage:
                 no_answer_pred = {'score': str(15.0), 'text': '', 'start_end_indices': [0, 0]}
                 valid_answers_passage = [no_answer_pred]
             # if after sorting the top answer is '' then we delete all the other answers for this passage
@@ -152,7 +153,7 @@ def run_inference(model, dataloader):
     current_step_loss_eval = 0  # total loss on validation fold at reached batch step
 
     # initializing lists to store prediction outputs
-    # first we run all passage through model, then we evaluate metrics merging passage answers to document level
+    # first we run all passages through model, then we merge passage answers to document level and eventually we evaluate metrics
     all_start_logits = []
     all_end_logits = []
     input_ids_list = []
@@ -162,12 +163,13 @@ def run_inference(model, dataloader):
 
     for eval_batch in dataloader:
         with torch.no_grad():
-            outputs = model(input_ids=eval_batch['input_ids'],
-                            attention_mask=eval_batch['attention_mask'],
-                            start_positions=eval_batch['start_positions'],
-                            end_positions=eval_batch['end_positions'],
-                            sequence_ids=eval_batch['sequence_ids']
-                            )
+            outputs = model(
+                input_ids=eval_batch['input_ids'],
+                attention_mask=eval_batch['attention_mask'],
+                start_positions=eval_batch['start_positions'],
+                end_positions=eval_batch['end_positions'],
+                sequence_ids=eval_batch['sequence_ids']
+            )
 
             loss = outputs.loss
             current_step_loss_eval += loss
@@ -181,15 +183,16 @@ def run_inference(model, dataloader):
             offset_mapping_list.extend([i.cpu() for i in eval_batch.get('offset_mapping')])
 
     # overall validation set loss
-    current_step_loss_eval = current_step_loss_eval / len(dataloader)
+    current_step_loss_eval /= len(dataloader)
 
     # overall validations set metrics computation
-    model_outputs_for_metrics = {'all_start_logits': all_start_logits,
-                                 'all_end_logits': all_end_logits,
-                                 'input_ids_list': input_ids_list,
-                                 'passage_id_list': passage_id_list,
-                                 'sequence_ids_list': sequence_ids_list,
-                                 'offset_mapping_list': offset_mapping_list
-                                 }
+    model_outputs_for_metrics = {
+        'all_start_logits': all_start_logits,
+        'all_end_logits': all_end_logits,
+        'input_ids_list': input_ids_list,
+        'passage_id_list': passage_id_list,
+        'sequence_ids_list': sequence_ids_list,
+        'offset_mapping_list': offset_mapping_list
+    }
 
     return {"loss": current_step_loss_eval, "model_outputs": model_outputs_for_metrics}

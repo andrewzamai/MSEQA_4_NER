@@ -1,4 +1,4 @@
-""" EVALUATE T5based-MS-EQA model on a Dataset's test fold """
+""" EVALUATE Deberta-MS-EQA model on a Dataset's test fold """
 
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
@@ -10,8 +10,8 @@ import sys
 import os
 
 # my libraries
-from models.MSEQA_T5_ENCODER import T5EncoderModelForQuestionAnswering
-from collator_MSEQA import collate_fn_MSEQA_T5
+from models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering
+from collator_MSEQA import collate_fn_MSEQA
 import inference_EQA_MS
 import metrics_EQA_MS
 
@@ -74,33 +74,31 @@ if __name__ == '__main__':
     print("ZERO-SHOT EVALUATIONS:\n")
 
     to_eval_on = [
-        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_MIT, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 64},
-        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 64},
-        {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 4},
-        {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 64}
+        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_MIT, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10}
     ]
 
     WITH_DEFINITION = True
     print(f"With definition: {WITH_DEFINITION}")
 
-    tokenizer_to_use = "t5-3b"
+    tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
 
     if WITH_DEFINITION:
-        #path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA/checkpoint-1400"
-        #path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA_3b_int8_adamint8/checkpoint-1400"
-        path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA_3b_int8_adamint8/checkpoint-1800"
+        path_to_model = "./baseline_Deberta/MSEQA_pileNERpt_TrueDef_LORA_int8_adamint8_bs64_stableemb/checkpoint-200"
     else:
-        path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_FalseDef_LORA_3b_int8_adamint8_bs64_stableemb/finetuned_model"
+        path_to_model = None
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 
     # loading LORA T5-MS-EQA model
     config = PeftConfig.from_pretrained(path_to_model)
-    model = T5EncoderModelForQuestionAnswering.from_pretrained(config.base_model_name_or_path, cache_dir='./hf_cache_dir')
+    model = DebertaXXLForQuestionAnswering.from_pretrained(config.base_model_name_or_path, cache_dir='./hf_cache_dir')
     #model = PeftModel.from_pretrained(model, path_to_model)
     model = PeftModelForQuestionAnswering.from_pretrained(model, path_to_model)
 
-    accelerator = Accelerator(mixed_precision='no')
+    accelerator = Accelerator(mixed_precision='fp16')
     model = accelerator.prepare(model)
 
     for data in to_eval_on:
@@ -132,7 +130,7 @@ if __name__ == '__main__':
 
             dataset_MSEQA_format = load_or_build_dataset_MSEQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION, load_from_disk=True)
 
-            EVAL_BATCH_SIZE = data['EVAL_BATCH_SIZE']
+            EVAL_BATCH_SIZE = 64
             print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
             sys.stdout.flush()
 
@@ -140,7 +138,7 @@ if __name__ == '__main__':
                 dataset_MSEQA_format['test'],
                 shuffle=False,
                 batch_size=EVAL_BATCH_SIZE,
-                collate_fn=partial(collate_fn_MSEQA_T5, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+                collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
             )
 
             test_dataloader = accelerator.prepare(test_dataloader)

@@ -1,12 +1,8 @@
 """
-LORA finetuning of a MSEQA model based on T5-Encoder-only.
+LORA finetuning of a MSEQA model based on Deberta-XXL.
 
 - LORA + 8bit model quantization + 8bit adam optimizer
 
-- T5EncoderModelForQuestionAnswering model inherits from T5EncoderModel
-- Train only in FP32, no FP16/bf16 as they gives NaN (T5 known problem)
-- /usr/local/lib/python3.8/dist-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
-  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
 - TODO: torch.nn.Embedding(...) ->  bnb.nn.StableEmbedding(...)
 - TODO: apply weight decay not on biases
 - TODO: how to get GPU usage printed during Training
@@ -42,7 +38,7 @@ import sys
 import os
 
 # my libraries
-from preprocess_MSEQA import tokenize_and_preprocess_T5  # TODO: T5 specific!
+from preprocess_MSEQA import tokenize_and_preprocess  # TODO: tokenizer similar to Roberta
 import inference_EQA_MS
 import metrics_EQA_MS
 
@@ -53,7 +49,7 @@ if __name__ == '__main__':
 
     print("Training parameters:\n")
 
-    pretrained_model_relying_on = "t5-3b"
+    pretrained_model_relying_on = "microsoft/deberta-v2-xxlarge"
     print(f"pretrained_model_relying_on: {pretrained_model_relying_on}")
     tokenizer_to_use = pretrained_model_relying_on
     print(f"tokenizer_to_use: {tokenizer_to_use}")
@@ -63,7 +59,7 @@ if __name__ == '__main__':
         "task_type": "QUESTION_ANS",
         "inference_mode": False,
         "r": 16,
-        "target_modules": ["q", "v"],
+        "target_modules": ["query_proj", "value_proj"],
         "lora_alpha": 32,
         "lora_dropout": 0.05,
         "fan_in_fan_out": False,
@@ -89,11 +85,11 @@ if __name__ == '__main__':
         torch.nn.modules.sparse.Embedding.__init__ = bnb_embed_init
 
         # to load a MSEQA with only T5 encoder pre-trained weights, but newly initialized qa_classifier weights
-        from models.MSEQA_T5_ENCODER import T5EncoderModelForQuestionAnswering as MSEQA_model
+        from models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering as MSEQA_model
 
         # loading MS-EQA model
         bnb_config = BitsAndBytesConfig(load_in_8bit=True)
-        model = MSEQA_model.from_pretrained(pretrained_model_relying_on, cache_dir='./hf_cache_dir', quantization_config=bnb_config, device_map="auto")
+        model = MSEQA_model.from_pretrained(pretrained_model_relying_on, cache_dir='./hf_cache_dir', quantization_config=bnb_config) #, device_map="auto")
         model = prepare_model_for_kbit_training(model)
 
         # peft wrapping
@@ -107,7 +103,7 @@ if __name__ == '__main__':
         # from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
-    pileNER_dataset_with_def = False
+    pileNER_dataset_with_def = True
     if pileNER_dataset_with_def:
         path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
@@ -116,7 +112,7 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./baseline_T5/T5_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA_3b_int8_adamint8_bs64_stableemb"
+    output_dir = f"./baseline_Deberta/MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA_int8_adamint8_bs64_stableemb_lr3e5"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -134,7 +130,7 @@ if __name__ == '__main__':
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
-    learning_rate = 1e-3
+    learning_rate = 3e-5
     num_train_epochs = 1
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
@@ -202,12 +198,12 @@ if __name__ == '__main__':
 
     print("Tokenizing and preprocessing MSEQA dataset for trainining...")
 
-    path_to_already_tokenized_dataset = path_to_dataset_MSEQA_format + '_tokenized_' + pretrained_model_relying_on + '_' + str(MAX_SEQ_LENGTH) + '_' + str(DOC_STRIDE)
+    path_to_already_tokenized_dataset = path_to_dataset_MSEQA_format + '_tokenized_' + pretrained_model_relying_on.split('/')[-1] + '_' + str(MAX_SEQ_LENGTH) + '_' + str(DOC_STRIDE)
     if not os.path.exists(path_to_already_tokenized_dataset):
         print(" ...tokenizing dataset for training")
         sys.stdout.flush()
         dataset_MSEQA_format_tokenized = dataset_MSEQA_format.map(
-            lambda examples_batch: tokenize_and_preprocess_T5(examples_batch, tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE),
+            lambda examples_batch: tokenize_and_preprocess(examples_batch, tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE),
             batched=True,
             remove_columns=dataset_MSEQA_format["train"].column_names
         )
@@ -279,7 +275,7 @@ if __name__ == '__main__':
     #optimizer = transformers.Adafactor(params=model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False)
 
     # parameter tensors with less than 16384 values are optimized in 32-bit
-    optimizer = bnb.optim.Adam8bit(peft_model.parameters(), min_8bit_size=16384, lr=learning_rate, betas=(0.9, 0.995)) #, weight_decay=0.01)
+    optimizer = bnb.optim.Adam8bit(peft_model.parameters(), min_8bit_size=16384, lr=learning_rate, betas=(0.9, 0.995))  #, weight_decay=0.01)
     lr_scheduler = get_scheduler(
         lr_scheduler_strategy,
         optimizer=optimizer,

@@ -1,58 +1,53 @@
-""" custom RoBERTa model for MULTI-SPAN EQA, RoBERTa as encoder, randomly initialized start/end prediction weights"""
+""" MS-EQA model based on DebertaV2 Encoder model """
 
-from typing import List, Optional, Tuple, Union
-
+from transformers.models.deberta_v2 import DebertaV2ForQuestionAnswering
 from transformers.modeling_outputs import QuestionAnsweringModelOutput
-from transformers.models.roberta import RobertaPreTrainedModel, RobertaModel
 
-import torch
-import torch.nn as nn
+from typing import Optional, Tuple, Union
 from torch.nn import BCEWithLogitsLoss
+import torch
 
-# RobertaPreTrainedModel abstract class from which to inherit
-class MultiSpanRobertaQuestionAnswering_from_scratch(RobertaPreTrainedModel):
+
+class DebertaXXLForQuestionAnswering(DebertaV2ForQuestionAnswering):
+    """ inherits from DebertaV2ForQuestionAnswering class """
 
     def __init__(self, config):
+        """ DebertaV2ForQuestionAnswering constructor """
         super().__init__(config)
-        self.roberta = RobertaModel(config, add_pooling_layer=False)
-        self.qa_outputs = nn.Linear(config.hidden_size, 2)
 
-    """
-        input_ids: input sequence tokens ids
-        attention_mask: mask to avoid performing attention on padding token indices
-        token_type_ids, position_ids, head_mask, inputs_embeds: NOT required
-
-        start_positions: tensor (BATCH_SIZE, MAX_SEQ_LENGTH) with 1 where answers start (multiple)
-        end_positions: tensor (BATCH_SIZE, MAX_SEQ_LENGTH) with 1 where answers end (multiple)
-        sequence_ids: tensor (BATCH_SIZE, MAX_SEQ_LENGTH) with 1 if CLS or passage token, 0 otherwise
-
-        start_positions and end_positions required to compute loss during training,
-        but not used in eval mode to compute metrics
-    """
     def forward(
             self,
-            input_ids: Optional[torch.LongTensor] = None,
-            attention_mask: Optional[torch.FloatTensor] = None,
-            token_type_ids: Optional[torch.LongTensor] = None,
-            position_ids: Optional[torch.LongTensor] = None,
-            head_mask: Optional[torch.FloatTensor] = None,
-            inputs_embeds: Optional[torch.FloatTensor] = None,
-            start_positions: Optional[torch.FloatTensor] = None,
-            end_positions: Optional[torch.FloatTensor] = None,
-            sequence_ids: Optional[torch.FloatTensor] = None,
+            input_ids: Optional[torch.Tensor] = None,
+            attention_mask: Optional[torch.Tensor] = None,
+            token_type_ids: Optional[torch.Tensor] = None,
+            position_ids: Optional[torch.Tensor] = None,
+            inputs_embeds: Optional[torch.Tensor] = None,
+            start_positions: Optional[torch.Tensor] = None,
+            end_positions: Optional[torch.Tensor] = None,
+            sequence_ids: Optional[torch.Tensor] = None,
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
     ) -> Union[Tuple[torch.Tensor], QuestionAnsweringModelOutput]:
+        r"""
+            input_ids: input sequence tokens ids
+            attention_mask: mask to avoid performing attention on padding token indices
+            token_type_ids, position_ids, head_mask, inputs_embeds: NOT required
 
+            start_positions: tensor (BATCH_SIZE, MAX_SEQ_LENGTH) with 1 where answers start (multiple)
+            end_positions: tensor (BATCH_SIZE, MAX_SEQ_LENGTH) with 1 where answers end (multiple)
+            sequence_ids: tensor (BATCH_SIZE, MAX_SEQ_LENGTH) with 1 if CLS or passage token, 0 otherwise
+
+            start_positions and end_positions required to compute loss during training,
+            but not used in eval mode to compute metrics
+        """
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
-        outputs = self.roberta(
+        outputs = self.deberta(
             input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
             position_ids=position_ids,
-            head_mask=head_mask,
             inputs_embeds=inputs_embeds,
             output_attentions=output_attentions,
             output_hidden_states=output_hidden_states,
@@ -86,7 +81,7 @@ class MultiSpanRobertaQuestionAnswering_from_scratch(RobertaPreTrainedModel):
             # sequence_ids shape (BATCH_SIZE, MAX_SEQ_LENGTH)
             # 1 if CLS or passage token, 0 otherwise
             # 0-ing loss for tokens that are not passage tokens or CLS
-            # explain how is different to masking the logit to 0
+            # is different to masking the logit to 0
             start_loss = torch.mul(start_loss, sequence_ids)
             end_loss = torch.mul(end_loss, sequence_ids)
 

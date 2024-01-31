@@ -5,17 +5,15 @@ def tokenize_and_preprocess(examples_MSEQA_format, tokenizer, max_seq_length, do
     # overflows will be automatically treated by using a sliding window approach with stride=doc_stride
     # questions are concatenated to the left of the document_context, so truncation="only_second" used
 
-    # setting padding=longest, padding to the longest sequence in the batch
-    # if concatenated input does not fit in max_seq_length stride approach applied
     tokenized_examples = tokenizer(
         examples_MSEQA_format["question"],
         examples_MSEQA_format["document_context"],
-        truncation='only_second',  # longest_first
+        truncation='only_second',
         max_length=max_seq_length,
         stride=doc_stride,
         return_overflowing_tokens=True,
         return_offsets_mapping=True,
-        padding=False,  # not padding here
+        padding=False,  # not padding here, but when collating
     )
 
     # Since one document might produce several passages if it has a long context,
@@ -27,19 +25,21 @@ def tokenize_and_preprocess(examples_MSEQA_format, tokenizer, max_seq_length, do
     # and going back from token to character positions
     offset_mapping = tokenized_examples.pop("offset_mapping")
 
+    num_passages = len(offset_mapping)
+
     # in multi-span EQA for each sample we may have multiple start_positions & end_positions
     # we encode gold start/end positions through k-hot-vectors
-    tokenized_examples["start_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int32) for i in range(len(offset_mapping))]
-    tokenized_examples["end_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int32) for i in range(len(offset_mapping))]
+    tokenized_examples["start_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int8) for i in range(num_passages)]
+    tokenized_examples["end_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int8) for i in range(num_passages)]
 
     # which are passage tokens and which are question/special tokens
-    tokenized_examples["sequence_ids"] = [[] for i in range(len(offset_mapping))]
+    tokenized_examples["sequence_ids"] = [[] for i in range(num_passages)]
 
     # in passage_id we save the doc_question_pairID that generated it to later collect back passages answers to doc level
     tokenized_examples["passage_id"] = []
 
     # new offset_mappings with [-1, -1] if not passage token (added to pad to MAX_SEQ_LENGTH)
-    tokenized_examples["offset_mapping"] = [[] for i in range(len(offset_mapping))]
+    tokenized_examples["offset_mapping"] = [[] for i in range(num_passages)]
 
     for i, offsets in enumerate(offset_mapping):
         # giving to passageID the ID of the doc-question pair that generated it
@@ -111,7 +111,6 @@ def tokenize_and_preprocess(examples_MSEQA_format, tokenizer, max_seq_length, do
                 tokenized_examples["end_positions"][i][cls_index] = 0
 
     # not padding here
-
     return {
         'input_ids': tokenized_examples['input_ids'],
         'attention_mask': tokenized_examples['attention_mask'],
@@ -125,24 +124,22 @@ def tokenize_and_preprocess(examples_MSEQA_format, tokenizer, max_seq_length, do
 
 def tokenize_and_preprocess_T5(examples_MSEQA_format, tokenizer, max_seq_length, doc_stride):
     # since T5 does not have CLS token (Extractive QA models use it for no-answers)
-    # we prefix each question with <extra_id_0>, one of the T5 special tokens
-    # <extra_id_0> question </s> text </s>
+    # we prefix each question with <extra_id_0>, one of the T5 special tokens for MLM
+    # <extra_id_0> question </s> context </s>
     cls_token_workaround = '<extra_id_0> '
 
     # concatenate the question;document_context and tokenize (adding also tokenizer special tokens)
     # overflows will be automatically treated by using a sliding window approach with stride=doc_stride
     # questions are concatenated to the left of the document_context, so truncation="only_second" used
-    # setting padding=longest, padding to the longest sequence in the batch
-    # if concatenated input does not fit in max_seq_length stride approach applied
     tokenized_examples = tokenizer(
-        [cls_token_workaround + q for q in examples_MSEQA_format["question"]],
+        [cls_token_workaround + q for q in examples_MSEQA_format["question"]],  # prefixing with cls_token_workaround
         examples_MSEQA_format["document_context"],
-        truncation='only_second',  # longest_first
+        truncation='only_second',
         max_length=max_seq_length,
         stride=doc_stride,
         return_overflowing_tokens=True,
         return_offsets_mapping=True,
-        padding=False,  # not padding here
+        padding=False,  # not padding here, but when collating
     )
 
     # Since one document might produce several passages if it has a long context,
@@ -154,19 +151,22 @@ def tokenize_and_preprocess_T5(examples_MSEQA_format, tokenizer, max_seq_length,
     # and going back from token to character positions
     offset_mapping = tokenized_examples.pop("offset_mapping")
 
+    num_passages = len(offset_mapping)
+
     # in multi-span EQA for each sample we may have multiple start_positions & end_positions
     # we encode gold start/end positions through k-hot-vectors
-    tokenized_examples["start_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int32) for i in range(len(offset_mapping))]
-    tokenized_examples["end_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int32) for i in range(len(offset_mapping))]
+    # changed from dtype=torch.int32 to torch.int8
+    tokenized_examples["start_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int8) for i in range(num_passages)]
+    tokenized_examples["end_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int8) for i in range(num_passages)]
 
     # which are passage tokens and which are question/special tokens
-    tokenized_examples["sequence_ids"] = [[] for i in range(len(offset_mapping))]
+    tokenized_examples["sequence_ids"] = [[] for i in range(num_passages)]
 
     # in passage_id we save the doc_question_pairID that generated it to later collect back passages answers to doc level
     tokenized_examples["passage_id"] = []
 
     # new offset_mappings with [-1, -1] if not passage token (added to pad to MAX_SEQ_LENGTH)
-    tokenized_examples["offset_mapping"] = [[] for i in range(len(offset_mapping))]
+    tokenized_examples["offset_mapping"] = [[] for i in range(num_passages)]
 
     for i, offsets in enumerate(offset_mapping):
         # giving to passageID the ID of the doc-question pair that generated it
@@ -254,9 +254,12 @@ def tokenize_and_preprocess_T5(examples_MSEQA_format, tokenizer, max_seq_length,
 
 if __name__ == '__main__':
     from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained('t5-small')
+    # tokenizer = AutoTokenizer.from_pretrained('t5-small')
+    tokenizer = AutoTokenizer.from_pretrained('microsoft/deberta-v2-xxlarge')
+    #tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 
-    question = '<extra_id_0> This is the question.'
+    #question = '<extra_id_0> This is the question.'
+    question = 'This is the question.'
     context = 'and this is the passage of text'
 
     tokenized_examples = tokenizer(

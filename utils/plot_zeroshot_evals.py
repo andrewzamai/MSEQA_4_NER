@@ -113,8 +113,8 @@ def read_dataset_evals(path_to_file, dataset_name):
 
     return ner_metrics
 
-def get_zero_shot_metrics(path_to_evals_folder, yes_no_Def, base_large):
-    path_to_file = os.path.join(path_to_evals_folder, str(yes_no_Def) + 'Def_' + base_large + '.txt')
+def get_zero_shot_metrics(path_to_evals_folder, yes_no_Def, model_name):
+    path_to_file = os.path.join(path_to_evals_folder, str(yes_no_Def) + 'Def_' + model_name + '.txt')
     ner_metrics = {}
     for dataset_name in dataset_name_list:
         ner_metrics[dataset_name] = read_dataset_evals(path_to_file, dataset_name)
@@ -185,7 +185,7 @@ def plot_avg_std_FalseTrueDef_comparison(ner_metrics_FalseDef_with_avg_std, ner_
     # Adding labels and title
     plt.xlabel('NE categories')
     plt.ylabel('average per-NE F1 across different runs')
-    plt.title(f'{ds_name} - {model_name} - FalseDef vs TrueDef comparison')
+    plt.title(f'{dataset_name} - {model_name} - FalseDef vs TrueDef comparison')
 
     plt.xticks(x, x_labels, rotation=10, fontsize=6)
     for i, label in enumerate(x_labels):
@@ -202,6 +202,7 @@ def plot_avg_std_FalseTrueDef_comparison(ner_metrics_FalseDef_with_avg_std, ner_
 
 if __name__ == '__main__':
 
+    """
     roberta_model = 'large'
 
     # list of datasets for which to compute evaluation statistics
@@ -263,18 +264,21 @@ if __name__ == '__main__':
         plot_avg_std_FalseTrueDef_comparison(average_std_metrics['FalseDef'], average_std_metrics['TrueDef'], ds_name, all_datasets_ne_statistics, f'MSEQA-{roberta_model}')
 
     """
-    path_to_evals_folder = '../../../experiments_outputs/baseline_4_evals/baseline_4_b'
+
+    model_name = 't5-3b'
+    path_to_evals_folder = '../../../experiments_outputs/T5-3b-MSEQA'
 
     dataset_name_list = ['movie', 'restaurant', 'ai', 'literature', 'music', 'politics', 'science', 'BUSTER']
 
-    ner_metrics_FalseDef = get_zero_shot_metrics(path_to_evals_folder, False, 'large')
+    ner_metrics_FalseDef = get_zero_shot_metrics(path_to_evals_folder, False, model_name)
     print(ner_metrics_FalseDef)
 
-    ner_metrics_TrueDef = get_zero_shot_metrics(path_to_evals_folder, True, 'large')
+    ner_metrics_TrueDef = get_zero_shot_metrics(path_to_evals_folder, True, model_name)
     print(ner_metrics_TrueDef)
 
-    plot_FalseTrueDef_comparison(ner_metrics_FalseDef, ner_metrics_TrueDef, 'science', all_datasets_ne_statistics)
+    for ds_name in dataset_name_list:
+        plot_FalseTrueDef_comparison(ner_metrics_FalseDef, ner_metrics_TrueDef, ds_name, all_datasets_ne_statistics)
 
-    """
+
     # print(compute_percentage_overlap(ai_ne_statistics))
 
