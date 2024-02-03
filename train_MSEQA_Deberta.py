@@ -1,7 +1,7 @@
 """
-LORA finetuning of a MSEQA model based on Deberta-XXL
+FULL-finetuning of a MSEQA model based on Deberta-XXL
 
-- LORA + 8bit model quantization + 8bit adam optimizer
+- NO LORA nor optimizations !
 
 1) Data Handling:
    - Implement a data_handler responsible for converting a NER dataset in BIO format to MS-EQA format.
@@ -18,15 +18,11 @@ LORA finetuning of a MSEQA model based on Deberta-XXL
    - Import the data_handler module, set your training parameters and execute this script.
 """
 
-# libraries for LORA fine-tuning + 8bit quantization
-from peft import PeftModelForQuestionAnswering, get_peft_config, prepare_model_for_kbit_training
-from transformers import BitsAndBytesConfig
-import bitsandbytes as bnb
-
 from torch.nn.utils.rnn import pad_sequence
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
-from transformers import AutoTokenizer, get_scheduler
+from transformers import AutoTokenizer
+from transformers import get_scheduler
 from accelerate import Accelerator
 import transformers
 import torch
@@ -47,22 +43,8 @@ if __name__ == '__main__':
 
     pretrained_model_relying_on = "microsoft/deberta-v2-xxlarge"
     print(f"pretrained_model_relying_on: {pretrained_model_relying_on}")
-    tokenizer_to_use = pretrained_model_relying_on
+    tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
     print(f"tokenizer_to_use: {tokenizer_to_use}")
-
-    my_peft_config = {
-        "peft_type": "LORA",
-        "task_type": "QUESTION_ANS",
-        "inference_mode": False,
-        "r": 16,
-        "target_modules": ["query_proj", "value_proj", "key_proj"],
-        "lora_alpha": 32,
-        "lora_dropout": 0.05,
-        "fan_in_fan_out": False,
-        "bias": "none"
-        # module_to_save: "qa_outputs" automatically inferred from task_type; LORA modules saved by default
-    }
-    print(f"PEFT config: {my_peft_config}")
 
     # pre-training on universalNER GPT conversations (i.e. pileNER corpus)
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
@@ -72,26 +54,8 @@ if __name__ == '__main__':
     print(f"start_training_from_scratch: {start_training_from_scratch}")
     if start_training_from_scratch:
 
-        # tell Adam8bit to run embeding layers in fp32
-        from bitsandbytes.optim import GlobalOptimManager
-        torch.nn.modules.sparse.Embedding.orig__init__ = torch.nn.modules.sparse.Embedding.__init__
-        def bnb_embed_init(self, *args, **kwargs):
-            torch.nn.modules.sparse.Embedding.orig__init__(self, *args, **kwargs)
-            GlobalOptimManager.get_instance().register_module_override(self, 'weight', {'optim_bits': 32})
-        torch.nn.modules.sparse.Embedding.__init__ = bnb_embed_init
-
-        # to load a MSEQA with only T5 encoder pre-trained weights, but newly initialized qa_classifier weights
+        # to load a MSEQA with only encoder pre-trained weights, but newly initialized qa_classifier weights
         from models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering as MSEQA_model
-
-        # loading MS-EQA model
-        bnb_config = BitsAndBytesConfig(load_in_8bit=True)
-        model = MSEQA_model.from_pretrained(pretrained_model_relying_on, cache_dir='./hf_cache_dir', quantization_config=bnb_config) #, device_map="auto")
-        model = prepare_model_for_kbit_training(model)
-
-        # peft wrapping
-        peft_config = get_peft_config(my_peft_config)
-        peft_model = PeftModelForQuestionAnswering(model, peft_config)
-        peft_model.print_trainable_parameters()
 
     else:
         # to load a MSEQA model with pre-trained weights
@@ -108,7 +72,7 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./baseline_Deberta/MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA_int8_adamint8_bs64_alsokey"
+    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_lr1e5_5epochs"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -119,15 +83,15 @@ if __name__ == '__main__':
     print(f"DOC_STRIDE: {DOC_STRIDE}")
     print(f"MAX_QUERY_LENGTH: {MAX_QUERY_LENGTH}")
 
-    BATCH_SIZE = 64
-    GRADIENT_ACCUMULATION_STEPS = 4
-    EVAL_BATCH_SIZE = 64 #64
+    BATCH_SIZE = 16  # >= 32 OOM
+    GRADIENT_ACCUMULATION_STEPS = 16
+    EVAL_BATCH_SIZE = 32
     print(f"BATCH_SIZE: {BATCH_SIZE}")
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
-    learning_rate = 0.0001
-    num_train_epochs = 1
+    learning_rate = 1e-5
+    num_train_epochs = 5
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
     MAX_GRAD_NORM = 1.0
@@ -179,7 +143,7 @@ if __name__ == '__main__':
     print(dataset_MSEQA_format)
 
     print("\nLoading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir', model_max_length=MAX_SEQ_LENGTH)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir')
     assert isinstance(tokenizer, transformers.PreTrainedTokenizerFast)
     MODEL_CONTEXT_WINDOW = tokenizer.model_max_length
     print(f"Pretrained model relying on: {pretrained_model_relying_on} has context window size of {MODEL_CONTEXT_WINDOW}")
@@ -241,63 +205,61 @@ if __name__ == '__main__':
                 'sequence_ids': pad_sequence([torch.tensor(t) for t in collated_batch['sequence_ids']], batch_first=True, padding_value=0),
             }
 
+    ''' ------------------ PREPARING HF TRAINER ------------------ '''
+
+    # DeBERTa finetuning hyperparams from https://paperswithcode.com/paper/deberta-decoding-enhanced-bert-with/review/
+
     training_arguments = transformers.TrainingArguments(
         output_dir=output_dir,
+        overwrite_output_dir=False,
         evaluation_strategy="steps",
+        eval_steps=EVALUATE_EVERY_N_STEPS,
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=EVAL_BATCH_SIZE,
         gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS,
-        #learning_rate=learning_rate,
-        #weight_decay=0.01,
+        # using default AdamW optimizer
+        optim="adamw_bnb_8bit",
+        learning_rate=learning_rate,
+        weight_decay=0.01,  # to all layers except all bias and LayerNorm weights
+        adam_beta1=0.9,
+        adam_beta2=0.999,
+        adam_epsilon=1e-6,
         max_grad_norm=MAX_GRAD_NORM,
         num_train_epochs=num_train_epochs,
-        #lr_scheduler_type=lr_scheduler_strategy,
-        #warmup_ratio=warmup_ratio,
+        lr_scheduler_type=lr_scheduler_strategy,
+        warmup_ratio=warmup_ratio,
         logging_strategy='steps',
         logging_steps=EVALUATE_EVERY_N_STEPS,
         fp16=False,
-        bf16=False,
-        eval_steps=EVALUATE_EVERY_N_STEPS,
+        bf16=True,
         load_best_model_at_end=True,
         save_steps=EVALUATE_EVERY_N_STEPS,
         save_total_limit=2,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
-        # optim="adamw_bnb_8bit"
-        # gradient_checkpointing=True,
-        # remove_unused_columns=False,  # to pass also passage_id and offset_mapping for metrics computation
+        gradient_checkpointing=True
     )
 
-    #optimizer = transformers.Adafactor(params=model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False)
-
-    # parameter tensors with less than 16384 values are optimized in 32-bit
-    optimizer = bnb.optim.Adam8bit(peft_model.parameters(), min_8bit_size=16384, lr=learning_rate, betas=(0.9, 0.995))  #, weight_decay=0.01)
-    lr_scheduler = get_scheduler(
-        lr_scheduler_strategy,
-        optimizer=optimizer,
-        num_warmup_steps=warmup_ratio * (len(dataset_MSEQA_format_tokenized['train']) / (BATCH_SIZE * GRADIENT_ACCUMULATION_STEPS)),
-        num_training_steps=len(dataset_MSEQA_format_tokenized['train']) / (BATCH_SIZE * GRADIENT_ACCUMULATION_STEPS),
-    )
+    model = MSEQA_model.from_pretrained(pretrained_model_relying_on, cache_dir='./hf_cache_dir')
 
     hf_trainer = transformers.Trainer(
-        peft_model,
+        model,
         training_arguments,
         data_collator=collate_and_pad_already_tokenized_dataset,
         train_dataset=dataset_MSEQA_format_tokenized['train'],
         eval_dataset=dataset_MSEQA_format_tokenized['validation'],
-        optimizers=(optimizer, lr_scheduler)
+        #optimizers=(optimizer, lr_scheduler)
     )
 
-    print("\nStarting training...\n")
     print(hf_trainer.model)
-    # print(hf_trainer.model_wrapped)
+
+    print("\nStarting training...\n")
     sys.stdout.flush()
 
     hf_trainer.train()
     hf_trainer.model.save_pretrained(save_directory=os.path.join(output_dir, 'finetuned_model'))
 
-    # getting peft model
-    model = peft_model
+    model = hf_trainer.model
 
     """ ----------------- EVALUATION on TEST SET ----------------- """
 
@@ -308,7 +270,7 @@ if __name__ == '__main__':
         collate_fn=collate_and_pad_already_tokenized_dataset
     )
 
-    accelerator = Accelerator(mixed_precision='no')
+    accelerator = Accelerator(mixed_precision='bf16')
     test_dataloader = accelerator.prepare(test_dataloader)
 
     print(f"\n\nEVALUATING ON TEST SET ...\n")
