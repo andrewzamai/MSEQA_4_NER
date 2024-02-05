@@ -1,19 +1,17 @@
 """
---- Pile-NER dataset gpt annotated ---
+--- Pile-NER dataset annotated by GPT ---
 https://huggingface.co/datasets/Universal-NER/Pile-NER-type
 https://universal-ner.github.io/
 """
 
+import re
 import ast
 import json
-import re
 import math
 import random
 import string
-from collections import OrderedDict
 import numpy as np
-from typing import List
-
+from collections import OrderedDict
 from datasets import Dataset, DatasetDict, load_dataset, concatenate_datasets
 
 
@@ -118,10 +116,11 @@ def get_dataset_statistics():
         context_length = len(context.split())
         context_lengths.append(context_length)
 
-    return {'contexts_average_number_words' : np.average(context_lengths),
-            'contexts_min_number_words': np.min(context_lengths),
-            'contexts_max_number_words': np.max(context_lengths)
-            }
+    return {
+        'contexts_average_number_words': np.average(context_lengths),
+        'contexts_min_number_words': np.min(context_lengths),
+        'contexts_max_number_words': np.max(context_lengths)
+    }
 
 
 def build_dataset_MSEQA_format():
@@ -175,11 +174,10 @@ def build_dataset_MSEQA_format():
                                         "validation": validation_dataset,
                                         "test": test_dataset
                                         })
-
     return dataset_MSEQA_format
 
 
-def remove_outlier_ne_types(dataset_QA_format, min_num_samples_per_ne_type=10):
+def remove_outlier_ne_types(dataset_QA_format, min_num_samples_per_ne_type=100):
     # new dataset with removed outliers
     filtered_dataset_MSEQA_format_list = {split: [] for split in dataset_QA_format.keys()}
     for split in dataset_QA_format.keys():
@@ -211,7 +209,80 @@ def remove_outlier_ne_types(dataset_QA_format, min_num_samples_per_ne_type=10):
     return DatasetDict({split: Dataset.from_list(values) for split, values in filtered_dataset_MSEQA_format_list.items()})
 
 
+def remove_bad_ne_types(dataset_MSEQA_format):
+    # get same NE types list for which we have GPT guidelines
+    ne_types_list = get_ne_types_list(dataset_MSEQA_format, 100)
+    print(len(ne_types_list))
+    print(ne_types_list)
+    # if the pileNER dataset is built by retaining only those NE which number of occurrences is > 100
+    # the total number of NEs now should be 455
+    # by plotting the dendrogram of the word embeddings using plot_word_emb.ipynb
+    # we produce this mapping to a new list of NEs
+    # by removing some bad NE categories or merging some
+    # now the new list of NEs should be of length 423
+    new_ne_type_list_mapping = {
+        "misc": None,
+        "miscellaneous": None,
+        "other": None,
+        "unknown": None,
+        "general": None,
+        "entity type not specified": None,
+        "entity type": None,
+        "entity": None,
+        "text": None,
+        "import": None,
+
+        "bacteria": "bacterium",
+        "biological": "biological entity",
+        "cell": "cell type",
+        "cellular component": "cell component",
+        "governmental body": "government body",
+        "movie": "film",
+        "work": "work of art",
+        "musical group": "music group",
+        "org": "organization",
+
+        "anatomical_structure": "anatomical structure",
+        "anatomicalstructure": "anatomical structure",
+        "biological_process": "biological process",
+        "body_part": "body part",
+        "gpe": "geopolitical entity",
+        "gene/protein": "gene",
+        "work_of_art": "work of art",
+        "job_title": "job title",
+        "organisation": "organization",
+        "chemical_substance": "chemical substance",
+        "medical_condition": "medical condition",
+        "medicalcondition": "medical condition",
+
+        "fieldterminology": None,
+        "cryptocurrency": "cryptocurrency",
+        "demonym": "demonym",
+        "norp": "norp"
+    }
+    # new dataset with re-mapped Named Entities
+    new_dataset_MSEQA_format_list = {split: [] for split in dataset_MSEQA_format.keys()}
+    for split in dataset_MSEQA_format.keys():
+        for sample in dataset_MSEQA_format[split]:
+            ne_type = sample['tagName']
+            old_ne_type = ne_type
+            if ne_type in new_ne_type_list_mapping:
+                ne_type = new_ne_type_list_mapping[ne_type]  # new NE name or None if to be removed
+            # if has not been remove and the new mapping is in the list of NEs for which we have the gpt definition
+            if ne_type is not None and ne_type in ne_types_list:
+                # new NE type
+                sample['tagName'] = ne_type
+                # replacing the old ne type occurrence to their new UPPERCASE
+                pattern = re.compile(re.escape(old_ne_type))
+                sample['question'] = pattern.sub(ne_type.upper(), sample['question'])
+
+                new_dataset_MSEQA_format_list[split].append(sample)
+
+    return DatasetDict({split: Dataset.from_list(values) for split, values in new_dataset_MSEQA_format_list.items()})
+
+
 def get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type=100):
+    """ list of NEs which number of answer spans (i.e. occurrences) across ALL splits is >= min_num_samples_per_ne_type """
     ne_types = {}
     for split in dataset_MSEQA_format.keys():
         for sample in dataset_MSEQA_format[split]:
@@ -649,11 +720,11 @@ def add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_w_guidelines, pa
 
 if __name__ == "__main__":
 
-    pileNER_raw_statistics = get_dataset_statistics()
-    print(pileNER_raw_statistics)
-    """
     raw_dataset = load_dataset("Universal-NER/Pile-NER-type")
     print(raw_dataset)
+
+    #pileNER_raw_statistics = get_dataset_statistics()
+    #print(pileNER_raw_statistics)
 
     #print(raw_dataset['train'][0]['conversations'])
     
@@ -676,7 +747,6 @@ if __name__ == "__main__":
     # for i in range(10):
     # print(uniNER_dataset_MSEQA_format['train'][i])
 
-    """
     ne_types = {split: {} for split in uniNER_dataset_MSEQA_format.keys()}
     for split in uniNER_dataset_MSEQA_format.keys():
         for sample in uniNER_dataset_MSEQA_format[split]:
@@ -723,18 +793,29 @@ if __name__ == "__main__":
     print("\n")
     print(prompt)
 
-    """
     print("\n")
-    dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
-    #dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
+
+    dataset_MSEQA_format = build_dataset_MSEQA_format()
+    print(dataset_MSEQA_format)
+    dataset_MSEQA_format_removed_NEs = remove_bad_ne_types(dataset_MSEQA_format)
+    print(dataset_MSEQA_format_removed_NEs)
+    print(dataset_MSEQA_format_removed_NEs['train'][0])
+    print(dataset_MSEQA_format_removed_NEs['train'][1])
+    print(dataset_MSEQA_format_removed_NEs['train'][23])
+    print(dataset_MSEQA_format_removed_NEs['train'][100])
+
+    """
+    #dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
+    dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
     print(dataset_MSEQA_format_with_guidelines)
     print(dataset_MSEQA_format_with_guidelines['train'][0])
     print(dataset_MSEQA_format_with_guidelines['train'][1])
     print(dataset_MSEQA_format_with_guidelines['train'][23])
     print(dataset_MSEQA_format_with_guidelines['train'][100])
+
+    #dataset_MSEQA_format_with_guidelines.save_to_disk("../../../datasets/dataset_MSEQA_format_with_guidelines_2")
     """
 
-    #dataset_MSEQA_format_with_guidelines.save_to_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
     """
     for split_name, split_dataset in dataset_MSEQA_format_with_guidelines.items():
         # Keep only the first num_samples_to_keep samples

@@ -314,7 +314,7 @@ if __name__ == '__main__':
     from data_handlers import data_handler_pileNER
     from data_handlers import data_handler_BUSTER
     from data_handlers import data_handler_MIT
-    from collator_MSEQA import collate_fn_MSEQA_T5
+    from collator_MSEQA import collate_fn_MSEQA
     from functools import partial
 
     def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition, load_from_disk=False):
@@ -406,7 +406,7 @@ if __name__ == '__main__':
                 dataset_MSEQA_format['test'],
                 shuffle=False,
                 batch_size=EVAL_BATCH_SIZE,
-                collate_fn=partial(collate_fn_MSEQA_T5, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
+                collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
             )
 
             # loading MS-EQA model with weights pretrained on SQuAD2

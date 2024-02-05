@@ -275,6 +275,8 @@ if __name__ == '__main__':
 
     print(tokenized_examples)
 
+    print(tokenized_examples['input_ids'][0].index(tokenizer.cls_token_id))
+
     # print(tokenizer.cls_token_id)  # DOES not have CLS token
     tokens = [tokenizer._convert_id_to_token(x) for x in tokenized_examples['input_ids'][0]]
     print(tokens)

@@ -107,7 +107,7 @@ if __name__ == '__main__':
         # from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
-    pileNER_dataset_with_def = False
+    pileNER_dataset_with_def = True
     if pileNER_dataset_with_def:
         path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./baseline_T5/T5_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA_3b_int8_adamint8_bs64_stableemb"
+    output_dir = f"./baseline_T5/T5_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_LORA_3b_int8_adamint8_bs64_stableemb_3epochs"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -127,15 +127,15 @@ if __name__ == '__main__':
     print(f"DOC_STRIDE: {DOC_STRIDE}")
     print(f"MAX_QUERY_LENGTH: {MAX_QUERY_LENGTH}")
 
-    BATCH_SIZE = 64
-    GRADIENT_ACCUMULATION_STEPS = 4
+    BATCH_SIZE = 32
+    GRADIENT_ACCUMULATION_STEPS = 8
     EVAL_BATCH_SIZE = 64
     print(f"BATCH_SIZE: {BATCH_SIZE}")
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
     learning_rate = 1e-3
-    num_train_epochs = 1
+    num_train_epochs = 3
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
     MAX_GRAD_NORM = 1.0
@@ -444,6 +444,7 @@ if __name__ == '__main__':
 
             dataset_MSEQA_format = load_or_build_dataset_MSEQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], pileNER_dataset_with_def, load_from_disk=True)
 
+            EVAL_BATCH_SIZE = EVAL_BATCH_SIZE if data['datasets_cluster_name'] != 'BUSTER' else 4
             print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
             sys.stdout.flush()
 

@@ -87,17 +87,23 @@ if __name__ == '__main__':
 
     if WITH_DEFINITION:
         #path_to_model = "./baseline_Deberta/MSEQA_pileNERpt_TrueDef_LORA_int8_adamint8_bs64_stableemb/checkpoint-200"
-        path_to_model = "./baseline_Deberta/MSEQA_pileNERpt_TrueDef_LORA_int8_adamint8_bs64_stableemb_lr3e5/checkpoint-1200"
+        #path_to_model = "./baseline_Deberta/MSEQA_pileNERpt_TrueDef_LORA_int8_adamint8_bs64_stableemb_lr3e5/checkpoint-1200"
+        #path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_lr1e5/finetuned_model"
+        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_lr1e5_5epochs/checkpoint-2600"
     else:
         path_to_model = None
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 
     # loading LORA T5-MS-EQA model
+    """
     config = PeftConfig.from_pretrained(path_to_model)
     model = DebertaXXLForQuestionAnswering.from_pretrained(config.base_model_name_or_path, cache_dir='./hf_cache_dir')
     #model = PeftModel.from_pretrained(model, path_to_model)
     model = PeftModelForQuestionAnswering.from_pretrained(model, path_to_model)
+    """
+
+    model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model)
 
     accelerator = Accelerator(mixed_precision='bf16')
     model = accelerator.prepare(model)
