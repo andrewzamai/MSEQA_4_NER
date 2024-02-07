@@ -273,7 +273,15 @@ if __name__ == '__main__':
         padding=False,  # not padding here
     )
 
+    print(type(tokenizer))
+
     print(tokenized_examples)
+    print(tokenized_examples['input_ids'][0])
+    tokens = [tokenizer._convert_id_to_token(x) for x in tokenized_examples['input_ids'][0]]
+    print(tokens)
+    print(tokenized_examples['offset_mapping'][0])
+
+
 
     print(tokenized_examples['input_ids'][0].index(tokenizer.cls_token_id))
 
@@ -283,8 +291,8 @@ if __name__ == '__main__':
     print(tokenized_examples.sequence_ids(0))
 
     print([tokenizer.all_special_tokens])
-    print(tokenizer.get_sentinel_token_ids())
-    print([tokenizer._convert_id_to_token(x) for x in tokenizer.get_sentinel_token_ids()])
+    #print(tokenizer.get_sentinel_token_ids())
+    #print([tokenizer._convert_id_to_token(x) for x in tokenizer.get_sentinel_token_ids()])
 
 
 

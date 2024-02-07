@@ -728,7 +728,7 @@ if __name__ == "__main__":
 
     #print(raw_dataset['train'][0]['conversations'])
     
-    context, quests_answers = extract_context_quests_answers(raw_dataset['train'][23]['conversations']).values()
+    context, quests_answers = extract_context_quests_answers(raw_dataset['train'][8840]['conversations']).values()
     print(context)
 
     print("\n")
@@ -795,6 +795,7 @@ if __name__ == "__main__":
 
     print("\n")
 
+    """
     dataset_MSEQA_format = build_dataset_MSEQA_format()
     print(dataset_MSEQA_format)
     dataset_MSEQA_format_removed_NEs = remove_bad_ne_types(dataset_MSEQA_format)
@@ -803,18 +804,18 @@ if __name__ == "__main__":
     print(dataset_MSEQA_format_removed_NEs['train'][1])
     print(dataset_MSEQA_format_removed_NEs['train'][23])
     print(dataset_MSEQA_format_removed_NEs['train'][100])
-
     """
-    #dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
-    dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
+
+
+    dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines_2")
+    #dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
     print(dataset_MSEQA_format_with_guidelines)
-    print(dataset_MSEQA_format_with_guidelines['train'][0])
-    print(dataset_MSEQA_format_with_guidelines['train'][1])
-    print(dataset_MSEQA_format_with_guidelines['train'][23])
-    print(dataset_MSEQA_format_with_guidelines['train'][100])
+    print(dataset_MSEQA_format_with_guidelines['train'][400])
+    print(dataset_MSEQA_format_with_guidelines['train'][443])
+    print(dataset_MSEQA_format_with_guidelines['train'][432])
+    print(dataset_MSEQA_format_with_guidelines['train'][732])
 
     #dataset_MSEQA_format_with_guidelines.save_to_disk("../../../datasets/dataset_MSEQA_format_with_guidelines_2")
-    """
 
     """
     for split_name, split_dataset in dataset_MSEQA_format_with_guidelines.items():

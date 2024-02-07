@@ -1,4 +1,4 @@
-""" EVALUATE Deberta-MS-EQA model on a Dataset's test fold """
+""" EVALUATE DeBERTa-MS-EQA model for zero-shot NER """
 
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
@@ -20,15 +20,14 @@ from data_handlers import data_handler_pileNER
 from data_handlers import data_handler_BUSTER
 from data_handlers import data_handler_MIT
 
-from peft import PeftModel, PeftConfig, PeftModelForQuestionAnswering
 
 def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition, load_from_disk=False):
 
     if subdataset_name == 'pileNER':
         if with_definition:
-            return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_prefix')
+            return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_TrueDef')
         else:
-            return DatasetDict.load_from_disk('./datasets/pileNER/min_occur_100_MSEQA')
+            return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_FalseDef')
 
     path_to_NER_datasets_BIO_format = f"./datasets/{datasets_cluster_name}/BIO_format"
 
@@ -86,12 +85,12 @@ if __name__ == '__main__':
     tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
 
     if WITH_DEFINITION:
-        #path_to_model = "./baseline_Deberta/MSEQA_pileNERpt_TrueDef_LORA_int8_adamint8_bs64_stableemb/checkpoint-200"
-        #path_to_model = "./baseline_Deberta/MSEQA_pileNERpt_TrueDef_LORA_int8_adamint8_bs64_stableemb_lr3e5/checkpoint-1200"
-        #path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_lr1e5/finetuned_model"
-        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_lr1e5_5epochs/checkpoint-2600"
+        # path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_lr1e5/finetuned_model"
+        #path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-0"
+        #path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_A/checkpoint-1200"
+        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_C/checkpoint-1200"
     else:
-        path_to_model = None
+        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_FalseDef_A/checkpoint-3800"
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 
@@ -103,6 +102,16 @@ if __name__ == '__main__':
     model = PeftModelForQuestionAnswering.from_pretrained(model, path_to_model)
     """
 
+    with open('./MSEQA_4_NER/experiments/.env', 'r') as file:
+        api_keys = file.readlines()
+
+    api_keys_dict = {}
+    for api_key in api_keys:
+        api_name, api_value = api_key.split('=')
+        api_keys_dict[api_name] = api_value
+    # print(api_keys_dict)
+
+    #model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model, token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'], cache_dir='./hf_cache_dir')
     model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model)
 
     accelerator = Accelerator(mixed_precision='bf16')
@@ -138,6 +147,8 @@ if __name__ == '__main__':
             dataset_MSEQA_format = load_or_build_dataset_MSEQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION, load_from_disk=True)
 
             EVAL_BATCH_SIZE = 64 if data['datasets_cluster_name'] != 'BUSTER' else 4
+            if data['datasets_cluster_name'] == 'pileNER':
+                EVAL_BATCH_SIZE = 32
             print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
             sys.stdout.flush()
 
@@ -152,6 +163,7 @@ if __name__ == '__main__':
 
             # run inference through the model
             current_step_loss_eval, model_outputs_for_metrics = inference_EQA_MS.run_inference(model, test_dataloader).values()
+            print(f"current_step_loss_eval: {current_step_loss_eval}")
             # extract answers
             question_on_document_predicted_answers_list = inference_EQA_MS.extract_answers_per_passage_from_logits(
                 max_ans_length_in_tokens=MAX_ANS_LENGTH_IN_TOKENS,

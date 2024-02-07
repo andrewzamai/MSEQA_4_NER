@@ -26,9 +26,9 @@ def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, d
 
     if subdataset_name == 'pileNER':
         if with_definition:
-            return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_prefix')
+            return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_TrueDef')
         else:
-            return DatasetDict.load_from_disk('./datasets/pileNER/min_occur_100_MSEQA')
+            return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_FalseDef')
 
     path_to_NER_datasets_BIO_format = f"./datasets/{datasets_cluster_name}/BIO_format"
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
         {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_MIT, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 64},
         {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 64},
         {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 4},
-        {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 64}
+        {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10, 'EVAL_BATCH_SIZE': 32}
     ]
 
     WITH_DEFINITION = True
@@ -88,7 +88,8 @@ if __name__ == '__main__':
     if WITH_DEFINITION:
         #path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA/checkpoint-1400"
         #path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA_3b_int8_adamint8/checkpoint-1400"
-        path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA_3b_int8_adamint8/checkpoint-1800"
+        #path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA_3b_int8_adamint8/checkpoint-1800"
+        path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_TrueDef_LORA_3b_int8_adamint8_bs64_stableemb_3epochs/checkpoint-3400"
     else:
         path_to_model = "./baseline_T5/T5_MSEQA_pileNERpt_FalseDef_LORA_3b_int8_adamint8_bs64_stableemb/finetuned_model"
 

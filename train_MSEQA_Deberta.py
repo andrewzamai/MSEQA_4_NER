@@ -1,16 +1,21 @@
 """
-FULL-finetuning of a MSEQA model based on Deberta-XXL
+FULL-finetuning of a MSEQA model based on Deberta-XXL 1.5b model
 
-- NO LORA nor optimizations !
+- NO LORA, no model quantization, only adamw_8bit optimizer
+- Batch size: 16 x ga=16 --> 256; eval_batch_size = 32;
+- learning rate 1e-5, cosine sched. over 5 epochs
+- training in bf16
+
+- tokenizing all MSEQA dataset before starting training but padding only when collating
 
 1) Data Handling:
    - Implement a data_handler responsible for converting a NER dataset in BIO format to MS-EQA format.
    - MSEQA_dataset is a DatasetDict with three partitions: train, validation, and test.
    - Each sample in each Dataset must contain the following features:
-        - doc_question_pairID: a string in the format "fold:docID:questionID_on_that_doc"
-        - document_context: the passage of text (any length)
+        - doc_question_pairID: a string in the format "[fold:]docID:questionID_on_that_doc"
+        - document_context: the passage of text (ANY length)
         - tagName: the named entity category being extracted
-        - question: the question to extract the desired NE
+        - question: the question to extract the desired tagName
         - answers: a dictionary {'answer_start': [], 'text': []}
           - answer_start: a list of starting positions in characters from the beginning of the context.
 
@@ -18,6 +23,7 @@ FULL-finetuning of a MSEQA model based on Deberta-XXL
    - Import the data_handler module, set your training parameters and execute this script.
 """
 
+from transformers import EarlyStoppingCallback
 from torch.nn.utils.rnn import pad_sequence
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
@@ -30,7 +36,8 @@ import sys
 import os
 
 # my libraries
-from preprocess_MSEQA import tokenize_and_preprocess  # tokenizer similar to Roberta
+# tokenizer similar to Roberta [CLS] quest [SEP] context [SEP]
+from preprocess_MSEQA import tokenize_and_preprocess
 import inference_EQA_MS
 import metrics_EQA_MS
 
@@ -53,45 +60,42 @@ if __name__ == '__main__':
     start_training_from_scratch = True
     print(f"start_training_from_scratch: {start_training_from_scratch}")
     if start_training_from_scratch:
-
         # to load a MSEQA with only encoder pre-trained weights, but newly initialized qa_classifier weights
         from models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering as MSEQA_model
-
     else:
         # to load a MSEQA model with pre-trained weights
         raise NotImplementedError
-        # from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
     pileNER_dataset_with_def = True
     if pileNER_dataset_with_def:
         path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
-        path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_prefix'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
+        path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_TrueDef'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
     else:
-        path_to_dataset_MSEQA_format = './datasets/pileNER/min_occur_100_MSEQA'  # dataset "what describes X in the text?" if already built, otherwise it will be built and stored here
+        path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_FalseDef'  # dataset "what describes X in the text?" if already built, otherwise it will be built and stored here
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_lr1e5_5epochs"
+    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_D"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
-    MAX_SEQ_LENGTH = 380  # question + context + special tokens
+    MAX_SEQ_LENGTH = 380 if pileNER_dataset_with_def else 280  # question + context + special tokens
     DOC_STRIDE = 50  # overlap between 2 consecutive passages from same document
-    MAX_QUERY_LENGTH = 150  # not used, average prefix length in tokens (task instruction, definition, guidelines)
+    MAX_QUERY_LENGTH = 150 if pileNER_dataset_with_def else 50  # not used, average prefix length in tokens (task instruction, definition, guidelines)
     print(f"MAX_SEQ_LENGTH: {MAX_SEQ_LENGTH}")
     print(f"DOC_STRIDE: {DOC_STRIDE}")
     print(f"MAX_QUERY_LENGTH: {MAX_QUERY_LENGTH}")
 
     BATCH_SIZE = 16  # >= 32 OOM
     GRADIENT_ACCUMULATION_STEPS = 16
-    EVAL_BATCH_SIZE = 32
+    EVAL_BATCH_SIZE = 32  # >= 64 OOM
     print(f"BATCH_SIZE: {BATCH_SIZE}")
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
     learning_rate = 1e-5
-    num_train_epochs = 5
+    num_train_epochs = 3
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
     MAX_GRAD_NORM = 1.0
@@ -133,7 +137,8 @@ if __name__ == '__main__':
         else:
             dataset_MSEQA_format = data_handler_MSEQA_dataset.build_dataset_MSEQA_format()
             # removing outliers
-            dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100)
+            # dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_outlier_ne_types(dataset_MSEQA_format, 100) <-- deprecated
+            dataset_MSEQA_format = data_handler_MSEQA_dataset.remove_bad_ne_types(dataset_MSEQA_format)
 
         dataset_MSEQA_format.save_to_disk(path_to_dataset_MSEQA_format)
     else:
@@ -162,6 +167,7 @@ if __name__ == '__main__':
     if not os.path.exists(path_to_already_tokenized_dataset):
         print(" ...tokenizing dataset for training")
         sys.stdout.flush()
+        # ALERT: using tokenizer before training may give parallelism deadlock warnings
         dataset_MSEQA_format_tokenized = dataset_MSEQA_format.map(
             lambda examples_batch: tokenize_and_preprocess(examples_batch, tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE),
             batched=True,
@@ -217,7 +223,7 @@ if __name__ == '__main__':
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=EVAL_BATCH_SIZE,
         gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS,
-        # using default AdamW optimizer
+        # using AdamW optimizer 8 bit
         optim="adamw_bnb_8bit",
         learning_rate=learning_rate,
         weight_decay=0.01,  # to all layers except all bias and LayerNorm weights
@@ -248,7 +254,8 @@ if __name__ == '__main__':
         data_collator=collate_and_pad_already_tokenized_dataset,
         train_dataset=dataset_MSEQA_format_tokenized['train'],
         eval_dataset=dataset_MSEQA_format_tokenized['validation'],
-        #optimizers=(optimizer, lr_scheduler)
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=EARLY_STOPPING_PATIENCE)]
+        # optimizers=(optimizer, lr_scheduler)
     )
 
     print(hf_trainer.model)
@@ -321,9 +328,9 @@ if __name__ == '__main__':
 
         if subdataset_name == 'pileNER':
             if with_definition:
-                return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_prefix')
+                return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_TrueDef')
             else:
-                return DatasetDict.load_from_disk('./datasets/pileNER/min_occur_100_MSEQA')
+                return DatasetDict.load_from_disk('./datasets/pileNER/MSEQA_FalseDef')
 
         path_to_NER_datasets_BIO_format = f"./datasets/{datasets_cluster_name}/BIO_format"
 
@@ -399,6 +406,9 @@ if __name__ == '__main__':
             dataset_MSEQA_format = load_or_build_dataset_MSEQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], pileNER_dataset_with_def, load_from_disk=True)
 
             EVAL_BATCH_SIZE = EVAL_BATCH_SIZE if data['datasets_cluster_name'] != 'BUSTER' else 4
+            if data['datasets_cluster_name'] == 'pileNER':
+                EVAL_BATCH_SIZE = 32
+
             print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
             sys.stdout.flush()
 
@@ -409,11 +419,6 @@ if __name__ == '__main__':
                 collate_fn=partial(collate_fn_MSEQA, tokenizer=tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE)
             )
 
-            # loading MS-EQA model with weights pretrained on SQuAD2
-            #from models.MultiSpanRobertaQuestionAnswering import MultiSpanRobertaQuestionAnswering as MSEQA_model
-            #model = MSEQA_model.from_pretrained(os.path.join(output_dir, 'finetuned_model'))
-
-            #accelerator = Accelerator(cpu=False, mixed_precision='no')
             test_dataloader = accelerator.prepare(test_dataloader)
 
             # run inference through the model

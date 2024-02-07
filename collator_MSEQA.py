@@ -36,8 +36,8 @@ def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):
 
     # in multi-span EQA for each sample we may have multiple start_positions & end_positions
     # we encode gold start/end positions through k-hot-vectors
-    tokenized_examples["start_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int32) for i in range(len(offset_mapping))]
-    tokenized_examples["end_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int32) for i in range(len(offset_mapping))]
+    tokenized_examples["start_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int8) for i in range(len(offset_mapping))]
+    tokenized_examples["end_positions"] = [torch.zeros(len(offset_mapping[i]), dtype=torch.int8) for i in range(len(offset_mapping))]
 
     # which are passage tokens and which are question/special tokens
     tokenized_examples["sequence_ids"] = [[] for i in range(len(offset_mapping))]

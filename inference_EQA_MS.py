@@ -15,6 +15,8 @@ import collections
 import torch
 import json
 
+from transformers import DebertaV2TokenizerFast
+
 # my libraries
 import merge_passage_answers
 
@@ -108,6 +110,8 @@ def extract_answers_per_passage_from_logits(max_ans_length_in_tokens,
 
                 # converting from token indices predictions to char start/end predictions
                 start_char = offset_mapping[start_index][0].item()
+                if isinstance(tokenizer, DebertaV2TokenizerFast) and start_char != 0:
+                    start_char += 1
                 end_char = offset_mapping[end_index][1].item()
 
                 # when saving to json we need to save float32 as strings

@@ -273,12 +273,13 @@ if __name__ == '__main__':
     ner_metrics_FalseDef = get_zero_shot_metrics(path_to_evals_folder, False, model_name)
     print(ner_metrics_FalseDef)
 
-    ner_metrics_TrueDef = get_zero_shot_metrics(path_to_evals_folder, True, model_name)
+    ner_metrics_TrueDef = get_zero_shot_metrics(path_to_evals_folder, True, 'deb-xxl')
     print(ner_metrics_TrueDef)
 
     for ds_name in dataset_name_list:
         plot_FalseTrueDef_comparison(ner_metrics_FalseDef, ner_metrics_TrueDef, ds_name, all_datasets_ne_statistics)
 
-
     # print(compute_percentage_overlap(ai_ne_statistics))
+
+
 
