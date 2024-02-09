@@ -67,7 +67,7 @@ if __name__ == '__main__':
         raise NotImplementedError
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
-    pileNER_dataset_with_def = True
+    pileNER_dataset_with_def = False
     if pileNER_dataset_with_def:
         path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_TrueDef'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_D"
+    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_0"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)

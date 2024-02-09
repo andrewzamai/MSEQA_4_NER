@@ -20,8 +20,8 @@ if __name__ == '__main__':
     )
     """
 
-    path_to_model_to_upload = './baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_A/checkpoint-1200'
-    new_repo_name = 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-A'
+    path_to_model_to_upload = './baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_B/checkpoint-2600'
+    new_repo_name = 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-B'
 
     url_new_repo_name = create_repo(
         repo_id=new_repo_name,
@@ -42,6 +42,8 @@ if __name__ == '__main__':
     
     print(uploaded_folder_results)
 
-    from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v2-xxlarge", cache_dir='./hf_cache_dir')
-    tokenizer.push_to_hub(new_repo_name, token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'])
+    #from transformers import AutoTokenizer
+    #tokenizer_name = "roberta-base"
+    #tokenizer_name = "microsoft/deberta-v2-xxlarge"
+    #tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, cache_dir='./hf_cache_dir')
+    #tokenizer.push_to_hub(new_repo_name, token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'])

@@ -88,9 +88,11 @@ if __name__ == '__main__':
         # path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_lr1e5/finetuned_model"
         #path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-0"
         #path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_A/checkpoint-1200"
-        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_C/checkpoint-1200"
+        #path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_C/checkpoint-2600"
+        #path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-B"
+        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_C/checkpoint-4000"
     else:
-        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_FalseDef_A/checkpoint-3800"
+        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_FalseDef_B/checkpoint-2600"
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 

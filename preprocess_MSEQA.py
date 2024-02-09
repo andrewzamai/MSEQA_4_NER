@@ -252,12 +252,206 @@ def tokenize_and_preprocess_T5(examples_MSEQA_format, tokenizer, max_seq_length,
     }
 
 
+def tokenize_and_preprocess_LLAMA(examples_MSEQA_format, tokenizer, max_seq_length, doc_stride):
+    # TODO: set empty answer if chunck does not contain answer !!!
+    # TODO: INST or something if LLAMA2
+    # TODO: ... if second part of chunked text
+
+    """ <s> ### Instruction:\n{instruction}\n\n <s> ### Input:\n{input}\n\n <s> ### Response:\n </s> """
+
+    prompt_template = {
+        "instruction": "### Instruction:\n{instruction}\n\n### Input:\n",
+        "input": "{input}",
+        "response": "\n\n### Response:\n"
+    }
+
+    """
+    prompt_template = {
+        "instruction": "### Instruction:\n{instruction}\n\n",
+        "input": "### Input:\n{input}",
+        "response": "\n\n### Response:\n"
+    }
+    """
+
+    tokenized_instruction_context = tokenizer(
+        [prompt_template['instruction'].format(instruction=x[:-len("TEXT:\n")]) for x in examples_MSEQA_format['question']],  # removing "TEXT:"
+        [prompt_template['input'].format(input=x) for x in examples_MSEQA_format['document_context']],
+        truncation='only_second',
+        max_length=max_seq_length,
+        stride=doc_stride,
+        return_overflowing_tokens=True,
+        return_offsets_mapping=False,  # don't care about offset mapping with a generative model
+        padding=False,  # not padding here
+    )
+
+    # popping <s> input ids (ID = 1) inserted by tokenizer between instruction and context
+    for i, tok_input_ids in enumerate(tokenized_instruction_context['input_ids']):
+        second_one_index = tok_input_ids.index(1, tok_input_ids.index(1) + 1)
+        tokenized_instruction_context['input_ids'][i].pop(second_one_index)
+        tokenized_instruction_context['attention_mask'][i].pop(second_one_index)
+
+    # tokenize answers and right-concatenate
+    # TODO: add attention mask 1 and EOS token
+    # sort text answers by ascending start positions
+    gold_answers_with_char_start_perDoc = examples_MSEQA_format['answers']
+    sorted_textonly_gold_answers_wo_duplicates_perDoc = []
+    for ga_w_c_s_perDoc in gold_answers_with_char_start_perDoc:
+        # sort text answers by ascending start positions
+        sorted_start_answers = sorted(zip(ga_w_c_s_perDoc['answer_start'], ga_w_c_s_perDoc['text']), key=lambda x: x[0])
+        # retrieve only text answers
+        sorted_answers_text_only = [item[1] for item in sorted_start_answers]
+        # deleting any duplicate while preserving order (order within document context)
+        sorted_textonly_gold_answers_wo_duplicates = list(OrderedDict.fromkeys(sorted_answers_text_only).keys())
+        # converting to string and appending
+        sorted_textonly_gold_answers_wo_duplicates_perDoc.append(prompt_template['response'] + str(sorted_textonly_gold_answers_wo_duplicates))
+
+    print(sorted_textonly_gold_answers_wo_duplicates_perDoc)
+
+    tokenized_answers = tokenizer(
+        sorted_textonly_gold_answers_wo_duplicates_perDoc,
+        truncation=True,
+        max_length=max_seq_length,
+        return_overflowing_tokens=True
+    )
+
+    print(tokenized_answers)
+
+    num_passages = len(tokenized_instruction_context['input_ids'])
+
+    # Since one document might produce several passages if it has a long context,
+    # we need a map from passages to its corresponding doc-question sample
+    sample_mapping = tokenized_instruction_context.pop("overflow_to_sample_mapping")
+
+    # in passage_id we save the doc_question_pairID that generated it to later collect back passages answers to doc level
+    tokenized_instruction_context["passage_id"] = []
+
+    for i in range(num_passages):
+        # giving to passageID the ID of the doc-question pair that generated it
+        sample_index = sample_mapping[i]
+        tokenized_instruction_context["passage_id"].append(examples_MSEQA_format["doc_question_pairID"][sample_index])
+
+        this_passage_tokenized_gold_answers_input_ids = tokenized_answers['input_ids'][sample_index][1:]
+        this_passage_tokenized_gold_answers_attention_mask = tokenized_answers['attention_mask'][sample_index][1:]
+
+        tokenized_instruction_context['input_ids'][i].extend(this_passage_tokenized_gold_answers_input_ids)
+        tokenized_instruction_context['attention_mask'][i].extend(this_passage_tokenized_gold_answers_attention_mask)
+
+        tokenized_instruction_context['input_ids'][i].append(tokenizer.eos_token_id)
+        tokenized_instruction_context['attention_mask'][i].append(1)
+
+    # not padding here
+    # TODO: add also "labels" key?
+
+    # TODO: add ... if chuncked text
+    # TODO: empty answer if chunck does not contain answer!!!
+    return {
+        'input_ids': tokenized_instruction_context['input_ids'],
+        'attention_mask': tokenized_instruction_context['attention_mask'],
+        'passage_id': tokenized_instruction_context['passage_id']
+    }
+
+
 if __name__ == '__main__':
+
+    from datasets import DatasetDict, Dataset
+    dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../datasets/dataset_MSEQA_format_with_guidelines")
+
+    from transformers import LlamaTokenizerFast
+    from typing import Union
+    from collections import OrderedDict
+    tokenizer = LlamaTokenizerFast.from_pretrained("hf-internal-testing/llama-tokenizer")
+    # tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-7b-hf")
+
+    """
+    prompt_template = {
+        "instruction": "### Instruction:\n{instruction}\n\n",
+        "input": "### Input:\n{input}\n\n",
+        "response": "### Response:\n"
+    }
+
+    for i in range(1):
+        MSEQA_sample = dataset_MSEQA_format_with_guidelines['train'][i]
+        #print(MSEQA_sample)
+
+        answers = MSEQA_sample['answers']
+        print(answers)
+
+        # sort text answers by ascending start positions
+        sorted_start_answers = sorted(zip(answers['answer_start'], answers['text']), key=lambda x: x[0])
+        sorted_answers_text_only = [item[1] for item in sorted_start_answers]
+        # deleting any duplicate while preserving order (order within document context)
+        sorted_textonly_gold_answers_wo_duplicates = list(OrderedDict.fromkeys(sorted_answers_text_only).keys())
+        print(sorted_textonly_gold_answers_wo_duplicates)
+
+    #llama_sample = generate_prompt(MSEQA_sample['question'], MSEQA_sample['document_context'])
+    #print(llama_sample)
+
+
+    tokenized_examples = tokenizer(
+        prompt_template['instruction'].format(instruction=MSEQA_sample['question'][:-len("TEXT:\n")]),
+        prompt_template['input'].format(input=MSEQA_sample['document_context']),
+        truncation='only_second',  # longest_first
+        max_length=380, # TODO: leave space for response
+        stride=50,
+        return_overflowing_tokens=True,
+        return_offsets_mapping=True,
+        padding=False,  # not padding here
+    )
+
+    print(type(tokenizer))
+
+    print(len(tokenized_examples['input_ids']))
+    for i in range(len(tokenized_examples['input_ids'])):
+        print(tokenized_examples['input_ids'][i])
+        tokens = [tokenizer._convert_id_to_token(x) for x in tokenized_examples['input_ids'][i]]
+        print(tokens)
+        print(tokenized_examples['offset_mapping'][i])
+        print(tokenized_examples.sequence_ids(i))
+
+        print("\n")
+
+    # TODO: convert list to string before encoding
+    # add attention mask 111 when concatenating to right of input text
+    tokenized_gold_answers = tokenizer.encode(str(sorted_textonly_gold_answers_wo_duplicates)) # TODO: convert list to string
+
+    print(tokenized_gold_answers)
+    tokens = [tokenizer._convert_id_to_token(x) for x in tokenized_gold_answers]
+    print(tokens)
+
+    print("\n")
+    print([tokenizer.all_special_tokens])
+    
+    """
+
+    small_train_MSEQA = Dataset.from_dict(dataset_MSEQA_format_with_guidelines['train'][0:10])
+    print(small_train_MSEQA)
+    #for sample in small_train_MSEQA:
+    #print(sample)
+
+    small_train_MSEQA_tokenized = small_train_MSEQA.map(
+        lambda examples_batch: tokenize_and_preprocess_LLAMA(examples_batch, tokenizer, max_seq_length=380, doc_stride=50),
+        batched=True,
+        remove_columns=small_train_MSEQA.column_names,
+    )
+
+    print(small_train_MSEQA_tokenized)
+
+    print(small_train_MSEQA_tokenized[1])
+    print([tokenizer._convert_id_to_token(x) for x in small_train_MSEQA_tokenized[1]['input_ids']])
+
+    print("\nExample of chunked/encoded and decoded back sample: \n")
+    print(tokenizer.decode(small_train_MSEQA_tokenized[1]['input_ids']))
+
+    #for sample in small_train_MSEQA_tokenized:
+    #print(len(sample['input_ids']) == len(sample['attention_mask']))
+
+
+    """
     from transformers import AutoTokenizer
     # tokenizer = AutoTokenizer.from_pretrained('t5-small')
-    tokenizer = AutoTokenizer.from_pretrained('microsoft/deberta-v2-xxlarge')
+    #tokenizer = AutoTokenizer.from_pretrained('microsoft/deberta-v2-xxlarge')
     #tokenizer = AutoTokenizer.from_pretrained('roberta-base')
-
+    
     #question = '<extra_id_0> This is the question.'
     question = 'This is the question.'
     context = 'and this is the passage of text'
@@ -295,6 +489,9 @@ if __name__ == '__main__':
     #print([tokenizer._convert_id_to_token(x) for x in tokenizer.get_sentinel_token_ids()])
 
 
+    """
 
-
+    print("\n\nIDs to token:")
+    print(tokenizer._convert_id_to_token(5159)) #▁[]
+    print(tokenizer._convert_id_to_token(2636)) # []
 

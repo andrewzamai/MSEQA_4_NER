@@ -1,8 +1,21 @@
 """
---- Pile-NER dataset annotated by GPT ---
-https://huggingface.co/datasets/Universal-NER/Pile-NER-type
-https://universal-ner.github.io/
+MSEQA_4_NER data_handler for Pile-NER dataset
+
+Converts the dataset in MSEQA format with or w/o definition
+
+- build_dataset_MSEQA_format() + remove_bad_ne_types() --> MSEQA dataset with question "What describes X in the text?"
+- build_dataset_MSEQA_format_with_guidelines() --> MSEQA dataset with instruction+definition+guidelines as prefix to the context
+
+- https://huggingface.co/datasets/Universal-NER/Pile-NER-type
+- https://universal-ner.github.io/
+
+Documents from PILE corpus annotated by GPT
+
+NB: MSEQA dataset only considers 455-top frequent NEs,
+and after some further deletions and NE mergings (lower casing + dict_of_merges)
+--> we obtain a total of 423 different NEs
 """
+
 
 import re
 import ast
@@ -15,12 +28,12 @@ from collections import OrderedDict
 from datasets import Dataset, DatasetDict, load_dataset, concatenate_datasets
 
 
-# given an UniversalNER conversation sample extract context (text passage) + (questions-gold_answers) list
+# given a single UniversalNER conversation sample extract context (text passage) + (questions-gold_answers) list
 def extract_context_quests_answers(conversation):
     # first element in the conversation list is the passage of text (context) provided by the human
     context = conversation.pop(0)
     if context["from"] == "human" and context["value"][:5] == "Text:":
-        context = context["value"][6:]
+        context = context["value"][len("Text: "):]
     else:
         raise ValueError("Invalid context or source in the conversation")
 
@@ -177,38 +190,6 @@ def build_dataset_MSEQA_format():
     return dataset_MSEQA_format
 
 
-def remove_outlier_ne_types(dataset_QA_format, min_num_samples_per_ne_type=100):
-    # new dataset with removed outliers
-    filtered_dataset_MSEQA_format_list = {split: [] for split in dataset_QA_format.keys()}
-    for split in dataset_QA_format.keys():
-        # counting number of QA samples per NE type
-        ne_types = {}
-        for sample in dataset_QA_format[split]:
-            if sample["tagName"] not in ne_types:
-                ne_types[sample["tagName"]] = 1
-            else:
-                ne_types[sample["tagName"]] += 1
-
-        # filter ne_types with count > min_num_samples_per_ne_type
-        filtered_items = {key: value for key, value in ne_types.items() if value >= min_num_samples_per_ne_type}
-        # sorting by decreasing count value
-        sorted_ordered_dict = OrderedDict(sorted(filtered_items.items(), key=lambda item: item[1], reverse=True))
-
-        for sample in dataset_QA_format[split]:
-            if sample["tagName"] in sorted_ordered_dict:
-                filtered_dataset_MSEQA_format_list[split].append(sample)
-
-        # creating smaller dataset for debugging
-        """
-        for split in filtered_dataset_MSEQA_format_list.keys():
-            if split != 'train':
-                filtered_dataset_MSEQA_format_list[split] = filtered_dataset_MSEQA_format_list[split][:200]
-            else:
-                filtered_dataset_MSEQA_format_list[split] = filtered_dataset_MSEQA_format_list[split][:1000]
-        """
-    return DatasetDict({split: Dataset.from_list(values) for split, values in filtered_dataset_MSEQA_format_list.items()})
-
-
 def remove_bad_ne_types(dataset_MSEQA_format):
     # get same NE types list for which we have GPT guidelines
     ne_types_list = get_ne_types_list(dataset_MSEQA_format, 100)
@@ -270,7 +251,7 @@ def remove_bad_ne_types(dataset_MSEQA_format):
                 ne_type = new_ne_type_list_mapping[ne_type]  # new NE name or None if to be removed
             # if has not been remove and the new mapping is in the list of NEs for which we have the gpt definition
             if ne_type is not None and ne_type in ne_types_list:
-                # new NE type
+                # assign new NE type
                 sample['tagName'] = ne_type
                 # replacing the old ne type occurrence to their new UPPERCASE
                 pattern = re.compile(re.escape(old_ne_type))
@@ -287,7 +268,7 @@ def get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type=100):
     for split in dataset_MSEQA_format.keys():
         for sample in dataset_MSEQA_format[split]:
             if sample["tagName"] in ne_types:
-                ne_types[sample["tagName"]] += len(sample['answers']['text'])
+                ne_types[sample["tagName"]] += len(sample['answers']['text']) # number of occurrences
             else:
                 ne_types[sample["tagName"]] = len(sample['answers']['text'])
 
@@ -301,7 +282,6 @@ def get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type=100):
 
 
 """ --- functions to extract n sentences per NE type as examples to build definitions through GPT prompting --- """
-
 
 def split_into_sentences(passage):
     # split the passage into sentences based on punctuation .?! while not splitting "Dr." or "Fig.1"
@@ -424,6 +404,7 @@ def get_n_sentences_per_ne_type(dataset_MSEQA_format, ne_types_list, n_sentences
 
 
 def generate_prompt(ne_type, example_sentences):
+    # TODO: NOT used
     sentences_to_text = ""
     for sto in example_sentences:
         sentence = sto['sentence']
@@ -450,20 +431,8 @@ def generate_prompt(ne_type, example_sentences):
     return prompt
 
 
-def generate_prompt_json(ne_type, example_sentences):
-    ex_sentences_json = []
-    for exsent in example_sentences:
-        ex_sentences_json.append({'sentence': exsent['sentence'], 'entities in it': exsent['target_words_in_it']})
-
-    prompt = "Given a Named Entity and some exemplary sentences in input, provide, concisely, "
-    prompt += "both a definition and warnings about what should not be labelled for this Named Entity. "
-    prompt += "Here is the input: 'Named Entity': \'{}\', 'examples': {}".format(ne_type, ex_sentences_json)
-    prompt += " Output in JSON format: {{\"Definition\": \"\", \"Do not label\": \"\"}}. Limit response to 50 tokens."
-
-    return prompt
-
-
 def generate_structured_prompt(ne_type, example_sentences):
+    """ part of the prompt template to get NE definition from GPT, complete prompt conversation schema in the ipynb notebook """
     # unpacking sentences
     ex_sentences_json = []
     for exsent in example_sentences:
@@ -703,7 +672,7 @@ def add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_w_guidelines, pa
         "tagName": Value(dtype='string', id=None),
         "question": Value(dtype='string', id=None),
         "answers": {
-            'answer_start': Sequence(feature=Value(dtype='int64', id=None), length=-1, id=None),
+            'answer_start': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None),
             'text': Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)
         }
     })
@@ -718,7 +687,232 @@ def add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_w_guidelines, pa
     return dataset_MSEQA_format_w_guidelines
 
 
+def convert_official_uniNER_eval_dataset_for_inference(dataset_name, path_to_dataset, with_definition=False, path_to_NE_guidelines_json=None):
+
+    with open(path_to_dataset, 'r') as fh:
+        uniNER_eval_samples = json.load(fh)
+
+    all_NEs_guidelines = None
+    if with_definition:
+        with open(path_to_NE_guidelines_json, 'r') as file:
+            all_NEs_guidelines = json.load(file)
+
+    # converting list to dict for fast access
+    if all_NEs_guidelines and isinstance(all_NEs_guidelines, list):
+        all_NEs_guidelines = {x['named_entity']: x for x in all_NEs_guidelines}
+
+    dataset_for_inference = []  # dataset being constructed
+    for uniNER_sample in uniNER_eval_samples:
+
+        context, questions_answers_list = extract_context_quests_answers(uniNER_sample['conversations']).values()
+
+        if len(questions_answers_list) > 1:
+            raise ValueError("Expected only 1 question")
+
+        question, ne_type, answers = questions_answers_list[0].values()
+
+        if with_definition:
+            # some uniNER NEs are different from the original NEs
+            try:
+                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            except KeyError:
+                if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
+                    ne_mapping = {
+                        'organization': 'organisation',
+                        'program language': 'programlang',
+                        'literary genre': 'literarygenre',
+                        'astronomical object': 'astronomicalobject',
+                        'chemical element': 'chemicalelement',
+                        'chemical compound': 'chemicalcompound',
+                        'academic journal': 'academicjournal',
+                        'political party': 'politicalparty',
+                        'musical artist': 'musicalartist',
+                        'musical instrument': 'musicalinstrument',
+                        'music genre': 'musicgenre',
+                    }
+                elif dataset_name == 'movie':
+                    ne_mapping = {
+                        'character': 'CHARACTER',
+                        'plot': 'PLOT',
+                        'year': 'YEAR',
+                        'director': 'DIRECTOR',
+                        'rating': 'RATING',
+                        'average ratings': 'RATINGS_AVERAGE',
+                        'actor': 'ACTOR',
+                        'genre': 'GENRE',
+                        'song': 'SONG',
+                        'trailer': 'TRAILER',
+                        'review': 'REVIEW',
+                        'title': 'TITLE'
+                    }
+                elif dataset_name == 'restaurant':
+                    ne_mapping = {
+                        'amenity': 'Amenity',
+                        'location': 'Location',
+                        'cuisine': 'Cuisine',
+                        'restaurant name': 'Restaurant_Name',
+                        'rating': 'Rating',
+                        'hours': 'Hours',
+                        'price': 'Price',
+                        'dish': 'Dish'
+                    }
+
+                ne_type = ne_mapping[ne_type]
+                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+
+            # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
+            if not gpt_definition.endswith("}"):
+                if not gpt_definition.endswith("\""):
+                    gpt_definition += "\""
+                gpt_definition += "}"
+
+            this_ne_guidelines = eval(gpt_definition)
+            # replacing ne types occurrences between single quotes to their UPPERCASE
+            ne_type_in_natural_language = all_NEs_guidelines[ne_type]['real_name']
+            pattern = re.compile(rf'\'{re.escape(ne_type_in_natural_language)}\'')
+            this_ne_guidelines = {k: pattern.sub(f'{ne_type_in_natural_language.upper()}', v) for k, v in this_ne_guidelines.items()}
+
+            question = f"Your task is to extract the Named Entities of type {ne_type_in_natural_language.upper()} from an input TEXT. "
+            question += "You are given a DEFINITION and some GUIDELINES.\n"
+            question += "DEFINITION: " + this_ne_guidelines['Definition'] + "\nGUIDELINES: " + this_ne_guidelines['Guidelines'] + "\n"
+            question += f"TEXT: "
+
+        inference_sample = {
+            "doc_question_pairID": uniNER_sample['id'],
+            "document_context": context,
+            "tagName": ne_type,
+            "question": question,
+            "answers": answers
+        }
+        dataset_for_inference.append(inference_sample)
+
+    return DatasetDict({"test": Dataset.from_list(dataset_for_inference)})
+
+
 if __name__ == "__main__":
+
+    def normalize_answer(s):
+        """Lower text and remove punctuation, articles and extra whitespace."""
+
+        def remove_articles(text):
+            return re.sub(r'\b(a|an|the)\b', ' ', text)
+
+        def white_space_fix(text):
+            return ' '.join(text.split())
+
+        def remove_punc(text):
+            exclude = set(string.punctuation)
+            return ''.join(ch for ch in text if ch not in exclude)
+
+        def lower(text):
+            return text.lower()
+
+        return white_space_fix(remove_articles(remove_punc(lower(s))))
+
+
+    def parser(text):
+        try:
+            match = re.match(r'\[(.*?)\]', text)
+            if match:
+                text = match.group()
+            else:
+                text = '[]'
+            items = json.loads(text)
+            formatted_items = []
+            for item in items:
+                if isinstance(item, list) or isinstance(item, tuple):
+                    item = tuple([normalize_answer(element) for element in item])
+                else:
+                    item = normalize_answer(item)
+                if item not in formatted_items:
+                    formatted_items.append(item)
+            return formatted_items
+        except Exception:
+            return []
+
+
+    class NEREvaluator:
+        def evaluate(self, preds: list, golds: list):
+            n_correct, n_pos_gold, n_pos_pred = 0, 0, 0
+            for pred, gold in zip(preds, golds):
+                gold_tuples = parser(gold)
+                pred_tuples = parser(pred)
+                for t in pred_tuples:
+                    if t in gold_tuples:
+                        n_correct += 1
+                    n_pos_pred += 1
+                n_pos_gold += len(gold_tuples)
+            prec = n_correct / (n_pos_pred + 1e-10)
+            recall = n_correct / (n_pos_gold + 1e-10)
+            f1 = 2 * prec * recall / (prec + recall + 1e-10)
+            return {
+                'precision': prec,
+                'recall': recall,
+                'f1': f1,
+            }
+
+    gold_sample = "[\"naive Bayes classifier\", \"Gaussian mixture model\", \"variational autoencoders\"]"
+    print(gold_sample)
+
+    # Esempio d'uso:
+    strings = ["naive Bayes classifier", "Gaussian mixture model", "variational autoencoders"]
+    filename = "output.json"
+    with open("./prova.json", "w") as f:
+        f.write(str(strings))
+
+
+    path_to_eval_dataset_uniNER = f'../../../datasets/eval_data_UniNER/test_data/mit-movie.json'
+    with open(path_to_eval_dataset_uniNER, 'r') as fh:
+        eval_dataset_uniNER = json.load(fh)
+    golds = [example['conversations'][-1]['value'] for example in eval_dataset_uniNER]
+    print(golds[0:100])
+    print(type(golds[0]))
+    print(type(golds[7]))
+
+    with open('./movie_preds.json', 'r') as fh:
+        preds = json.load(fh)
+
+    preds = [json.dumps(x['pred_answers']) for x in preds]
+
+    print(preds[0:100])
+    print(type(preds[0]))
+    print(type(preds[7]))
+
+    eval_result = NEREvaluator().evaluate(preds, golds)
+
+    print(f'Precision: {eval_result["precision"]}, Recall: {eval_result["recall"]}, F1: {eval_result["f1"]}')
+
+
+    """
+    first_list = [{'id': 'CrossNER_literature_0'}, {'id': 'CrossNER_literature_1'}, {'id': 'CrossNER_literature_2'}]
+    second_list = [{'doc_question_pairID': 'CrossNER_literature_2'}, {'doc_question_pairID': 'CrossNER_literature_1'}, {'doc_question_pairID': 'CrossNER_literature_0'}]
+
+    # Sort the second list based on the order of IDs from the first list
+    sorted_second_list = sorted(second_list,key=lambda x: [d['id'] for d in first_list].index(x['doc_question_pairID']))
+    print(sorted_second_list)
+
+    dataset_name = 'ai'
+    data_path = f'../../../datasets/eval_data_UniNER/test_data/CrossNER_{dataset_name}.json'
+    #data_path = f'../../../datasets/eval_data_UniNER/test_data/mit-{dataset_name}.json'
+    with open(data_path, 'r') as fh:
+        examples = json.load(fh)
+
+    print(type(examples))
+    print(len(examples))
+    print(examples[0])
+
+    dataset_for_inference_MSEQA = convert_official_uniNER_eval_dataset_for_inference(dataset_name, data_path, with_definition=True, path_to_NE_guidelines_json=f'./questions/crossNER/gpt_guidelines/{dataset_name}_NE_definitions.json')
+    print(dataset_for_inference_MSEQA)
+    print(dataset_for_inference_MSEQA['test'][0])
+    print(dataset_for_inference_MSEQA['test'][1])
+    print(dataset_for_inference_MSEQA['test'][10])
+
+    #for sample in dataset_for_inference_MSEQA['test']:
+        #print(sample)
+
+    """
+
+    """
 
     raw_dataset = load_dataset("Universal-NER/Pile-NER-type")
     print(raw_dataset)
@@ -726,7 +920,7 @@ if __name__ == "__main__":
     #pileNER_raw_statistics = get_dataset_statistics()
     #print(pileNER_raw_statistics)
 
-    #print(raw_dataset['train'][0]['conversations'])
+    print(raw_dataset['train'][8840]['conversations'])
     
     context, quests_answers = extract_context_quests_answers(raw_dataset['train'][8840]['conversations']).values()
     print(context)
@@ -738,6 +932,9 @@ if __name__ == "__main__":
             print(context[a_s:a_s+15])
             print(text)
             print("---")
+
+    """
+
     """
     # uniNER_dataset_MSEQA_format = build_dataset_MSEQA_format()
     # uniNER_dataset_MSEQA_format.save_to_disk("../../../datasets/uniNER_dataset_MSEQA_format")
@@ -806,16 +1003,18 @@ if __name__ == "__main__":
     print(dataset_MSEQA_format_removed_NEs['train'][100])
     """
 
+    """
+    #dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
+    dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
 
-    dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/dataset_MSEQA_format_with_guidelines_2")
-    #dataset_MSEQA_format_with_guidelines = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json")
     print(dataset_MSEQA_format_with_guidelines)
     print(dataset_MSEQA_format_with_guidelines['train'][400])
     print(dataset_MSEQA_format_with_guidelines['train'][443])
     print(dataset_MSEQA_format_with_guidelines['train'][432])
     print(dataset_MSEQA_format_with_guidelines['train'][732])
 
-    #dataset_MSEQA_format_with_guidelines.save_to_disk("../../../datasets/dataset_MSEQA_format_with_guidelines_2")
+    #dataset_MSEQA_format_with_guidelines.save_to_disk("../../../datasets/dataset_MSEQA_format_with_guidelines")
+    """
 
     """
     for split_name, split_dataset in dataset_MSEQA_format_with_guidelines.items():
