@@ -1,5 +1,5 @@
 """ MSEQA for NER metrics """
-
+import os.path
 from typing import Tuple, List
 import collections
 import json
@@ -32,7 +32,7 @@ def compute_overlap_char_indices(interval_1: Tuple[int, int], interval_2: Tuple[
 
 def compute_precision_recall_f1_for_a_NE_category(all_predictions_related_to_a_tagName: List[dict]) -> dict:
     """
-    Given all predictions related to a NE category compute precision, recall, f1 for this NE category (question)
+    Given all predictions related to a NE category (1 question per document) compute precision, recall, f1 for this NE category (question)
     Each prediction is a dict with fields 'gold_answers', 'predicted_answers_doc_level' ...
     """
 
@@ -44,7 +44,7 @@ def compute_precision_recall_f1_for_a_NE_category(all_predictions_related_to_a_t
     for sample in all_predictions_related_to_a_tagName:
 
         gold_answers = sample["gold_answers"]  # text and start_char indices only
-        pred_answers_for_doc = sample["predicted_answers_doc_level"]
+        pred_answers_for_doc = sample["predicted_answers_doc_level"]  # predictions already merged from passages to doc level
 
         # building gold answers with (start, end) char indices
         gold_answers_with_char_intervals = []
@@ -66,13 +66,14 @@ def compute_precision_recall_f1_for_a_NE_category(all_predictions_related_to_a_t
             for pred in pred_answers_for_doc:
                 hit = False
                 for i, ga in enumerate(gold_answers_with_char_intervals):
-                    # hard hit between character intervals
+                    # exact match between character intervals
                     if pred['start_end_indices'] == ga['start_end_indices']:
                         hit = True
                         hit_gold_answers_indices.append(i)
                 if hit:
                     # if '' had highest score in the passage than all the other answers were removed
                     # but a '' answer may still appear as answer in a list of non empty answers, with a low score
+                    # TODO: modify merge_passage function to remove '' prediction if not top score
                     if pred['text'] != '':
                         tp += 1
                     else:
@@ -99,7 +100,7 @@ def compute_precision_recall_f1_for_a_NE_category(all_predictions_related_to_a_t
     return metrics
 
 
-def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List[dict]) -> dict:
+def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List[dict], dataset_name='unknown_dataset', path_to_save_predictions='./predictions') -> dict:
     """
     Compute micro precision, recall and F1 across all predictions (NE category agnostic)
     """
@@ -110,6 +111,8 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
     tn = 0
 
     to_print_preds = False
+    if dataset_name != 'unknown_dataset':
+        to_print_preds = True  # set to True to print FPs, TPs, FNs
     false_positives = []
     true_positives = []
     false_negatives = []
@@ -209,11 +212,13 @@ def compute_micro_precision_recall_f1(pred_answers_for_a_quest_on_doc_list: List
     metrics = {'precision': precision, 'recall': recall, 'f1': f1}
 
     if to_print_preds:
-        with open('./predictions/false_positives.json', 'w', encoding='utf-8') as f:
+        if not os.path.exists(os.path.join(path_to_save_predictions, dataset_name)):
+            os.makedirs(os.path.join(path_to_save_predictions, dataset_name))
+        with open(os.path.join(path_to_save_predictions, dataset_name, 'false_positives.json'), 'w', encoding='utf-8') as f:
             json.dump(false_positives, f, ensure_ascii=False, indent=4)
-        with open('./predictions/true_positives.json', 'w', encoding='utf-8') as f:
+        with open(os.path.join(path_to_save_predictions, dataset_name, 'true_positives.json'), 'w', encoding='utf-8') as f:
             json.dump(true_positives, f, ensure_ascii=False, indent=4)
-        with open('./predictions/false_negatives.json', 'w', encoding='utf-8') as f:
+        with open(os.path.join(path_to_save_predictions, dataset_name, 'false_negatives.json'), 'w', encoding='utf-8') as f:
             json.dump(false_negatives, f, ensure_ascii=False, indent=4)
 
     return metrics

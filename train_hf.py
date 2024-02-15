@@ -39,6 +39,8 @@ if __name__ == '__main__':
 
     print("Training parameters:\n")
 
+    dataset_name = 'pileNER'
+
     # pre-training on universalNER GPT conversations (i.e. pileNER corpus)
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
@@ -267,7 +269,7 @@ if __name__ == '__main__':
         model_outputs_for_metrics=model_outputs_for_metrics
     )
     # compute metrics
-    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=dataset_name)
     print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
 
     # compute all other metrics
@@ -409,7 +411,7 @@ if __name__ == '__main__':
                 model_outputs_for_metrics=model_outputs_for_metrics
             )
             # compute metrics
-            micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+            micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=dataset_name)
             print("\n\nmicro (100%) - Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
 
             # compute all other metrics

@@ -117,9 +117,9 @@ if __name__ == '__main__':
     tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
 
     if WITH_DEFINITION:
-        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-0"
+        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-C"
     else:
-        path_to_model = None
+        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-FalseDef-0"
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 

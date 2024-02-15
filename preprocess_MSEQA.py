@@ -274,26 +274,36 @@ def tokenize_and_preprocess_LLAMA(examples_MSEQA_format, tokenizer, max_seq_leng
     """
 
     tokenized_instruction_context = tokenizer(
-        [prompt_template['instruction'].format(instruction=x[:-len("TEXT:\n")]) for x in examples_MSEQA_format['question']],  # removing "TEXT:"
+        [prompt_template['instruction'].format(instruction=x[:-len("TEXT:\n")]) for x in examples_MSEQA_format['question']],  # removing ending "TEXT:"
         [prompt_template['input'].format(input=x) for x in examples_MSEQA_format['document_context']],
         truncation='only_second',
         max_length=max_seq_length,
         stride=doc_stride,
         return_overflowing_tokens=True,
-        return_offsets_mapping=False,  # don't care about offset mapping with a generative model
+        return_offsets_mapping=True,  # don't care about offset mapping with a generative model
         padding=False,  # not padding here
     )
 
-    # popping <s> input ids (ID = 1) inserted by tokenizer between instruction and context
+    # popping middle <s> inserted by tokenizer between instruction and context
+    offset_mapping = tokenized_instruction_context.pop("offset_mapping")
+    print(offset_mapping)
     for i, tok_input_ids in enumerate(tokenized_instruction_context['input_ids']):
-        second_one_index = tok_input_ids.index(1, tok_input_ids.index(1) + 1)
-        tokenized_instruction_context['input_ids'][i].pop(second_one_index)
-        tokenized_instruction_context['attention_mask'][i].pop(second_one_index)
+        # finding middle <s> which corresponds to ID=1
+        middle_s_index = tok_input_ids.index(tokenizer.bos_token_id, 1)
+        tokenized_instruction_context['input_ids'][i].pop(middle_s_index)
+        tokenized_instruction_context['attention_mask'][i].pop(middle_s_index)
+        offset_mapping[i] = offset_mapping[i][middle_s_index:]
 
-    # tokenize answers and right-concatenate
-    # TODO: add attention mask 1 and EOS token
-    # sort text answers by ascending start positions
+    print(offset_mapping)
+
+    # if the passage is the second part of a chunked doc --> prefix with ...
+
+    # tokenize answers and right-concatenate to the instruction+passage_of_text already encoded
+    # sorting the text answers by ascending start positions to give the LLM a pattern: extract the occurences in the order they appear in the passage of text
+    # although the evaluation metrics are order independent the NTP loss is penalizes order
+    # we delete duplicate occurrences thus obtaining a SET of gold_answers
     gold_answers_with_char_start_perDoc = examples_MSEQA_format['answers']
+    # working in batch
     sorted_textonly_gold_answers_wo_duplicates_perDoc = []
     for ga_w_c_s_perDoc in gold_answers_with_char_start_perDoc:
         # sort text answers by ascending start positions
@@ -303,32 +313,64 @@ def tokenize_and_preprocess_LLAMA(examples_MSEQA_format, tokenizer, max_seq_leng
         # deleting any duplicate while preserving order (order within document context)
         sorted_textonly_gold_answers_wo_duplicates = list(OrderedDict.fromkeys(sorted_answers_text_only).keys())
         # converting to string and appending
-        sorted_textonly_gold_answers_wo_duplicates_perDoc.append(prompt_template['response'] + str(sorted_textonly_gold_answers_wo_duplicates))
+        #sorted_textonly_gold_answers_wo_duplicates_perDoc.append(prompt_template['response'] + str(sorted_textonly_gold_answers_wo_duplicates))
+        sorted_textonly_gold_answers_wo_duplicates_perDoc.append(sorted_textonly_gold_answers_wo_duplicates)
 
     print(sorted_textonly_gold_answers_wo_duplicates_perDoc)
 
-    tokenized_answers = tokenizer(
-        sorted_textonly_gold_answers_wo_duplicates_perDoc,
-        truncation=True,
-        max_length=max_seq_length,
-        return_overflowing_tokens=True
-    )
-
-    print(tokenized_answers)
-
+    # total number of passages the documents have been chunked in
     num_passages = len(tokenized_instruction_context['input_ids'])
 
     # Since one document might produce several passages if it has a long context,
     # we need a map from passages to its corresponding doc-question sample
     sample_mapping = tokenized_instruction_context.pop("overflow_to_sample_mapping")
 
+
+
     # in passage_id we save the doc_question_pairID that generated it to later collect back passages answers to doc level
     tokenized_instruction_context["passage_id"] = []
 
+    gold_answers_per_passage = []
     for i in range(num_passages):
         # giving to passageID the ID of the doc-question pair that generated it
         sample_index = sample_mapping[i]
         tokenized_instruction_context["passage_id"].append(examples_MSEQA_format["doc_question_pairID"][sample_index])
+
+        sorted_text_only_answers_for_this_doc = sorted_textonly_gold_answers_wo_duplicates_perDoc[sample_index]
+        # since the document may have been chunked in passages not all gold answers may be present in this passage of text
+        # now we need to pop the gold answers that are not in this chunk of text
+        # TODO: return also offsetmappings, after finging middle <s> scale offset by -len(istruction)? probably no
+        # check if start, end char intervals within passage offset mapping
+
+        passage_input_ids = tokenized_instruction_context['input_ids'][i]
+        this_passage_gold_answers = []
+        for i, ga_text in enumerate(sorted_text_only_answers_for_this_doc):
+            ga_text_input_ids = tokenizer.encode(ga_text.strip(), add_special_tokens=False)
+            #print(f"{ga_text}: {ga_text_input_ids}")
+            #print([tokenizer._convert_id_to_token(x) for x in ga_text_input_ids])
+            #print(passage_input_ids)
+
+            passage_contains_ga = False
+            # Iterate through input_ids using a sliding window
+            max_index = len(passage_input_ids) - len(ga_text_input_ids)
+            for j in range(max_index + 1):
+                if passage_input_ids[j:j + len(ga_text_input_ids)] == ga_text_input_ids:
+                    passage_contains_ga = True
+
+            if passage_contains_ga:
+                this_passage_gold_answers.append(ga_text)
+
+        gold_answers_per_passage.append(this_passage_gold_answers)
+
+        """   
+        tokenized_answers = tokenizer(
+            this_passage_gold_answers,
+            truncation=True,
+            max_length=max_seq_length,
+            return_overflowing_tokens=True
+        )
+
+        print(tokenized_answers)
 
         this_passage_tokenized_gold_answers_input_ids = tokenized_answers['input_ids'][sample_index][1:]
         this_passage_tokenized_gold_answers_attention_mask = tokenized_answers['attention_mask'][sample_index][1:]
@@ -338,6 +380,8 @@ def tokenize_and_preprocess_LLAMA(examples_MSEQA_format, tokenizer, max_seq_leng
 
         tokenized_instruction_context['input_ids'][i].append(tokenizer.eos_token_id)
         tokenized_instruction_context['attention_mask'][i].append(1)
+        """
+    print(gold_answers_per_passage)
 
     # not padding here
     # TODO: add also "labels" key?
@@ -361,6 +405,28 @@ if __name__ == '__main__':
     from collections import OrderedDict
     tokenizer = LlamaTokenizerFast.from_pretrained("hf-internal-testing/llama-tokenizer")
     # tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-7b-hf")
+
+    #print(tokenizer("..."))
+    #print(tokenizer._convert_id_to_token(2023))
+
+    print(tokenizer.encode("STDIN_FILENO"))
+    print([tokenizer._convert_id_to_token(x) for x in tokenizer.encode("STDIN_FILENO")])
+    print(tokenizer.encode("(STDIN_FILENO)"))
+    print([tokenizer._convert_id_to_token(x) for x in tokenizer.encode("(STDIN_FILENO)")])
+
+    print(29922, 949, 29898, 1254, 29928, 1177, 29918, 7724, 6632)
+    print([tokenizer._convert_id_to_token(x) for x in [29922, 949, 29898, 1254, 29928, 1177, 29918, 7724, 6632]])
+
+    print(tokenizer("affection"))
+    print(tokenizer.encode("affection", add_special_tokens=False))
+    print([tokenizer._convert_id_to_token(x) for x in tokenizer("affection")['input_ids']])
+    print(tokenizer(" affection"))
+    print(tokenizer.encode(" affection", add_special_tokens=False))
+    print([tokenizer._convert_id_to_token(x) for x in tokenizer(" affection")['input_ids']])
+    print(tokenizer("affection "))
+    print([tokenizer._convert_id_to_token(x) for x in tokenizer("affection ")['input_ids']])
+    print(tokenizer("ciao affection ciao"))
+    print([tokenizer._convert_id_to_token(x) for x in tokenizer("ciao affection ciao")['input_ids']])
 
     """
     prompt_template = {

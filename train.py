@@ -43,6 +43,8 @@ if __name__ == '__main__':
 
     print("Training parameters:\n")
 
+    dataset_name = 'pileNER'
+
     # pre-training on universalNER gpt conversations (i.e. pileNER corpus)
     from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
@@ -259,7 +261,7 @@ if __name__ == '__main__':
             model_outputs_for_metrics=model_outputs_for_metrics
         )
         # compute metrics
-        micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+        micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=dataset_name)
         print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100,
                                                                      micro_metrics['recall'] * 100,
                                                                      micro_metrics['f1'] * 100))
@@ -354,7 +356,7 @@ if __name__ == '__main__':
                                                                                                                            datasetdict_MSEQA_format=dataset_MSEQA_format,
                                                                                                                            model_outputs_for_metrics=model_outputs_for_metrics)
                     # computing metrics
-                    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+                    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=dataset_name)
                     print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
                     # metrics_per_question_on_validation_every_N_batch_steps.append(metrics_per_question)
                     metrics_overall_on_validation_every_N_batch_steps.append(micro_metrics)
@@ -415,7 +417,7 @@ if __name__ == '__main__':
         model_outputs_for_metrics=model_outputs_for_metrics
     )
     # compute metrics
-    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=dataset_name)
     print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
 
     # compute all other metrics

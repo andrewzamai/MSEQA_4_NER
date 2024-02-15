@@ -85,14 +85,9 @@ if __name__ == '__main__':
     tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
 
     if WITH_DEFINITION:
-        # path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_lr1e5/finetuned_model"
-        #path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-0"
-        #path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_A/checkpoint-1200"
-        #path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_C/checkpoint-2600"
-        #path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-B"
-        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_C/checkpoint-4000"
+        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-0"
     else:
-        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_FalseDef_B/checkpoint-2600"
+        path_to_model = "./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_FalseDef_B/finetuned_model"
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 
@@ -113,8 +108,8 @@ if __name__ == '__main__':
         api_keys_dict[api_name] = api_value
     # print(api_keys_dict)
 
-    #model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model, token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'], cache_dir='./hf_cache_dir')
-    model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model)
+    model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model, token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'], cache_dir='./hf_cache_dir')
+    #model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model)
 
     accelerator = Accelerator(mixed_precision='bf16')
     model = accelerator.prepare(model)
@@ -177,7 +172,7 @@ if __name__ == '__main__':
                 model_outputs_for_metrics=model_outputs_for_metrics
             )
             # compute metrics
-            micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+            micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=subdataset_name)
             print("\n\nmicro (100%) - Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
 
             # compute all other metrics

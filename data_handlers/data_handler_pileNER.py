@@ -15,8 +15,7 @@ NB: MSEQA dataset only considers 455-top frequent NEs,
 and after some further deletions and NE mergings (lower casing + dict_of_merges)
 --> we obtain a total of 423 different NEs
 """
-
-
+import os
 import re
 import ast
 import json
@@ -789,11 +788,63 @@ def convert_official_uniNER_eval_dataset_for_inference(dataset_name, path_to_dat
     return DatasetDict({"test": Dataset.from_list(dataset_for_inference)})
 
 
+def convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition=True, path_to_save_to='./unk_dataset_GenQA'):
+
+    for split_name in dataset_MSEQA_format.keys():
+        dataset_GenQA = []
+        for MSEQA_sample in dataset_MSEQA_format[split_name]:
+            genQA_sample = {
+                "doc_question_pairID": MSEQA_sample['doc_question_pairID'],
+                "tagName": MSEQA_sample['tagName'],
+                # new column names as finetune_sft.py requires
+                "input": MSEQA_sample['document_context'],
+                "instruction": "",
+                "output": ""
+            }
+            if with_definition:
+                instruction = MSEQA_sample['question']
+                instruction = instruction.replace("from an input TEXT", "from the text chunk you have read")
+                instruction = instruction.replace("Your task is to extract", "Extract")
+                instruction = instruction.replace("\nTEXT: ", "\nReturn a JSON list.")
+                # instruction = instruction[:-len("\nTEXT: ")]
+                genQA_sample['instruction'] = instruction
+            else:
+                # TODO: rephrase question What describes X in the text?
+                genQA_sample['instruction'] = MSEQA_sample['question']
+
+            # sorting the text answers by ascending starting positions to give the LLM a pattern: extract the occurences in the order they appear in the passage of text
+            # this is because although the evaluation metrics are order independent the NTP loss penalizes order
+            # we also delete duplicate occurrences thus obtaining a SET of gold_answers
+            gold_answers_with_char_starts = MSEQA_sample['answers']
+            # sort text answers by ascending start positions
+            sorted_start_answers = sorted(zip(gold_answers_with_char_starts['answer_start'], gold_answers_with_char_starts['text']), key=lambda x: x[0])
+            # retrieve only text answers
+            sorted_answers_text_only = [item[1] for item in sorted_start_answers]
+            # deleting any duplicate while preserving order (order within document context)
+            sorted_textonly_gold_answers_wo_duplicates = list(OrderedDict.fromkeys(sorted_answers_text_only).keys())
+            #genQA_sample["output"] = str(sorted_textonly_gold_answers_wo_duplicates)  # stringifying list
+            genQA_sample["output"] = json.dumps(sorted_textonly_gold_answers_wo_duplicates)  # stringifying list
+
+            dataset_GenQA.append(genQA_sample)
+
+        dataset_GenQA = Dataset.from_list(dataset_GenQA)
+
+        dataset_GenQA.to_json(os.path.join(path_to_save_to, split_name + '.jsonl'))
+
+
 if __name__ == "__main__":
 
-    def normalize_answer(s):
-        """Lower text and remove punctuation, articles and extra whitespace."""
+    dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/pileNER_MSEQA_format_with_guidelines")
+    print(dataset_MSEQA_format_with_guidelines)
+    print(dataset_MSEQA_format_with_guidelines['train'][400])
+    print(dataset_MSEQA_format_with_guidelines['train'][443])
+    print(dataset_MSEQA_format_with_guidelines['train'][432])
+    print(dataset_MSEQA_format_with_guidelines['train'][732])
 
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_guidelines, with_definition=True, path_to_save_to="../../../datasets/pileNER_GenQA_format_with_guidelines")
+
+    """
+    def normalize_answer(s):
         def remove_articles(text):
             return re.sub(r'\b(a|an|the)\b', ' ', text)
 
@@ -860,7 +911,6 @@ if __name__ == "__main__":
     with open("./prova.json", "w") as f:
         f.write(str(strings))
 
-
     path_to_eval_dataset_uniNER = f'../../../datasets/eval_data_UniNER/test_data/mit-movie.json'
     with open(path_to_eval_dataset_uniNER, 'r') as fh:
         eval_dataset_uniNER = json.load(fh)
@@ -881,6 +931,7 @@ if __name__ == "__main__":
     eval_result = NEREvaluator().evaluate(preds, golds)
 
     print(f'Precision: {eval_result["precision"]}, Recall: {eval_result["recall"]}, F1: {eval_result["f1"]}')
+    """
 
 
     """

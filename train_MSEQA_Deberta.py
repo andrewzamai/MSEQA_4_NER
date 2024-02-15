@@ -48,6 +48,8 @@ if __name__ == '__main__':
 
     print("Training parameters:\n")
 
+    dataset_name = 'pileNER'
+
     pretrained_model_relying_on = "microsoft/deberta-v2-xxlarge"
     print(f"pretrained_model_relying_on: {pretrained_model_relying_on}")
     tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
@@ -76,7 +78,7 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_0"
+    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_C-bis"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -294,7 +296,7 @@ if __name__ == '__main__':
         model_outputs_for_metrics=model_outputs_for_metrics
     )
     # compute metrics
-    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+    micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=dataset_name)
     print("Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
 
     # compute all other metrics
@@ -434,7 +436,7 @@ if __name__ == '__main__':
                 model_outputs_for_metrics=model_outputs_for_metrics
             )
             # compute metrics
-            micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list)
+            micro_metrics = metrics_EQA_MS.compute_micro_precision_recall_f1(question_on_document_predicted_answers_list, dataset_name=subdataset_name)
             print("\n\nmicro (100%) - Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(micro_metrics['precision'] * 100, micro_metrics['recall'] * 100, micro_metrics['f1'] * 100))
 
             # compute all other metrics
