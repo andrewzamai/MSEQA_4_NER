@@ -117,7 +117,7 @@ if __name__ == '__main__':
     tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
 
     if WITH_DEFINITION:
-        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-C"
+        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-D"
     else:
         path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-FalseDef-0"
 

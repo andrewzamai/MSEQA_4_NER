@@ -832,8 +832,121 @@ def convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition=
         dataset_GenQA.to_json(os.path.join(path_to_save_to, split_name + '.jsonl'))
 
 
+def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset, with_definition=False, path_to_NE_guidelines_json=None):
+    """
+    Adapting UniNER eval datasets mit/crossNER for eval with Generative LLMs.
+    Changing document_context column name to 'input' and answers to 'output'.
+    Adding NE Guidelines as 'instruction'
+    """
+
+    with open(path_to_dataset, 'r') as fh:
+        uniNER_eval_samples = json.load(fh)
+
+    all_NEs_guidelines = None
+    if with_definition:
+        with open(path_to_NE_guidelines_json, 'r') as file:
+            all_NEs_guidelines = json.load(file)
+
+    # converting list to dict for fast access
+    if all_NEs_guidelines and isinstance(all_NEs_guidelines, list):
+        all_NEs_guidelines = {x['named_entity']: x for x in all_NEs_guidelines}
+
+    dataset_GenQA = []  # dataset being constructed
+    for uniNER_sample in uniNER_eval_samples:
+
+        context, questions_answers_list = extract_context_quests_answers(uniNER_sample['conversations']).values()
+
+        if len(questions_answers_list) > 1:
+            raise ValueError("Expected only 1 question")
+
+        question, ne_type, answers = questions_answers_list[0].values()
+
+        if with_definition:
+            # some uniNER NEs are different from the original NEs
+            try:
+                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            except KeyError:
+                if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
+                    ne_mapping = {
+                        'organization': 'organisation',
+                        'program language': 'programlang',
+                        'literary genre': 'literarygenre',
+                        'astronomical object': 'astronomicalobject',
+                        'chemical element': 'chemicalelement',
+                        'chemical compound': 'chemicalcompound',
+                        'academic journal': 'academicjournal',
+                        'political party': 'politicalparty',
+                        'musical artist': 'musicalartist',
+                        'musical instrument': 'musicalinstrument',
+                        'music genre': 'musicgenre',
+                    }
+                elif dataset_name == 'movie':
+                    ne_mapping = {
+                        'character': 'CHARACTER',
+                        'plot': 'PLOT',
+                        'year': 'YEAR',
+                        'director': 'DIRECTOR',
+                        'rating': 'RATING',
+                        'average ratings': 'RATINGS_AVERAGE',
+                        'actor': 'ACTOR',
+                        'genre': 'GENRE',
+                        'song': 'SONG',
+                        'trailer': 'TRAILER',
+                        'review': 'REVIEW',
+                        'title': 'TITLE'
+                    }
+                elif dataset_name == 'restaurant':
+                    ne_mapping = {
+                        'amenity': 'Amenity',
+                        'location': 'Location',
+                        'cuisine': 'Cuisine',
+                        'restaurant name': 'Restaurant_Name',
+                        'rating': 'Rating',
+                        'hours': 'Hours',
+                        'price': 'Price',
+                        'dish': 'Dish'
+                    }
+
+                ne_type = ne_mapping[ne_type]
+                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+
+            # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
+            if not gpt_definition.endswith("}"):
+                if not gpt_definition.endswith("\""):
+                    gpt_definition += "\""
+                gpt_definition += "}"
+
+            this_ne_guidelines = eval(gpt_definition)
+            # replacing ne types occurrences between single quotes to their UPPERCASE
+            ne_type_in_natural_language = all_NEs_guidelines[ne_type]['real_name']
+            pattern = re.compile(rf'\'{re.escape(ne_type_in_natural_language)}\'')
+            this_ne_guidelines = {k: pattern.sub(f'{ne_type_in_natural_language.upper()}', v) for k, v in this_ne_guidelines.items()}
+
+            question = f"Your task is to extract the Named Entities of type {ne_type_in_natural_language.upper()} from an input TEXT. "
+            question += "You are given a DEFINITION and some GUIDELINES.\n"
+            question += "DEFINITION: " + this_ne_guidelines['Definition'] + "\nGUIDELINES: " + this_ne_guidelines['Guidelines'] + "\n"
+            question += f"TEXT: "
+
+            # adapting to reverse_INST template Prompter
+            question = question.replace("from an input TEXT", "from the text chunk you have read")
+            question = question.replace("Your task is to extract", "Extract")
+            question = question.replace("\nTEXT: ", "\nReturn a JSON list.")
+
+        genQA_sample = {
+            "doc_question_pairID": uniNER_sample['id'],
+            "input": context,
+            "tagName": ne_type,
+            "instruction": question,
+            "output": uniNER_sample['conversations'][-1]['value']
+        }
+        dataset_GenQA.append(genQA_sample)
+
+    return Dataset.from_list(dataset_GenQA)
+
+
 if __name__ == "__main__":
 
+    """
     dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/pileNER_MSEQA_format_with_guidelines")
     print(dataset_MSEQA_format_with_guidelines)
     print(dataset_MSEQA_format_with_guidelines['train'][400])
@@ -842,6 +955,28 @@ if __name__ == "__main__":
     print(dataset_MSEQA_format_with_guidelines['train'][732])
 
     convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_guidelines, with_definition=True, path_to_save_to="../../../datasets/pileNER_GenQA_format_with_guidelines")
+    """
+
+    dataset_name = 'ai'
+    data_path = f'../../../datasets/eval_data_UniNER/test_data/CrossNER_{dataset_name}.json'
+    # data_path = f'../../../datasets/eval_data_UniNER/test_data/mit-{dataset_name}.json'
+    with open(data_path, 'r') as fh:
+        examples = json.load(fh)
+
+    print(type(examples))
+    print(len(examples))
+    print(examples[0])
+
+    dataset_for_inference_MSEQA = convert_official_uniNER_eval_dataset_for_GenQA(dataset_name,
+                                                                                     data_path,
+                                                                                     with_definition=True,
+                                                                                     path_to_NE_guidelines_json=f'./questions/crossNER/gpt_guidelines/{dataset_name}_NE_definitions.json')
+    print(dataset_for_inference_MSEQA)
+    print(dataset_for_inference_MSEQA[0])
+    print(dataset_for_inference_MSEQA[1])
+    print(dataset_for_inference_MSEQA[10])
+
+    dataset_for_inference_MSEQA.to_json('./ai_GenQA_for_inference.json')
 
     """
     def normalize_answer(s):
