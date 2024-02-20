@@ -957,9 +957,9 @@ if __name__ == "__main__":
     convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_guidelines, with_definition=True, path_to_save_to="../../../datasets/pileNER_GenQA_format_with_guidelines")
     """
 
-    dataset_name = 'ai'
-    data_path = f'../../../datasets/eval_data_UniNER/test_data/CrossNER_{dataset_name}.json'
-    # data_path = f'../../../datasets/eval_data_UniNER/test_data/mit-{dataset_name}.json'
+    dataset_name = 'restaurant'
+    #data_path = f'../../../datasets/eval_data_UniNER/test_data/CrossNER_{dataset_name}.json'
+    data_path = f'../../../datasets/eval_data_UniNER/test_data/mit-{dataset_name}.json'
     with open(data_path, 'r') as fh:
         examples = json.load(fh)
 
@@ -970,13 +970,14 @@ if __name__ == "__main__":
     dataset_for_inference_MSEQA = convert_official_uniNER_eval_dataset_for_GenQA(dataset_name,
                                                                                      data_path,
                                                                                      with_definition=True,
-                                                                                     path_to_NE_guidelines_json=f'./questions/crossNER/gpt_guidelines/{dataset_name}_NE_definitions.json')
+                                                                                     path_to_NE_guidelines_json=f'./questions/MIT/gpt_guidelines/{dataset_name}_NE_definitions.json')
     print(dataset_for_inference_MSEQA)
+    # print(len(dataset_for_inference_MSEQA))
     print(dataset_for_inference_MSEQA[0])
     print(dataset_for_inference_MSEQA[1])
     print(dataset_for_inference_MSEQA[10])
 
-    dataset_for_inference_MSEQA.to_json('./ai_GenQA_for_inference.json')
+    # dataset_for_inference_MSEQA.to_json('./ai_GenQA_for_inference.json')
 
     """
     def normalize_answer(s):

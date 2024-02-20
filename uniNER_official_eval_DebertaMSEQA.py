@@ -111,15 +111,15 @@ if __name__ == '__main__':
         {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
     ]
 
-    WITH_DEFINITION = True
+    WITH_DEFINITION = False
     print(f"With definition: {WITH_DEFINITION}")
 
     tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
 
     if WITH_DEFINITION:
-        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-D"
+        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-B-bis"
     else:
-        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-FalseDef-0"
+        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-FalseDef-C-bis"
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 

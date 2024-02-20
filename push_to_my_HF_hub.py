@@ -20,8 +20,8 @@ if __name__ == '__main__':
     )
     """
 
-    path_to_model_to_upload = './baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_TrueDef_D/finetuned_model'
-    new_repo_name = 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-D'
+    path_to_model_to_upload = './baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_FalseDef_C-bis/finetuned_model'
+    new_repo_name = 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-C-bis'
 
     url_new_repo_name = create_repo(
         repo_id=new_repo_name,
