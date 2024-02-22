@@ -69,10 +69,8 @@ def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, d
         path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/mit-{subdataset_name}.json"
     path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
 
-    path_to_subdataset_guidelines = None
-    if with_definition:
-        path_to_subdataset_guidelines = os.path.join(path_to_guidelines_folder, subdataset_name + '_NE_definitions.json')
-
+    # load definitions also if with_def False to map NEs to their canonical names
+    path_to_subdataset_guidelines = os.path.join(path_to_guidelines_folder, subdataset_name + '_NE_definitions.json')
     return data_handler.convert_official_uniNER_eval_dataset_for_GenQA(subdataset_name, path_to_eval_dataset_uniNER, with_definition, path_to_subdataset_guidelines)
 
 
@@ -95,11 +93,10 @@ if __name__ == '__main__':
 
     #model_path_or_name = "./merged_models/llama2_4_NER_noQuant"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
-    model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_end_eval_cp"
+    model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
     print(f"LLM model: {model_path_or_name}")
 
     # TODO: load from configs parameters
-    cutoff_len = 768  # 768
     max_new_tokens = 256
     print(f"max_new_tokens {max_new_tokens}")
 
@@ -132,6 +129,7 @@ if __name__ == '__main__':
 
             print(f"\n\nEvaluating model named '{model_path_or_name.split('/')[-1]}' on '{subdataset_name}' test fold in ZERO-SHOT setting\n")
 
+            cutoff_len = 768  # 768
             if subdataset_name == 'BUSTER':
                 cutoff_len = 1528
             print(f"cutoff_len: {cutoff_len}")
@@ -175,22 +173,23 @@ if __name__ == '__main__':
             print("pred_answers")
             print(all_pred_answers[0:10])
             eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(all_pred_answers, all_gold_answers)
-            print(f"\nDataset: {subdataset_name}")
             precision = round(eval_result["precision"]*100, 2)
             recall = round(eval_result["recall"]*100, 2)
             f1 = round(eval_result["f1"]*100, 2)
-            print(f'Precision: {precision} % -- Recall: {recall} % -- F1: {f1} %')
-            print("\n------------------------------------------------------- ")
+            print("\n{} ==> micro-Precision: {:.2f}, micro-Recall: {:.2f}, micro-F1: {:.2f}".format(subdataset_name, precision, recall, f1))
 
+            print("\nMetrics per NE category (100%):\n")
             for tagName, indices_for_this_tagName in indices_per_tagName.items():
                 this_tagName_golds = [gold_ans for idx, gold_ans in enumerate(all_gold_answers) if idx in indices_for_this_tagName]
                 this_tagName_preds = [pred_ans for idx, pred_ans in enumerate(all_pred_answers) if idx in indices_for_this_tagName]
                 eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(this_tagName_preds, this_tagName_golds)
-                print(f"\n NE: {tagName}")
+                support = sum(len(sublist) for sublist in this_tagName_golds)
+
+                print("{} --> support: {}".format(tagName, support))
                 precision = round(eval_result["precision"] * 100, 2)
                 recall = round(eval_result["recall"] * 100, 2)
                 f1 = round(eval_result["f1"] * 100, 2)
-                print(f' Precision: {precision} % -- Recall: {recall} % -- F1: {f1} %')
+                print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, precision, recall, f1))
                 print("\n ------------------------------------------------------- ")
 
             preds_to_save = []
@@ -209,5 +208,5 @@ if __name__ == '__main__':
             """
             print("\n")
 
-    print("\nDONE  :)")
+    print("\nDONE :)")
     sys.stdout.flush()

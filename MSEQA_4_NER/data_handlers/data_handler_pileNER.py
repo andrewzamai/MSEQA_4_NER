@@ -845,10 +845,9 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
     with open(path_to_dataset, 'r') as fh:
         uniNER_eval_samples = json.load(fh)
 
-    all_NEs_guidelines = None
-    if with_definition:
-        with open(path_to_NE_guidelines_json, 'r') as file:
-            all_NEs_guidelines = json.load(file)
+    # we load guidelines also if with_def False to make NE mapping to canonical names (uniNER eval NEs are different)
+    with open(path_to_NE_guidelines_json, 'r') as file:
+        all_NEs_guidelines = json.load(file)
 
     # converting list to dict for fast access
     if all_NEs_guidelines and isinstance(all_NEs_guidelines, list):
@@ -864,55 +863,54 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
 
         question, ne_type, answers = questions_answers_list[0].values()
 
+        # some uniNER NEs are different from the original NEs
+        try:
+            gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+        except KeyError:
+            if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
+                ne_mapping = {
+                    'organization': 'organisation',
+                    'program language': 'programlang',
+                    'literary genre': 'literarygenre',
+                    'astronomical object': 'astronomicalobject',
+                    'chemical element': 'chemicalelement',
+                    'chemical compound': 'chemicalcompound',
+                    'academic journal': 'academicjournal',
+                    'political party': 'politicalparty',
+                    'musical artist': 'musicalartist',
+                    'musical instrument': 'musicalinstrument',
+                    'music genre': 'musicgenre',
+                }
+            elif dataset_name == 'movie':
+                ne_mapping = {
+                    'character': 'CHARACTER',
+                    'plot': 'PLOT',
+                    'year': 'YEAR',
+                    'director': 'DIRECTOR',
+                    'rating': 'RATING',
+                    'average ratings': 'RATINGS_AVERAGE',
+                    'actor': 'ACTOR',
+                    'genre': 'GENRE',
+                    'song': 'SONG',
+                    'trailer': 'TRAILER',
+                    'review': 'REVIEW',
+                    'title': 'TITLE'
+                }
+            elif dataset_name == 'restaurant':
+                ne_mapping = {
+                    'amenity': 'Amenity',
+                    'location': 'Location',
+                    'cuisine': 'Cuisine',
+                    'restaurant name': 'Restaurant_Name',
+                    'rating': 'Rating',
+                    'hours': 'Hours',
+                    'price': 'Price',
+                    'dish': 'Dish'
+                }
+            ne_type = ne_mapping[ne_type]
+            gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+
         if with_definition:
-            # some uniNER NEs are different from the original NEs
-            try:
-                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
-            except KeyError:
-                if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
-                    ne_mapping = {
-                        'organization': 'organisation',
-                        'program language': 'programlang',
-                        'literary genre': 'literarygenre',
-                        'astronomical object': 'astronomicalobject',
-                        'chemical element': 'chemicalelement',
-                        'chemical compound': 'chemicalcompound',
-                        'academic journal': 'academicjournal',
-                        'political party': 'politicalparty',
-                        'musical artist': 'musicalartist',
-                        'musical instrument': 'musicalinstrument',
-                        'music genre': 'musicgenre',
-                    }
-                elif dataset_name == 'movie':
-                    ne_mapping = {
-                        'character': 'CHARACTER',
-                        'plot': 'PLOT',
-                        'year': 'YEAR',
-                        'director': 'DIRECTOR',
-                        'rating': 'RATING',
-                        'average ratings': 'RATINGS_AVERAGE',
-                        'actor': 'ACTOR',
-                        'genre': 'GENRE',
-                        'song': 'SONG',
-                        'trailer': 'TRAILER',
-                        'review': 'REVIEW',
-                        'title': 'TITLE'
-                    }
-                elif dataset_name == 'restaurant':
-                    ne_mapping = {
-                        'amenity': 'Amenity',
-                        'location': 'Location',
-                        'cuisine': 'Cuisine',
-                        'restaurant name': 'Restaurant_Name',
-                        'rating': 'Rating',
-                        'hours': 'Hours',
-                        'price': 'Price',
-                        'dish': 'Dish'
-                    }
-
-                ne_type = ne_mapping[ne_type]
-                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
-
             # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
             if not gpt_definition.endswith("}"):
                 if not gpt_definition.endswith("\""):
