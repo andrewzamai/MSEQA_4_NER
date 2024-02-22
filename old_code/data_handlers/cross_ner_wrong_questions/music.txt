@@ -1,0 +1,25 @@
+album:A song is a musical composition typically consisting of lyrics and melody, often intended for singing. Which are songs in the document ?
+
+award:A music award is like a prize given to musicians or groups to acknowledge their achievements in areas like singing, writing music, and producing. Which are awards in the document ?
+
+band:A musical artist is an individual involved in creating, performing, and often composing music. Which are musical artists in the document ?
+
+country:A location is a specific place or position, usually defined by its geographical coordinates, where events occur. Which are locations in the document ?
+
+event:An event is a planned and organized occasion or happening, often with a specific purpose or goal, where people gather to participate or observe. Which are events in the document ?
+
+location:A location is a specific place or position, usually defined by its geographical coordinates, where events occur. Which are locations in the document ?
+
+misc:Apart from albums, awards, bands, countries, events, locations, musical artists, musical instruments, music genres, organisations, people and songs, which are other relevant information in the document ?
+
+musicalartist:A musical artist is an individual involved in creating, performing, and often composing music. Which are musical artists in the document ?
+
+musicalinstrument:A musical instrument is a tool or device to make music. Which are musical instruments in the document ?
+
+musicgenre:A music genre is a category that classifies music based on shared characteristics, such as musical style, cultural influences, and thematic elements. Which are genres in the document ?
+
+organisation:An organization is a structured group of people with a common goal, purpose, or function, often working together to achieve specific objectives. Which are organisations in the document ?
+
+person:A person is an individual human being. Which are person but not musical artists in the document ?
+
+song:A song is a musical composition typically consisting of lyrics and melody, often intended for singing. Which are songs in the document ?

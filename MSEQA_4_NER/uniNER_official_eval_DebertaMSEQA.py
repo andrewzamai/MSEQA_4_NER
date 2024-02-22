@@ -27,66 +27,20 @@ from data_handlers import data_handler_pileNER
 from collator_MSEQA import collate_fn_MSEQA
 import inference_EQA_MS
 
-
-""" --------------- UniNER official evaluation functions --------------- """
-
-def normalize_answer(s):
-    """Lower text and remove punctuation, articles and extra whitespace."""
-    def remove_articles(text):
-        return re.sub(r'\b(a|an|the)\b', ' ', text)
-    def white_space_fix(text):
-        return ' '.join(text.split())
-    def remove_punc(text):
-        exclude = set(string.punctuation)
-        return ''.join(ch for ch in text if ch not in exclude)
-    def lower(text):
-        return text.lower()
-    return white_space_fix(remove_articles(remove_punc(lower(s))))
-
-def parser(text):
-    try:
-        match = re.match(r'\[(.*?)\]', text)
-        if match:
-            text = match.group()
-        else:
-            text = '[]'
-        items = json.loads(text)
-        formatted_items = []
-        for item in items:
-            if isinstance(item, list) or isinstance(item, tuple):
-                item = tuple([normalize_answer(element) for element in item])
-            else:
-                item = normalize_answer(item)
-            if item not in formatted_items:
-                formatted_items.append(item)
-        return formatted_items
-    except Exception:
-        return []
-
-class NEREvaluator:
-    def evaluate(self, preds: list, golds: list):
-        n_correct, n_pos_gold, n_pos_pred = 0, 0, 0
-        for pred, gold in zip(preds, golds):
-            gold_tuples = parser(gold)
-            pred_tuples = parser(pred)
-            for t in pred_tuples:
-                if t in gold_tuples:
-                    n_correct += 1
-                n_pos_pred += 1
-            n_pos_gold += len(gold_tuples)
-        prec = n_correct / (n_pos_pred + 1e-10)
-        recall = n_correct / (n_pos_gold + 1e-10)
-        f1 = 2 * prec * recall / (prec + recall + 1e-10)
-        return {
-            'precision': prec,
-            'recall': recall,
-            'f1': f1,
-        }
-
+from SFT_finetuning.evaluating import uniNER_official_eval_script
+from SFT_finetuning.commons.initialization import get_HF_access_token
 
 def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition):
+
+    if datasets_cluster_name == 'BUSTER':
+        if with_definition:
+            path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_guidelines/BUSTER"
+        else:
+            path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_no_def/BUSTER"
+        return DatasetDict.load_from_disk(path_to_BUSTER_MSEQA)
+
     path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/CrossNER_{subdataset_name}.json" if datasets_cluster_name == 'crossNER' else f"./datasets/eval_data_UniNER/mit-{subdataset_name}.json"
-    path_to_guidelines_folder = f"./MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
+    path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
 
     path_to_subdataset_guidelines = None
     if with_definition:
@@ -106,33 +60,27 @@ if __name__ == '__main__':
     print("CrossNER/MIT ZERO-SHOT EVALUATIONS with UniNER official eval script:\n")
 
     to_eval_on = [
+        {'datasets_cluster_name': 'BUSTER', 'data_handler': None, 'subdataset_names': ['BUSTER'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
         # converting from uniNER dataset using function inside data_handler_pileNER
-        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
-        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        #{'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
+        #{'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science'], 'MAX_SEQ_LENGTH': 380, 'DOC_STRIDE': 50, 'MAX_ANS_LENGTH_IN_TOKENS': 10},
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = True
     print(f"With definition: {WITH_DEFINITION}")
 
     tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
 
     if WITH_DEFINITION:
-        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-B-bis"
+        path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-TrueDef-C"
     else:
         path_to_model = "andrewzamai/MSEQA-DeBERTaXXL-FalseDef-C-bis"
 
     print(f"Model name: {' '.join(path_to_model.split('/')[-2:])}")
 
-    with open('./MSEQA_4_NER/experiments/.env', 'r') as file:
-        api_keys = file.readlines()
+    HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-    api_keys_dict = {}
-    for api_key in api_keys:
-        api_name, api_value = api_key.split('=')
-        api_keys_dict[api_name] = api_value
-    # print(api_keys_dict)
-
-    model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model, token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'], cache_dir='./hf_cache_dir')
+    model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model, token=HF_ACCESS_TOKEN, cache_dir='./hf_cache_dir')
     #model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model)
 
     accelerator = Accelerator(mixed_precision='bf16')
@@ -167,7 +115,9 @@ if __name__ == '__main__':
 
             dataset_MSEQA_format = load_or_build_dataset_MSEQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION)
 
-            EVAL_BATCH_SIZE = 64
+            # dataset_MSEQA_format = DatasetDict({"test": Dataset.from_dict(dataset_MSEQA_format['test'][0:20])})
+
+            EVAL_BATCH_SIZE = 64 if data['datasets_cluster_name'] != 'BUSTER' else 4
             print("BATCH_SIZE for evaluation: {}".format(EVAL_BATCH_SIZE))
             sys.stdout.flush()
 
@@ -196,39 +146,69 @@ if __name__ == '__main__':
 
             # compute metrics
             datasets_cluster_name = data['datasets_cluster_name']
-            path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/CrossNER_{subdataset_name}.json" if datasets_cluster_name == 'crossNER' else f"./datasets/eval_data_UniNER/mit-{subdataset_name}.json"
-            with open(path_to_eval_dataset_uniNER, 'r') as fh:
-                eval_dataset_uniNER = json.load(fh)
-            golds = [example['conversations'][-1]['value'] for example in eval_dataset_uniNER]
+            if datasets_cluster_name != 'BUSTER':
+                path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/CrossNER_{subdataset_name}.json" if datasets_cluster_name == 'crossNER' else f"./datasets/eval_data_UniNER/mit-{subdataset_name}.json"
+                with open(path_to_eval_dataset_uniNER, 'r') as fh:
+                    eval_dataset_uniNER = json.load(fh)
+                golds = [example['conversations'][-1]['value'] for example in eval_dataset_uniNER]
 
-            # sort question_on_document_predicted_answers_list with IDs same ordering in eval_dataset_uniNER
-            sorted_question_on_document_predicted_answers_list = sorted(question_on_document_predicted_answers_list, key=lambda x: [d['id'] for d in eval_dataset_uniNER].index(x['doc_question_pairID']))
+                # sort question_on_document_predicted_answers_list with IDs same ordering in eval_dataset_uniNER
+                sorted_question_on_document_predicted_answers_list = sorted(question_on_document_predicted_answers_list, key=lambda x: [d['id'] for d in eval_dataset_uniNER].index(x['doc_question_pairID']))
 
-            ids_preds = []
-            for sample_prediction in sorted_question_on_document_predicted_answers_list:
-                id = sample_prediction['doc_question_pairID']
-                gold_answers = sample_prediction['gold_answers']['text']
-                predicted_answers_doc_level = sample_prediction['predicted_answers_doc_level']
+                ids_preds = []
+                for sample_prediction in sorted_question_on_document_predicted_answers_list:
+                    id = sample_prediction['doc_question_pairID']
+                    gold_answers = sample_prediction['gold_answers']['text']
+                    predicted_answers_doc_level = sample_prediction['predicted_answers_doc_level']
 
-                if not isinstance(predicted_answers_doc_level, list):
-                    if predicted_answers_doc_level['text'] == '':
-                        predicted_answers_doc_level = []
-                else:
-                    predicted_answers_doc_level = [x['text'] for x in predicted_answers_doc_level]
+                    if not isinstance(predicted_answers_doc_level, list):
+                        if predicted_answers_doc_level['text'] == '':
+                            predicted_answers_doc_level = []
+                    else:
+                        predicted_answers_doc_level = [x['text'] for x in predicted_answers_doc_level]
 
-                ids_preds.append({
-                    'id': id,
-                    'gold_answers': str(gold_answers),
-                    'pred_answers': predicted_answers_doc_level
-                })
+                    ids_preds.append({
+                        'id': id,
+                        'gold_answers': str(gold_answers),
+                        'pred_answers': predicted_answers_doc_level
+                    })
 
-            with open(f"./predictions/{subdataset_name}_preds.json", 'w') as f:
-                json.dump(ids_preds, f, indent=4)
+                with open(f"./predictions/{subdataset_name}_preds.json", 'w') as f:
+                    json.dump(ids_preds, f, indent=4)
 
-            preds = [json.dumps(x['pred_answers']) for x in ids_preds]
-            eval_result = NEREvaluator().evaluate(preds, golds)
-            print(f"\n{subdataset_name}")
-            print(f'Precision: {eval_result["precision"]}, Recall: {eval_result["recall"]}, F1: {eval_result["f1"]}')
+                preds = [json.dumps(x['pred_answers']) for x in ids_preds]
+
+            else:
+                ids_preds = []
+                for sample_prediction in question_on_document_predicted_answers_list:
+                    id = sample_prediction['doc_question_pairID']
+                    gold_answers = sample_prediction['gold_answers']['text']
+                    predicted_answers_doc_level = sample_prediction['predicted_answers_doc_level']
+
+                    if not isinstance(predicted_answers_doc_level, list):
+                        if predicted_answers_doc_level['text'] == '':
+                            predicted_answers_doc_level = []
+                    else:
+                        predicted_answers_doc_level = [x['text'] for x in predicted_answers_doc_level]
+
+                    ids_preds.append({
+                        'id': id,
+                        'gold_answers': gold_answers,
+                        'pred_answers': predicted_answers_doc_level
+                    })
+
+                with open(f"./predictions/{subdataset_name}_preds.json", 'w') as f:
+                    json.dump(ids_preds, f, indent=4)
+
+                preds = [json.dumps(x['pred_answers']) for x in ids_preds]
+                golds = [json.dumps((x['gold_answers'])) for x in ids_preds]
+
+            eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(preds, golds)
+            print(f"\nDataset: {subdataset_name}")
+            precision = round(eval_result["precision"] * 100, 2)
+            recall = round(eval_result["recall"] * 100, 2)
+            f1 = round(eval_result["f1"] * 100, 2)
+            print(f'Precision: {precision} % -- Recall: {recall} % -- F1: {f1} %')
             print("\n ------------------------------------ ")
 
     print("\nDONE :)")

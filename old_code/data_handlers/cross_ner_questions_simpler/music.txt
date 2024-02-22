@@ -1,0 +1,25 @@
+album:Which are albums in the document ?
+
+award:Which are awards in the document ?
+
+band:Which are bands in the document ?
+
+country:Which are countries in the document ?
+
+event:Which are events in the document ?
+
+location:Which are locations in the document ?
+
+misc:Which are other relevant information in the document ?
+
+musicalartist:Which are musical artists in the document ?
+
+musicalinstrument:Which are musical instruments in the document ?
+
+musicgenre:Which are genres in the document ?
+
+organisation:Which are organisations in the document ?
+
+person:Which are person but not musical artists in the document ?
+
+song:Which are songs in the document ?

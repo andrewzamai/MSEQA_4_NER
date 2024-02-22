@@ -1,0 +1,4 @@
+person:A person is any human being like a man, woman or child. Which are persons in the document ?
+organisation:An organisation denotes names of companies, institutions, or any organised groups. Which are organisation in the document ?
+location:A location denotes names of places, such as cities, countries, or geographical locations. Which are locations in the document ?
+misc:A catch-all category for miscellaneous entities that are not person, organisation or location. It may include events, dates, percentages, etc. Which are miscellaneous in the document ?

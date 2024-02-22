@@ -1,0 +1,25 @@
+album:A music album is a collection of audio recordings, typically songs, that are released together as a single package. Find all the albums in the document.
+
+award:A music award is like a prize given to musicians or groups to acknowledge their achievements in areas like singing, writing music, and producing. Find all the awards in the document.
+
+band:A music band is a group of musicians who play instruments and/or sing together. Find all the bands in the document.
+
+country:A country is a distinct geographical area with its own government, borders, and population. Find all the countries in the document.
+
+event:An event is a planned and organized occasion or happening, often with a specific purpose or goal, where people gather to participate or observe. Find all the events in the document.
+
+location:A location is a specific place or position, usually defined by its geographical coordinates, where something exists or events occur. Find all the locations in the document.
+
+misc:Apart from albums, awards, bands, countries, events, locations, musical artists, musical instruments, music genres, organisations, people and songs, find other relevant information in the document.
+
+musicalartist:A musical artist is an individual involved in creating, performing, and often composing music. Find all the musical artists in the document.
+
+musicalinstrument:A musical instrument is a tool or device to make music. Find all the musical instruments in the document.
+
+musicgenre:A music genre is a category that classifies music based on shared characteristics, such as musical style, cultural influences, and thematic elements. Find all the music genres in the document.
+
+organisation:An organization is a structured group of people with a common goal, purpose, or function, often working together to achieve specific objectives. Find all the organisations in the document.
+
+person:A person is an individual human being. Find all the persons which are not musical artists in the document.
+
+song:A song is a musical composition typically consisting of lyrics and melody, often intended for singing or performance. Find all the songs in the document.

@@ -1,0 +1,33 @@
+academicjournal:Which academic journals are mentioned in the document ?
+
+astronomicalobject:Which astronomical objects are mentioned in the document ?
+
+award:Which awards are mentioned in the document ?
+
+chemicalcompound:Which chemical compounds are mentioned in the document ?
+
+chemicalelement:Which chemical elements are mentioned in the document ?
+
+country:Which countries are mentioned in the document ?
+
+discipline:Which disciplines are mentioned in the document ?
+
+enzyme:Which enzymes are mentioned in the document ?
+
+event:Which events are mentioned in the document ?
+
+location:Which locations are mentioned in the document ?
+
+misc:Which miscellaneous entities are mentioned in the document ?
+
+organisation:Which organisations are mentioned in the document ?
+
+person:Which people are mentioned in the document ?
+
+protein:Which proteins are mentioned in the document ?
+
+scientist:Which scientists are mentioned in the document ?
+
+theory:Which scientific theories are mentioned in the document ?
+
+university:Which universities are mentioned in the document ?

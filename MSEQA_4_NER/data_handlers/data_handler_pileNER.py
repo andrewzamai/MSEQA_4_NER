@@ -15,6 +15,9 @@ NB: MSEQA dataset only considers 455-top frequent NEs,
 and after some further deletions and NE mergings (lower casing + dict_of_merges)
 --> we obtain a total of 423 different NEs
 """
+
+__package__ = "MSEQA_4_NER.data_handlers"
+
 import os
 import re
 import ast
@@ -946,6 +949,18 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
 
 if __name__ == "__main__":
 
+    dataset_MSEQA_format_FalseDef = build_dataset_MSEQA_format()
+    dataset_MSEQA_format_FalseDef = remove_bad_ne_types(dataset_MSEQA_format_FalseDef)
+
+    print(dataset_MSEQA_format_FalseDef)
+    print(dataset_MSEQA_format_FalseDef['train'][400])
+    print(dataset_MSEQA_format_FalseDef['train'][443])
+    print(dataset_MSEQA_format_FalseDef['train'][432])
+    print(dataset_MSEQA_format_FalseDef['train'][732])
+
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_FalseDef, with_definition=False, path_to_save_to="../../../datasets/pileNER_GenQA_format_FalseDef")
+
+
     """
     dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/pileNER_MSEQA_format_with_guidelines")
     print(dataset_MSEQA_format_with_guidelines)
@@ -955,6 +970,9 @@ if __name__ == "__main__":
     print(dataset_MSEQA_format_with_guidelines['train'][732])
 
     convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_guidelines, with_definition=True, path_to_save_to="../../../datasets/pileNER_GenQA_format_with_guidelines")
+    """
+
+
     """
 
     dataset_name = 'restaurant'
@@ -977,6 +995,7 @@ if __name__ == "__main__":
     print(dataset_for_inference_MSEQA[1])
     print(dataset_for_inference_MSEQA[10])
 
+    """
     # dataset_for_inference_MSEQA.to_json('./ai_GenQA_for_inference.json')
 
     """

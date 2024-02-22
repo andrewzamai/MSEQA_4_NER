@@ -1,0 +1,25 @@
+album:Define a music album as a collection of songs. What are the names of the music albums mentioned in the document?
+
+award:Define a music award as a recognition given to musicians or groups for achievements in areas such as singing, music composition, and production. What are the names of the music awards mentioned in the document?
+
+band:Define a music band as a group of musicians who play instruments and/or sing together. What are the names of the music bands mentioned in the document?
+
+country:Define a country as a distinct geographical area with its own government, borders, and population. What are the names of the countries mentioned in the document?
+
+event:Define an event as a planned and organised occasion or happening, often with a specific purpose or goal, where people gather to participate or observe. What are the names of the events mentioned in the document?
+
+location:Define a location as a specific place or position, usually defined by its geographical coordinates, where something exists or events occur. What are the names of the locations mentioned in the document?
+
+misc:Apart from albums, awards, bands, countries, events, locations, musical artists, musical instruments, music genres, organisations, people and songs, what are other relevant information in the document?
+
+musicalartist:Define a musical artist as an individual involved in creating, performing, and often composing music. What are the names of the musical artists mentioned in the document?
+
+musicalinstrument:Define a musical instrument as a tool or device used to make music. What are the names of the musical instruments mentioned in the document?
+
+musicgenre:Define a music genre as a category that classifies music based on shared characteristics, such as musical style, cultural influences, and thematic elements. What are the names of the music genres mentioned in the document?
+
+organisation:Define an organization as a structured group of people with a common goal, purpose, or function, often working together to achieve specific objectives. What are the names of the organizations mentioned in the document?
+
+person:Define a person as an individual human being. Which individuals in the document are considered persons, but are not musical artists?
+
+song:Define a song as a musical composition typically consisting of lyrics and melody, often intended for singing or performance. What are the names of the songs mentioned in the document?

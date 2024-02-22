@@ -1,0 +1,33 @@
+academicjournal:An academic journal is a periodical publication that contains scholarly articles, research studies, and reviews within a specific academic discipline. Which academic journals are mentioned in the document ?
+
+astronomicalobject:An astronomical object is any naturally occurring physical entity in space, such as planets, stars, galaxies, or celestial bodies. Which astronomical objects are mentioned in the document ?
+
+award:An award is a recognition or prize given to individuals or entities for their achievements or contributions in a particular field. Which awards are mentioned in the document ?
+
+chemicalcompound:A chemical compound is a substance composed of two or more elements in a fixed ratio, exhibiting specific chemical properties. Which chemical compounds are mentioned in the document ?
+
+chemicalelement:A chemical element is a chemical substance that cannot be broken down into other substances. Which chemical elements are mentioned in the document ?
+
+country:A country is a distinct territorial body or political entity with defined borders and a government. Which countries are mentioned in the document ?
+
+discipline:A discipline is a branch of knowledge or field of study, often within an academic or scientific context. Which disciplines are mentioned in the document ?
+
+enzyme:An enzyme is a biological molecule that catalyzes and accelerates chemical reactions in living organisms. Which enzymes are mentioned in the document ?
+
+event:An event is a notable occurrence or happening, often with specific details such as time and place. Which events are mentioned in the document ?
+
+location:A location is a specific place or position, often with geographical coordinates. Which locations are mentioned in the document ?
+
+misc:Miscellaneous refers to entities that do not fit into specific predefined natural science categories. Which miscellaneous entities are mentioned in the document ?
+
+organisation:An organisation is a group of people with a common purpose, often structured with specific roles and functions. Which organisations are mentioned in the document ?
+
+person:A person is an individual human being. Which people are mentioned in the document ?
+
+protein:A protein is a large biomolecule composed of amino acids, essential for the structure and function of living cells. Which proteins are mentioned in the document ?
+
+scientist:A scientist is a person who engages in scientific research and investigation. Which scientists are mentioned in the document ?
+
+theory:A theory is a systematic explanation or framework that organizes and explains a set of observations or phenomena. Which scientific theories are mentioned in the document ?
+
+university:A university is an institution of higher education and research, typically offering academic degrees in various disciplines. Which universities are mentioned in the document ?
