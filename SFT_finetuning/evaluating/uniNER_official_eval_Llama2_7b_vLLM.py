@@ -209,5 +209,5 @@ if __name__ == '__main__':
             """
             print("\n")
 
-    print("\nDONE :)")
+    print("\nDONE  :)")
     sys.stdout.flush()
