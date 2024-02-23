@@ -189,6 +189,7 @@ def train(
         if os.path.exists(checkpoint_name):
             print(f"Restarting from {checkpoint_name}")
             # adapters_weights = torch.load(checkpoint_name)
+            # TODO: fix this
             adapters_weights = {}
             with safetensors.safe_open(checkpoint_name, framework="pt") as f:
                 for k in f.keys():
@@ -309,14 +310,14 @@ def train(
 
 if __name__ == "__main__":
 
-    print("Llama-2-7b-chat finetuning on pileNER - NO guidelines - no quantization\n")
+    print("Llama-2-7b-chat finetuning on pileNER - with guidelines - enhanced \n")
 
     # load HuggingFace access token with permissions to LLAMA repo
     from huggingface_hub import login
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
     login(token=HF_ACCESS_TOKEN)
 
-    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_resume_from_cp.yml'
+    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_enhanced.yml'
 
     parser = argparse.ArgumentParser(description='''LLMs Supervised Fine-tuning Trainer''')
     parser.add_argument('--config', type=str, default=path_to_training_config, help='Config file for finetuning')

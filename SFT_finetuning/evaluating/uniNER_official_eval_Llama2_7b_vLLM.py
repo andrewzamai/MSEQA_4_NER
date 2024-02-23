@@ -93,7 +93,8 @@ if __name__ == '__main__':
 
     #model_path_or_name = "./merged_models/llama2_4_NER_noQuant"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
-    model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
+    #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
+    model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"
     print(f"LLM model: {model_path_or_name}")
 
     # TODO: load from configs parameters
@@ -183,14 +184,15 @@ if __name__ == '__main__':
                 this_tagName_golds = [gold_ans for idx, gold_ans in enumerate(all_gold_answers) if idx in indices_for_this_tagName]
                 this_tagName_preds = [pred_ans for idx, pred_ans in enumerate(all_pred_answers) if idx in indices_for_this_tagName]
                 eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(this_tagName_preds, this_tagName_golds)
-                support = sum(len(sublist) for sublist in this_tagName_golds)
+                # eval json dumps to list before counting support
+                support = sum(len(eval(sublist)) for sublist in this_tagName_golds)
 
                 print("{} --> support: {}".format(tagName, support))
                 precision = round(eval_result["precision"] * 100, 2)
                 recall = round(eval_result["recall"] * 100, 2)
                 f1 = round(eval_result["f1"] * 100, 2)
                 print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, precision, recall, f1))
-                print("\n ------------------------------------------------------- ")
+                print("------------------------------------------------------- ")
 
             preds_to_save = []
             for i, sample in enumerate(dataset_MSEQA_format):

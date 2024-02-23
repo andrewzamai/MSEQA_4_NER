@@ -398,13 +398,15 @@ def tokenize_and_preprocess_LLAMA(examples_MSEQA_format, tokenizer, max_seq_leng
 if __name__ == '__main__':
 
     from datasets import DatasetDict, Dataset
-    dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../datasets/dataset_MSEQA_format_with_guidelines")
+    # dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../datasets/dataset_MSEQA_format_with_guidelines")
 
     from transformers import LlamaTokenizerFast
     from typing import Union
     from collections import OrderedDict
     tokenizer = LlamaTokenizerFast.from_pretrained("hf-internal-testing/llama-tokenizer")
-    # tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-7b-hf")
+    from transformers import AutoTokenizer
+
+    print(tokenizer.encode("<unk>"))
 
     #print(tokenizer("..."))
     #print(tokenizer._convert_id_to_token(2023))

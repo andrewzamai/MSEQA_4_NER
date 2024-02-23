@@ -543,6 +543,7 @@ def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json):
 
 
 def add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_w_guidelines, path_to_NE_guidelines_json):
+    # DEPRECATED (because I discovered that pileNER already has negative examples added)
 
     # loading gpt guidelines for each NE type in pileNER (only of top frequent NEs)
     with open(path_to_NE_guidelines_json, 'r') as file:
@@ -945,8 +946,167 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
     return Dataset.from_list(dataset_GenQA)
 
 
+def mask_named_entities_probability_proportional(dataset_split):
+    # count how many samples (i.e. how many questions) of a ne_type exist
+    # e.g. {'train': {'gene': 5, 'sports team': 4, 'norp': 3, 'disease': 9,...}
+    # --> there are 5 MSEQA samples which question is about 'gene' NE type and have a empty/non-empty answer
+    number_samples_per_ne_type = {}
+    for sample in dataset_split:
+        ne_type = sample['tagName']
+        if ne_type in number_samples_per_ne_type:
+            number_samples_per_ne_type[ne_type] += 1
+        else:
+            number_samples_per_ne_type[ne_type] = 1
+    print("Number of samples per NE type:")
+    print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
+
+    total_num_samples = sum(x for x in number_samples_per_ne_type.values())
+    tagName_probabilities = {tagName: x / total_num_samples for tagName, x in number_samples_per_ne_type.items()}
+    #print(sorted(tagName_probabilities.items(), key=lambda x: x[1], reverse=True))
+
+    # calculate scaling factor and apply maximum corruption probability threshold
+    scaling_factor = max(tagName_probabilities.values())
+    # scaling_factor = 0.5
+    max_corruption_prob_threshold = 0.5  # Set a maximum corruption probability threshold
+    # min_corruption_prob_threshold = 0.01
+
+    # adjust the probabilities based on the scaling factor and the maximum corruption probability threshold
+    scaled_tag_probabilities = {}
+    for tagName, probability in tagName_probabilities.items():
+        scaled_probability = min(probability / scaling_factor, max_corruption_prob_threshold)
+        # scaled_probability = max(scaled_probability, min_corruption_prob_threshold)
+        scaled_tag_probabilities[tagName] = scaled_probability
+
+    #sorted_probabilities = sorted(scaled_tag_probabilities.items(), key=lambda x: x[1], reverse=True)
+
+    #print(sorted_probabilities)
+
+    # initialize tag_datasets dictionary
+    tag_datasets = {tagName: {"original": [], "corrupted": []} for tagName in scaled_tag_probabilities}
+
+    # Step 4: Split dataset into original and corrupted subsets for each tagName
+    for sample in dataset_split:
+        tagName = sample["tagName"]
+        scaled_probability = scaled_tag_probabilities[tagName]
+        # Randomly decide whether to include the sample in original or corrupted subset
+        subset = "original" if random.random() < 0.8 else "corrupted"
+        tag_datasets[tagName][subset].append(sample)
+
+    corrupted_dataset = [sample for datasets in tag_datasets.values() for sample in datasets["corrupted"]]
+    number_samples_per_ne_type = {}
+    for sample in corrupted_dataset:
+        ne_type = sample['tagName']
+        if ne_type in number_samples_per_ne_type:
+            number_samples_per_ne_type[ne_type] += 1
+        else:
+            number_samples_per_ne_type[ne_type] = 1
+    print("Number of samples per NE type in corrupted dataset:")
+    print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
+
+    """
+    # Step 5: Corrupt samples in the corrupted subset
+    for tagName, datasets in tag_datasets.items():
+        for sample in datasets["corrupted"]:
+            # Randomly decide whether to mask or replace Named Entity
+            if random.random() < 0.5:  # 50% chance
+                # Mask Named Entity
+                # Assuming Named Entity is stored in a property called "entity"
+                sample["masked_entity"] = sample["entity"]
+                sample["entity"] = "[MASKED]"
+            else:
+                # Replace Named Entity with another random Named Entity
+                # Assuming entity_list is a list of all possible Named Entities
+                sample["entity"] = random.choice(entity_list)
+
+    # Step 6: Combine corrupted samples with original dataset
+    corrupted_dataset = [sample for datasets in tag_datasets.values() for sample in datasets["corrupted"]]
+
+    # Optionally, shuffle the corrupted dataset
+    random.shuffle(corrupted_dataset)
+    """
+
+
+def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8):
+
+    # count how many samples (i.e. how many questions) for a ne_type exist
+    # e.g. {'train': {'gene': 5, 'sports team': 4, 'norp': 3, 'disease': 9,...}
+    # --> there are 5 MSEQA samples which question is about 'gene' NE type and have a empty/non-empty answer
+    number_samples_per_ne_type = {}
+    for sample in dataset_split:
+        ne_type = sample['tagName']
+        if ne_type in number_samples_per_ne_type:
+            number_samples_per_ne_type[ne_type] += 1
+        else:
+            number_samples_per_ne_type[ne_type] = 1
+    print("Number of samples per NE type:")
+    print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
+
+    # initialize tag_datasets dictionary
+    tag_datasets = {tagName: {"original": [], "corrupted": []} for tagName in number_samples_per_ne_type}
+
+    # split dataset into original and corrupted subsets for each tagName
+    for sample in dataset_split:
+        tagName = sample["tagName"]
+        # decide whether to include the sample in original or corrupted subset
+        subset = "original" if random.random() < 1 - corruption_prob else "corrupted"
+        tag_datasets[tagName][subset].append(sample)
+
+    # corrupt samples in the corrupted subset
+    for tagName, datasets in tag_datasets.items():
+        for sample in datasets["corrupted"]:
+            # Randomly decide whether to mask or replace Named Entity
+            if random.random() < masking_prob:
+                # mask tagName occurrences in "instruction" with <unk>
+                mask = '<unk>'
+                sample['doc_question_pairID'] = sample['doc_question_pairID'] + ':masked'
+            else:
+                # replace tagName occurrences in "instruction" with another random Named Entity
+                mask = random.choice(list(tag_datasets.keys()))
+                mask = mask.upper()
+                sample['doc_question_pairID'] = sample['doc_question_pairID'] + ':switchedNE'
+
+            pattern = re.compile(rf'{re.escape(tagName)}', flags=re.IGNORECASE)
+            sample['instruction'] = pattern.sub(mask, sample['instruction'])
+
+    number_samples_per_ne_type = {}
+    for tagName, datasets in tag_datasets.items():
+        for sample in datasets['corrupted']:
+            ne_type = sample['tagName']
+            if ne_type in number_samples_per_ne_type:
+                number_samples_per_ne_type[ne_type] += 1
+            else:
+                number_samples_per_ne_type[ne_type] = 1
+    print("Number of samples per NE type in corrupted dataset:")
+    print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
+    print(f"A total of {sum(number_samples_per_ne_type.values())} samples will be corrupted by masking or entity replacing")
+
+    # combine corrupted samples with original dataset
+    corrupted_subset = [sample for datasets in tag_datasets.values() for sample in datasets["corrupted"]]
+    original_subset = [sample for datasets in tag_datasets.values() for sample in datasets["original"]]
+
+    original_subset.extend(corrupted_subset)
+    random.shuffle(original_subset)
+
+    new_dataset = Dataset.from_list(original_subset)
+
+    return new_dataset
+
+
 if __name__ == "__main__":
 
+    pileNER_train_GenQA_TrueDef = load_dataset("../../../datasets/pileNER_GenQA_format_TrueDef")['validation']
+    print(pileNER_train_GenQA_TrueDef)
+
+    print(pileNER_train_GenQA_TrueDef[0])
+
+    pileNER_train_GenQA_TrueDef_enhanced = mask_named_entities(pileNER_train_GenQA_TrueDef)
+    print(pileNER_train_GenQA_TrueDef_enhanced)
+
+    pileNER_train_GenQA_TrueDef_enhanced.to_json(os.path.join("../../../datasets/pileNER_GenQA_format_TrueDef_enhanced", 'validation' + '.jsonl'))
+
+    print("\n\n\n")
+
+    """
     dataset_MSEQA_format_FalseDef = build_dataset_MSEQA_format()
     dataset_MSEQA_format_FalseDef = remove_bad_ne_types(dataset_MSEQA_format_FalseDef)
 
@@ -957,7 +1117,7 @@ if __name__ == "__main__":
     print(dataset_MSEQA_format_FalseDef['train'][732])
 
     convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_FalseDef, with_definition=False, path_to_save_to="../../../datasets/pileNER_GenQA_format_FalseDef")
-
+    """
 
     """
     dataset_MSEQA_format_with_guidelines = DatasetDict.load_from_disk("../../../datasets/pileNER_MSEQA_format_with_guidelines")

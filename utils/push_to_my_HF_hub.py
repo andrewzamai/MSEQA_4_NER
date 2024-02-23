@@ -3,7 +3,7 @@ from huggingface_hub import HfApi, create_repo, upload_folder
 if __name__ == '__main__':
 
     # load HuggingFace access token from .env file (git ignored)
-    with open('./MSEQA_4_NER/experiments/.env', 'r') as file:
+    with open('./.env', 'r') as file:
         api_keys = file.readlines()
     api_keys_dict = {}
     for api_key in api_keys:
@@ -20,8 +20,8 @@ if __name__ == '__main__':
     )
     """
 
-    path_to_model_to_upload = './baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_FalseDef_C-bis/finetuned_model'
-    new_repo_name = 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-C-bis'
+    path_to_model_to_upload = './merged_models/llama2_4_NER_FalseDef'
+    new_repo_name = 'andrewzamai/Llama2-7B-FalseDef'
 
     url_new_repo_name = create_repo(
         repo_id=new_repo_name,
