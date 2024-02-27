@@ -4,7 +4,7 @@ from typing import Tuple, List
 import collections
 import json
 
-
+__package__ = "MSEQA_4_NER"
 def compute_overlap_char_indices(interval_1: Tuple[int, int], interval_2: Tuple[int, int]) -> int:
     """
     Compute overlap between 2 int intervals: [a, b] and [c, d]

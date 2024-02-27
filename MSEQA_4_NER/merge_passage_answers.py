@@ -9,10 +9,12 @@ does not mean there is no answer (like voting rule)
 but means only that the 3 passages do not contain any span of text answering to that question, but the 4th yes
 """
 
+__package__ = "MSEQA_4_NER"
+
 import json
 
 # personal libraries
-import metrics_EQA_MS
+from . import metrics_EQA_MS
 
 """ 
 deletes overlapping answers keeping the one with highest score

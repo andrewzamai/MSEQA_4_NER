@@ -15,6 +15,8 @@ We use convert_official_uniNER_eval_dataset_for_GenQA for:
 
 __package__ = "SFT_finetuning.evaluating"
 
+import re
+
 # use vllm_pip_container.sif
 # noinspection PyUnresolvedReferences
 from vllm import LLM, SamplingParams
@@ -88,13 +90,14 @@ if __name__ == '__main__':
         {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = True
     print(f"\nWith definition: {WITH_DEFINITION}")
 
     #model_path_or_name = "./merged_models/llama2_4_NER_noQuant"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
-    model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"
+    #model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"
+    model_path_or_name = "./merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp"
     print(f"LLM model: {model_path_or_name}")
 
     # TODO: load from configs parameters
@@ -147,7 +150,16 @@ if __name__ == '__main__':
             # retrieving gold answers (saved in ouput during dataset conversion from uniNER eval datatasets)
             all_gold_answers = dataset_MSEQA_format['output']
 
-            instructions = dataset_MSEQA_format['instruction']
+            instructions = []
+            # TODO: masking tagName
+            for sample in dataset_MSEQA_format:
+                tagName = sample['tagName']
+                pattern = re.compile(rf'{re.escape(tagName)}', flags=re.IGNORECASE)
+                sample['instruction'] = pattern.sub('<unk>', sample['instruction'])
+                instructions.append(sample['instruction'])
+
+            print(instructions[0])
+
             inputs = dataset_MSEQA_format['input']
 
             batch_instruction_input_pairs = [

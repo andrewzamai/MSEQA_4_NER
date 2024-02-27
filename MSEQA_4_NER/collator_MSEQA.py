@@ -1,3 +1,4 @@
+__package__ = "MSEQA_4_NER"
 import torch
 from torch.nn.utils.rnn import pad_sequence
 def collate_fn_MSEQA(batch, tokenizer, max_seq_length=256, doc_stride=128):

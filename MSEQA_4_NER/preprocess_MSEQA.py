@@ -1,3 +1,5 @@
+__package__ = "MSEQA_4_NER"
+
 import torch
 
 def tokenize_and_preprocess(examples_MSEQA_format, tokenizer, max_seq_length, doc_stride):

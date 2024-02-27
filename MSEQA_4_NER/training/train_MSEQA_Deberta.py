@@ -23,6 +23,8 @@ FULL-finetuning of a MSEQA model based on Deberta-XXL 1.5b model
    - Import the data_handler module, set your training parameters and execute this script.
 """
 
+__package__ = "MSEQA_4_NER.training"
+
 from transformers import EarlyStoppingCallback
 from torch.nn.utils.rnn import pad_sequence
 from datasets import Dataset, DatasetDict
@@ -37,9 +39,9 @@ import os
 
 # my libraries
 # tokenizer similar to Roberta [CLS] quest [SEP] context [SEP]
-from preprocess_MSEQA import tokenize_and_preprocess
-import inference_EQA_MS
-import metrics_EQA_MS
+from ..preprocess_MSEQA import tokenize_and_preprocess
+from .. import inference_EQA_MS
+from .. import metrics_EQA_MS
 
 
 if __name__ == '__main__':
@@ -56,14 +58,14 @@ if __name__ == '__main__':
     print(f"tokenizer_to_use: {tokenizer_to_use}")
 
     # pre-training on universalNER GPT conversations (i.e. pileNER corpus)
-    from data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
+    from ..data_handlers import data_handler_pileNER as data_handler_MSEQA_dataset
 
     # train from scratch or continue fine-tuning an already existing MSEQA model
     start_training_from_scratch = True
     print(f"start_training_from_scratch: {start_training_from_scratch}")
     if start_training_from_scratch:
         # to load a MSEQA with only encoder pre-trained weights, but newly initialized qa_classifier weights
-        from models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering as MSEQA_model
+        from ..models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering as MSEQA_model
     else:
         # to load a MSEQA model with pre-trained weights
         raise NotImplementedError

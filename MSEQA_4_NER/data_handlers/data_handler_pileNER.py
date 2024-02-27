@@ -691,14 +691,16 @@ def add_negative_examples_to_MSEQA_dataset(dataset_MSEQA_format_w_guidelines, pa
 
 
 def convert_official_uniNER_eval_dataset_for_inference(dataset_name, path_to_dataset, with_definition=False, path_to_NE_guidelines_json=None):
+    """
+    converts a eval dataset provided by uniNER github for inference through a MSEQA model;
+    i.e. applies Definition if with_definition=True, some NEs mapping and renames features as expected by MSEQA models
+    """
 
     with open(path_to_dataset, 'r') as fh:
         uniNER_eval_samples = json.load(fh)
 
-    all_NEs_guidelines = None
-    if with_definition:
-        with open(path_to_NE_guidelines_json, 'r') as file:
-            all_NEs_guidelines = json.load(file)
+    with open(path_to_NE_guidelines_json, 'r') as f:
+        all_NEs_guidelines = json.load(f)
 
     # converting list to dict for fast access
     if all_NEs_guidelines and isinstance(all_NEs_guidelines, list):
@@ -710,59 +712,58 @@ def convert_official_uniNER_eval_dataset_for_inference(dataset_name, path_to_dat
         context, questions_answers_list = extract_context_quests_answers(uniNER_sample['conversations']).values()
 
         if len(questions_answers_list) > 1:
-            raise ValueError("Expected only 1 question")
+            raise ValueError("Was expected only 1 question here!")
 
         question, ne_type, answers = questions_answers_list[0].values()
 
+        # some uniNER NEs are different from the original NEs
+        try:
+            gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+        except KeyError:
+            if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
+                ne_mapping = {
+                    'organization': 'organisation',
+                    'program language': 'programlang',
+                    'literary genre': 'literarygenre',
+                    'astronomical object': 'astronomicalobject',
+                    'chemical element': 'chemicalelement',
+                    'chemical compound': 'chemicalcompound',
+                    'academic journal': 'academicjournal',
+                    'political party': 'politicalparty',
+                    'musical artist': 'musicalartist',
+                    'musical instrument': 'musicalinstrument',
+                    'music genre': 'musicgenre',
+                }
+            elif dataset_name == 'movie':
+                ne_mapping = {
+                    'character': 'CHARACTER',
+                    'plot': 'PLOT',
+                    'year': 'YEAR',
+                    'director': 'DIRECTOR',
+                    'rating': 'RATING',
+                    'average ratings': 'RATINGS_AVERAGE',
+                    'actor': 'ACTOR',
+                    'genre': 'GENRE',
+                    'song': 'SONG',
+                    'trailer': 'TRAILER',
+                    'review': 'REVIEW',
+                    'title': 'TITLE'
+                }
+            elif dataset_name == 'restaurant':
+                ne_mapping = {
+                    'amenity': 'Amenity',
+                    'location': 'Location',
+                    'cuisine': 'Cuisine',
+                    'restaurant name': 'Restaurant_Name',
+                    'rating': 'Rating',
+                    'hours': 'Hours',
+                    'price': 'Price',
+                    'dish': 'Dish'
+                }
+            ne_type = ne_mapping[ne_type]
+            gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+
         if with_definition:
-            # some uniNER NEs are different from the original NEs
-            try:
-                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
-            except KeyError:
-                if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
-                    ne_mapping = {
-                        'organization': 'organisation',
-                        'program language': 'programlang',
-                        'literary genre': 'literarygenre',
-                        'astronomical object': 'astronomicalobject',
-                        'chemical element': 'chemicalelement',
-                        'chemical compound': 'chemicalcompound',
-                        'academic journal': 'academicjournal',
-                        'political party': 'politicalparty',
-                        'musical artist': 'musicalartist',
-                        'musical instrument': 'musicalinstrument',
-                        'music genre': 'musicgenre',
-                    }
-                elif dataset_name == 'movie':
-                    ne_mapping = {
-                        'character': 'CHARACTER',
-                        'plot': 'PLOT',
-                        'year': 'YEAR',
-                        'director': 'DIRECTOR',
-                        'rating': 'RATING',
-                        'average ratings': 'RATINGS_AVERAGE',
-                        'actor': 'ACTOR',
-                        'genre': 'GENRE',
-                        'song': 'SONG',
-                        'trailer': 'TRAILER',
-                        'review': 'REVIEW',
-                        'title': 'TITLE'
-                    }
-                elif dataset_name == 'restaurant':
-                    ne_mapping = {
-                        'amenity': 'Amenity',
-                        'location': 'Location',
-                        'cuisine': 'Cuisine',
-                        'restaurant name': 'Restaurant_Name',
-                        'rating': 'Rating',
-                        'hours': 'Hours',
-                        'price': 'Price',
-                        'dish': 'Dish'
-                    }
-
-                ne_type = ne_mapping[ne_type]
-                gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
-
             # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
             if not gpt_definition.endswith("}"):
                 if not gpt_definition.endswith("\""):
@@ -779,6 +780,8 @@ def convert_official_uniNER_eval_dataset_for_inference(dataset_name, path_to_dat
             question += "You are given a DEFINITION and some GUIDELINES.\n"
             question += "DEFINITION: " + this_ne_guidelines['Definition'] + "\nGUIDELINES: " + this_ne_guidelines['Guidelines'] + "\n"
             question += f"TEXT: "
+
+        # else: question is already "What describes NE in the text?"
 
         inference_sample = {
             "doc_question_pairID": uniNER_sample['id'],
@@ -867,6 +870,8 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
         # some uniNER NEs are different from the original NEs
         try:
             gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            # NE name in natural languange form, e.g. ORG --> organization
+            real_name_ne = all_NEs_guidelines[ne_type]['real_name']
         except KeyError:
             if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
                 ne_mapping = {
@@ -910,6 +915,7 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
                 }
             ne_type = ne_mapping[ne_type]
             gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            real_name_ne = all_NEs_guidelines[ne_type]['real_name']
 
         if with_definition:
             # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
@@ -937,7 +943,7 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
         genQA_sample = {
             "doc_question_pairID": uniNER_sample['id'],
             "input": context,
-            "tagName": ne_type,
+            "tagName": real_name_ne, #ne_type,
             "instruction": question,
             "output": uniNER_sample['conversations'][-1]['value']
         }
@@ -1094,6 +1100,7 @@ def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8):
 
 if __name__ == "__main__":
 
+    """
     pileNER_train_GenQA_TrueDef = load_dataset("../../../datasets/pileNER_GenQA_format_TrueDef")['validation']
     print(pileNER_train_GenQA_TrueDef)
 
@@ -1103,6 +1110,31 @@ if __name__ == "__main__":
     print(pileNER_train_GenQA_TrueDef_enhanced)
 
     pileNER_train_GenQA_TrueDef_enhanced.to_json(os.path.join("../../../datasets/pileNER_GenQA_format_TrueDef_enhanced", 'validation' + '.jsonl'))
+    """
+    pileNER_train_GenQA_TrueDef_enhanced = load_dataset("../../../datasets/pileNER_GenQA_format_TrueDef_enhanced")
+
+    number_samples_per_ne_type = {}
+    for sample in pileNER_train_GenQA_TrueDef_enhanced['validation']:
+        ne_type = sample['tagName']
+        if ne_type in number_samples_per_ne_type:
+            number_samples_per_ne_type[ne_type] += 1
+        else:
+            number_samples_per_ne_type[ne_type] = 1
+    print("Number of samples per NE type:")
+    print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
+
+    number_samples_per_ne_type = {}
+    for i, sample in enumerate(pileNER_train_GenQA_TrueDef_enhanced['validation']):
+        ne_type = sample['tagName']
+        if ne_type in number_samples_per_ne_type:
+            number_samples_per_ne_type[ne_type] += 1
+        else:
+            number_samples_per_ne_type[ne_type] = 1
+        if i >= 5000:
+            break
+    print("Number of samples per NE type:")
+    print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
+
 
     print("\n\n\n")
 

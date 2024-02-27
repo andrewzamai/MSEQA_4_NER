@@ -11,6 +11,8 @@ Output:
 - metrics computation on aggregated predictions
 """
 
+__package__ = "MSEQA_4_NER"
+
 import collections
 import torch
 import json
@@ -18,7 +20,7 @@ import json
 from transformers import DebertaV2TokenizerFast
 
 # my libraries
-import merge_passage_answers
+from . import merge_passage_answers
 
 
 def extract_answers_per_passage_from_logits(max_ans_length_in_tokens,
