@@ -131,10 +131,17 @@ def get_dataset_statistics():
         context_length = len(context.split())
         context_lengths.append(context_length)
 
+    fullPileNER_tagName_list = {}
+    for raw_sample in raw_dataset['train']['conversations']:
+        context, questions_answers_list = extract_context_quests_answers(raw_sample).values()
+        for question in questions_answers_list:
+            fullPileNER_tagName_list[question['ne_type']] = 1
+
     return {
         'contexts_average_number_words': np.average(context_lengths),
         'contexts_min_number_words': np.min(context_lengths),
-        'contexts_max_number_words': np.max(context_lengths)
+        'contexts_max_number_words': np.max(context_lengths),
+        'fullPileNER_tagName_list': list(fullPileNER_tagName_list.keys())
     }
 
 
@@ -943,7 +950,7 @@ def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset
         genQA_sample = {
             "doc_question_pairID": uniNER_sample['id'],
             "input": context,
-            "tagName": real_name_ne, #ne_type,
+            "tagName": ne_type,  # real_name_ne if want to mask in evaluation given tagName
             "instruction": question,
             "output": uniNER_sample['conversations'][-1]['value']
         }
@@ -1009,30 +1016,12 @@ def mask_named_entities_probability_proportional(dataset_split):
     print("Number of samples per NE type in corrupted dataset:")
     print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
 
+
+def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8, default_mask='<unk>'):
     """
-    # Step 5: Corrupt samples in the corrupted subset
-    for tagName, datasets in tag_datasets.items():
-        for sample in datasets["corrupted"]:
-            # Randomly decide whether to mask or replace Named Entity
-            if random.random() < 0.5:  # 50% chance
-                # Mask Named Entity
-                # Assuming Named Entity is stored in a property called "entity"
-                sample["masked_entity"] = sample["entity"]
-                sample["entity"] = "[MASKED]"
-            else:
-                # Replace Named Entity with another random Named Entity
-                # Assuming entity_list is a list of all possible Named Entities
-                sample["entity"] = random.choice(entity_list)
-
-    # Step 6: Combine corrupted samples with original dataset
-    corrupted_dataset = [sample for datasets in tag_datasets.values() for sample in datasets["corrupted"]]
-
-    # Optionally, shuffle the corrupted dataset
-    random.shuffle(corrupted_dataset)
+    works both on MSEQA and GenQA format dataset WITH guidelines
+    for Llama2-7B use <unk> as mask, for DeBERTa use [UNK]
     """
-
-
-def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8):
 
     # count how many samples (i.e. how many questions) for a ne_type exist
     # e.g. {'train': {'gene': 5, 'sports team': 4, 'norp': 3, 'disease': 9,...}
@@ -1062,8 +1051,8 @@ def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8):
         for sample in datasets["corrupted"]:
             # Randomly decide whether to mask or replace Named Entity
             if random.random() < masking_prob:
+                mask = default_mask
                 # mask tagName occurrences in "instruction" with <unk>
-                mask = '<unk>'
                 sample['doc_question_pairID'] = sample['doc_question_pairID'] + ':masked'
             else:
                 # replace tagName occurrences in "instruction" with another random Named Entity
@@ -1072,7 +1061,12 @@ def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8):
                 sample['doc_question_pairID'] = sample['doc_question_pairID'] + ':switchedNE'
 
             pattern = re.compile(rf'{re.escape(tagName)}', flags=re.IGNORECASE)
-            sample['instruction'] = pattern.sub(mask, sample['instruction'])
+            if 'instruction' in sample.keys():
+                # GenQA instruction dataset feature
+                sample['instruction'] = pattern.sub(mask, sample['instruction'])
+            else:
+                # MSEQA question dataset feature
+                sample['question'] = pattern.sub(mask, sample['question'])
 
     number_samples_per_ne_type = {}
     for tagName, datasets in tag_datasets.items():
@@ -1100,6 +1094,21 @@ def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8):
 
 if __name__ == "__main__":
 
+    pileNER_statistics = get_dataset_statistics()
+    fullPileNER_tagName_list = pileNER_statistics['fullPileNER_tagName_list']
+    with open(os.path.join('../../../datasets', "fullPileNER_tagName_list.json"), 'w') as f:
+        json.dump(fullPileNER_tagName_list, f, indent=2)
+
+    """ 
+    pileNER_MSEQA_TrueDef = DatasetDict.load_from_disk("../../../datasets/pileNER_MSEQA_format_TrueDef")
+    print(pileNER_MSEQA_TrueDef)
+
+    # for DeBERTa model use '[UNK]' as mask
+    pileNER_MSEQA_TrueDef_enhanced_split = mask_named_entities(pileNER_MSEQA_TrueDef['validation'], corruption_prob=0.2, masking_prob=0.8, default_mask='[UNK]')
+    pileNER_MSEQA_TrueDef_enhanced_split.to_json(os.path.join("../../../datasets/pileNER_MSEQA_TrueDef_enhanced", 'validation' + '.jsonl'))
+    """
+
+    print("\n\n\n")
     """
     pileNER_train_GenQA_TrueDef = load_dataset("../../../datasets/pileNER_GenQA_format_TrueDef")['validation']
     print(pileNER_train_GenQA_TrueDef)
@@ -1110,6 +1119,9 @@ if __name__ == "__main__":
     print(pileNER_train_GenQA_TrueDef_enhanced)
 
     pileNER_train_GenQA_TrueDef_enhanced.to_json(os.path.join("../../../datasets/pileNER_GenQA_format_TrueDef_enhanced", 'validation' + '.jsonl'))
+    """
+
+    # (to count how many samples per NE in validation with 5000 samples)
     """
     pileNER_train_GenQA_TrueDef_enhanced = load_dataset("../../../datasets/pileNER_GenQA_format_TrueDef_enhanced")
 
@@ -1135,8 +1147,8 @@ if __name__ == "__main__":
     print("Number of samples per NE type:")
     print(sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True))
 
-
-    print("\n\n\n")
+    
+    """
 
     """
     dataset_MSEQA_format_FalseDef = build_dataset_MSEQA_format()

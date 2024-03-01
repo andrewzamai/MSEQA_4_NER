@@ -1,6 +1,6 @@
 """
 
-Evaluating pileNER-finetuned DeBERTa-XXL-MSEQA model for zero-shot NER on CrossNER/MIT datasets
+Evaluating pileNER-finetuned {RoBERTabase/large/DeBERTa}-MSEQA model for zero-shot NER on CrossNER/MIT datasets
 
 UniNER's authors provide the crossNER/MIT test datasets already converted to QA format
 
@@ -24,9 +24,7 @@ import sys
 import os
 
 # my libraries
-from ..models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering
 from ..data_handlers import data_handler_pileNER
-from ..collator_MSEQA import collate_fn_MSEQA
 from .. import inference_EQA_MS
 
 from SFT_finetuning.evaluating import uniNER_official_eval_script
@@ -66,7 +64,7 @@ def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, d
 
 if __name__ == '__main__':
 
-    print("DeBERTa-XXL-MSEQA ZERO-SHOT NER EVALUATIONS on CrossNER/MIT datasets with UniNER official eval script:\n")
+    print("xxx-MSEQA ZERO-SHOT NER EVALUATIONS on CrossNER/MIT datasets with UniNER official eval script:\n")
 
     to_eval_on = [
         # converting from provided uniNER eval datasets using function inside data_handler_pileNER
@@ -80,14 +78,10 @@ if __name__ == '__main__':
 
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-    tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
-    print("\nLoading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir')
-
     # models_TrueDef = ['andrewzamai/MSEQA-DeBERTaXXL-0', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-A', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-B-bis', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-C', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-D']
-    models_TrueDef = ['andrewzamai/MSEQA-DeBERTaXXL-TrueDef-D']
+    models_TrueDef = ['andrewzamai/MSEQA-RoBERTa-base-TrueDef-d', 'andrewzamai/MSEQA-RoBERTa-large-TrueDef-d']
     #models_FalseDef = ['andrewzamai/MSEQA-DeBERTaXXL-FalseDef-A', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-B', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-C-bis', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-D', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-0']
-    models_FalseDef = ['andrewzamai/MSEQA-DeBERTaXXL-FalseDef-0']
+    models_FalseDef = ['andrewzamai/MSEQA-RoBERTa-base-FalseDef-d', 'andrewzamai/MSEQA-RoBERTa-large-FalseDef-d']
 
     WITH_DEFINITION = False
     print(f"With definition: {WITH_DEFINITION}")
@@ -99,9 +93,25 @@ if __name__ == '__main__':
 
     for path_to_model in path_to_models:
 
+        if 'RoBERTa' in path_to_model:
+            from ..models.MultiSpanRobertaQuestionAnswering_from_scratch import MultiSpanRobertaQuestionAnswering_from_scratch as MSModelForQuestionAnswering
+            from ..collator_MSEQA import collate_fn_MSEQA
+            if 'base' in path_to_model:
+                tokenizer_to_use = "roberta-base"
+            elif 'large' in path_to_model:
+                tokenizer_to_use = "roberta-large"
+        elif 'DeBERTa' in path_to_model:
+            from ..models.MSEQA_DebertaXXL import DebertaXXLForQuestionAnswering as MSModelForQuestionAnswering
+            from ..collator_MSEQA import collate_fn_MSEQA
+            tokenizer_to_use = "microsoft/deberta-v2-xxlarge"
+        else:
+            raise IOError("Error parsing model name - unrecognized model class")
+
+        print("\nLoading tokenizer...")
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir')
+
         print(f"Model name: {path_to_model.split('/')[-1]}")
-        model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model, token=HF_ACCESS_TOKEN, cache_dir='./hf_cache_dir')
-        # model = DebertaXXLForQuestionAnswering.from_pretrained(path_to_model)
+        model = MSModelForQuestionAnswering.from_pretrained(path_to_model, token=HF_ACCESS_TOKEN, cache_dir='./hf_cache_dir')
 
         model = accelerator.prepare(model)
 
@@ -200,7 +210,7 @@ if __name__ == '__main__':
                         'pred_answers': predicted_answers_doc_level
                     })
 
-                path_to_save_pred_folder = os.path.join("./predictions", 'DeBERTa-XXL-MSEQA', str(WITH_DEFINITION)+'Def', path_to_model.split('/')[-1])
+                path_to_save_pred_folder = os.path.join("./predictions", path_to_model.split("/")[-1], str(WITH_DEFINITION)+'Def', path_to_model.split('/')[-1])
                 if not os.path.exists(path_to_save_pred_folder):
                     os.makedirs(path_to_save_pred_folder)
                 with open(os.path.join(path_to_save_pred_folder, f"{subdataset_name}_preds.json"), 'w') as f:
@@ -212,7 +222,7 @@ if __name__ == '__main__':
                 if datasets_cluster_name not in ['crossNER', 'MIT']:
                     golds = [json.dumps((x['gold_answers'])) for x in ids_preds]
 
-                path_to_save_eval_folder = os.path.join("./evals", 'DeBERTa-XXL-MSEQA', str(WITH_DEFINITION)+'Def')
+                path_to_save_eval_folder = os.path.join("./evals_2", path_to_model.split("/")[-1], str(WITH_DEFINITION)+'Def')
                 if not os.path.exists(path_to_save_eval_folder):
                     os.makedirs(path_to_save_eval_folder)
                 # write in append mode

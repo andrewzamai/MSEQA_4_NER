@@ -93,11 +93,11 @@ if __name__ == '__main__':
     WITH_DEFINITION = True
     print(f"\nWith definition: {WITH_DEFINITION}")
 
-    #model_path_or_name = "./merged_models/llama2_4_NER_noQuant"
+    model_path_or_name = "andrewzamai/Llama2-7B-TrueDef"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
     #model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"
-    model_path_or_name = "./merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp"
+    #model_path_or_name = "./merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp"
     print(f"LLM model: {model_path_or_name}")
 
     # TODO: load from configs parameters
@@ -150,13 +150,16 @@ if __name__ == '__main__':
             # retrieving gold answers (saved in ouput during dataset conversion from uniNER eval datatasets)
             all_gold_answers = dataset_MSEQA_format['output']
 
+            # masking tagName
+            """
             instructions = []
-            # TODO: masking tagName
             for sample in dataset_MSEQA_format:
                 tagName = sample['tagName']
                 pattern = re.compile(rf'{re.escape(tagName)}', flags=re.IGNORECASE)
                 sample['instruction'] = pattern.sub('<unk>', sample['instruction'])
                 instructions.append(sample['instruction'])
+            """
+            instructions = dataset_MSEQA_format['instruction']
 
             print(instructions[0])
 

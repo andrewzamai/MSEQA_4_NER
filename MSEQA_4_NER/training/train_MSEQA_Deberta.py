@@ -3,7 +3,7 @@ FULL-finetuning of a MSEQA model based on Deberta-XXL 1.5b model
 
 - NO LORA, no model quantization, only adamw_8bit optimizer
 - Batch size: 16 x ga=16 --> 256; eval_batch_size = 32;
-- learning rate 1e-5, cosine sched. over 5 epochs
+- learning rate 1e-5, cosine sched. over 3 epochs
 - training in bf16
 
 - tokenizing all MSEQA dataset before starting training but padding only when collating
@@ -71,16 +71,25 @@ if __name__ == '__main__':
         raise NotImplementedError
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
-    pileNER_dataset_with_def = False
+    pileNER_dataset_with_def = True
+    enhance_TrueDef_training = True  # applies random NE masking and switching to enhance guidelines following
+    print(f"enhance_TrueDef_training: {enhance_TrueDef_training}")
+    corruption_prob = 0.2
+    print(f"corruption_prob: {corruption_prob}")
+    masking_prob = 0.8
+    print(f"masking_prob: {masking_prob}")
+    this_model_mask = '[UNK]'  # depends on tokenizer
+    print(f"this_model_mask: {this_model_mask}")
+
     if pileNER_dataset_with_def:
-        path_to_pileNER_definitions_json = './MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
+        path_to_pileNER_definitions_json = './src/MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_TrueDef'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
     else:
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_FalseDef'  # dataset "what describes X in the text?" if already built, otherwise it will be built and stored here
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./baseline_Deberta_FT/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_C-bis"
+    output_dir = f"./trained_models/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_{enhance_TrueDef_training}enhanced_b"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -127,7 +136,7 @@ if __name__ == '__main__':
 
     """ -------------------- Loading Datasets in MS-EQA format -------------------- """
 
-    print(f"\n\nTraining MS-EQA model on {path_to_dataset_MSEQA_format.split('/')[-1]} dataset\n")
+    print(f"\n\nTraining MS-EQA model on {path_to_dataset_MSEQA_format.split('/')[-1]} dataset - {enhance_TrueDef_training}_enhanced \n")
     print(f"Fine-tuned model will be saved in: {output_dir}\n")
 
     print("Loading train/validation/test Datasets in MS-EQA format...")
@@ -149,7 +158,17 @@ if __name__ == '__main__':
         print(" ...using already existing Datasets in MS-EQA format")
         dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_dataset_MSEQA_format)
 
+    if enhance_TrueDef_training:
+        dataset_MSEQA_format['train'] = data_handler_MSEQA_dataset.mask_named_entities(dataset_MSEQA_format['train'], corruption_prob, masking_prob, this_model_mask)
+        dataset_MSEQA_format['validation'] = data_handler_MSEQA_dataset.mask_named_entities(dataset_MSEQA_format['validation'], corruption_prob, masking_prob, this_model_mask)
+
     print(dataset_MSEQA_format)
+
+    print("A masked question example: ")
+    for sample in dataset_MSEQA_format['train']:
+        if 'masked' in sample['doc_question_pairID']:
+            print(sample['question'])
+            break
 
     print("\nLoading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir')
@@ -167,6 +186,16 @@ if __name__ == '__main__':
 
     print("Tokenizing and preprocessing MSEQA dataset for trainining...")
 
+    print(" ...tokenizing dataset for training")
+    sys.stdout.flush()
+    # ALERT: using tokenizer before training may give parallelism deadlock warnings
+    dataset_MSEQA_format_tokenized = dataset_MSEQA_format.map(
+        lambda examples_batch: tokenize_and_preprocess(examples_batch, tokenizer, max_seq_length=MAX_SEQ_LENGTH, doc_stride=DOC_STRIDE),
+        batched=True,
+        remove_columns=dataset_MSEQA_format["train"].column_names
+    )
+
+    """
     path_to_already_tokenized_dataset = path_to_dataset_MSEQA_format + '_tokenized_' + pretrained_model_relying_on.split('/')[-1] + '_' + str(MAX_SEQ_LENGTH) + '_' + str(DOC_STRIDE)
     if not os.path.exists(path_to_already_tokenized_dataset):
         print(" ...tokenizing dataset for training")
@@ -182,6 +211,7 @@ if __name__ == '__main__':
     else:
         print(" ...using already existing tokenized dataset")
         dataset_MSEQA_format_tokenized = DatasetDict.load_from_disk(path_to_already_tokenized_dataset)
+    """
 
     print(dataset_MSEQA_format_tokenized)
 
@@ -321,11 +351,11 @@ if __name__ == '__main__':
 
     print("\n\nZERO-SHOT EVALUATIONS:\n")
 
-    from data_handlers import data_handler_cross_NER
-    from data_handlers import data_handler_pileNER
-    from data_handlers import data_handler_BUSTER
-    from data_handlers import data_handler_MIT
-    from collator_MSEQA import collate_fn_MSEQA
+    from ..data_handlers import data_handler_cross_NER
+    from ..data_handlers import data_handler_pileNER
+    from ..data_handlers import data_handler_BUSTER
+    from ..data_handlers import data_handler_MIT
+    from ..collator_MSEQA import collate_fn_MSEQA
     from functools import partial
 
     def load_or_build_dataset_MSEQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition, load_from_disk=False):
@@ -338,10 +368,10 @@ if __name__ == '__main__':
 
         path_to_NER_datasets_BIO_format = f"./datasets/{datasets_cluster_name}/BIO_format"
 
-        path_to_guidelines_folder = f"./MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
+        path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
         path_to_datasets_MSEQA_format_folder_with_def = f"./datasets/{datasets_cluster_name}/MSEQA_format_guidelines/"
 
-        path_to_subdataset_questions_folder = f"./MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/what_describes_questions"
+        path_to_subdataset_questions_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/what_describes_questions"
         path_to_dataset_MSEQA_format_folder_no_def = f"./datasets/{datasets_cluster_name}/MSEQA_format_no_def/"
 
         if with_definition:

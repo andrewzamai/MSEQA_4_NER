@@ -1,12 +1,14 @@
-""" plot evaluation outputs """
-
+""" Helper module for plotting evaluation outputs: metrics per NE class, avg, std ... """
+import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
+import json
 import os
 import re
 
 # all_ne_list: list of Named Entities in this dataset
-# novel_ne_list: NEs in this dataset but not in pileNER training
+# novel_ne_list: NEs in this dataset but not in pileNER pre-training, i.e. NOVEL NEs
 # same_ne_diff_def_list: NEs which have same name, but different definition wrt pileNER
 
 movie_ne_statistics = {
@@ -68,54 +70,14 @@ all_datasets_ne_statistics = {
     'BUSTER': BUSTER_ne_statistics
 }
 
-# uniNER-eval datasets use a list of NEs different from original crossNER/MIT
-# to adapt to MSEQA setting and above ne_statistics here is a mapping
-ne_mapping = {
-    'crossNER': {
-        'organization': 'organisation',
-        'program language': 'programlang',
-        'literary genre': 'literarygenre',
-        'astronomical object': 'astronomicalobject',
-        'chemical element': 'chemicalelement',
-        'chemical compound': 'chemicalcompound',
-        'academic journal': 'academicjournal',
-        'political party': 'politicalparty',
-        'musical artist': 'musicalartist',
-        'musical instrument': 'musicalinstrument',
-        'music genre': 'musicgenre',
-    },
-    'movie': {
-        'character': 'CHARACTER',
-        'plot': 'PLOT',
-        'year': 'YEAR',
-        'director': 'DIRECTOR',
-        'rating': 'RATING',
-        'average ratings': 'RATINGS_AVERAGE',
-        'actor': 'ACTOR',
-        'genre': 'GENRE',
-        'song': 'SONG',
-        'trailer': 'TRAILER',
-        'review': 'REVIEW',
-        'title': 'TITLE'
-    },
-    'restaurant': {
-        'amenity': 'Amenity',
-        'location': 'Location',
-        'cuisine': 'Cuisine',
-        'restaurant name': 'Restaurant_Name',
-        'rating': 'Rating',
-        'hours': 'Hours',
-        'price': 'Price',
-        'dish': 'Dish'
-    }
-}
-
 
 def compute_percentage_overlap(dataset_ne_statistics):
+    """ computes the percentage of overlapping NEs between training and ZERO-shot evaluation """
     return len(set(dataset_ne_statistics['all_ne_list']) - set(dataset_ne_statistics['novel_ne_list'])) / len(dataset_ne_statistics['all_ne_list']) * 100
 
 
 def read_dataset_evals(path_to_file, dataset_name):
+    """ reads an evaluation .txt file relative to a model on multiple datasets in ZERO-SHOT setting """
 
     with open(path_to_file, 'r') as file:
         logs = file.readlines()
@@ -130,8 +92,8 @@ def read_dataset_evals(path_to_file, dataset_name):
                 break
 
     # Regular expression patterns for extracting metrics
-    support_pattern = re.compile(r'^([\w.]+) --> support: (\d+)$')
-    metrics_pattern = re.compile(r'^([\w.]+) --> Precision: (\d+\.\d+), Recall: (\d+\.\d+), F1: (\d+\.\d+)$')
+    support_pattern = re.compile(r'^([\w\s.]+) --> support: (\d+)$')
+    metrics_pattern = re.compile(r'^([\w\s.]+) --> Precision: (\d+\.\d+), Recall: (\d+\.\d+), F1: (\d+\.\d+)$')
 
     ner_metrics = {}
     # reading lines after toread_start until new evaluation starts
@@ -159,111 +121,97 @@ def read_dataset_evals(path_to_file, dataset_name):
     return ner_metrics
 
 
-def read_dataset_evals_llama2(path_to_file, dataset_name):
-
-    with open(path_to_file, 'r') as file:
-        logs = file.readlines()
-
-    # finding line at which evaluation metrics for dataset_name start
-    evaluating_pattern = re.compile(r'^Evaluating model named.*? on \'(.+?)\' test fold in ZERO-SHOT setting$')
-    for i, line in enumerate(logs):
-        evaluate_match = evaluating_pattern.match(line)
-        if evaluate_match:
-            if evaluate_match.group(1) == dataset_name:
-                toread_start = i
-                break
-
-    # Regular expression patterns for extracting metrics
-    ne_pattern = re.compile(r'^\s*NE:\s*([\w.]+)$')
-
-    metrics_pattern = re.compile(r'\s*Precision: (\d+\.\d+) % -- Recall: (\d+\.\d+) % -- F1: (\d+\.\d+) %')
-
-    ner_metrics = {}
-    # reading lines after toread_start until new evaluation starts
-    for i in range(toread_start + 1, len(logs)):
-        line = logs[i]
-        # Check if the line contains metrics for a Named Entity
-        ne_match = ne_pattern.match(line)
-        if ne_match:
-            ne_name = ne_match.group(1)
-            print(ne_name)
-        metrics_match = metrics_pattern.match(line)
-        if metrics_match:
-            precision = float(metrics_match.group(1))
-            recall = float(metrics_match.group(2))
-            f1 = float(metrics_match.group(3))
-            ner_metrics[ne_name] = {'Precision': precision, 'Recall': recall, 'F1': f1, 'support': 1000}
-
-        # Check if a new evaluation is starting
-        evaluating_match = evaluating_pattern.match(line)
-        if evaluating_match:
-            break
-
-    return ner_metrics
-
-
-def get_zero_shot_metrics(path_to_evals_folder, yes_no_Def, model_name):
-    path_to_file = os.path.join(path_to_evals_folder, str(yes_no_Def) + 'Def_' + model_name + '.txt')
-    ner_metrics = {}
-    for dataset_name in dataset_name_list:
-        ner_metrics[dataset_name] = read_dataset_evals(path_to_file, dataset_name)
-    return ner_metrics
-
-
 def get_zero_shot_metrics_from_file(path_to_file, dataset_name_list):
+    """ loads eval metrics for all datasets in dataset_name_list from path_to_file.txt """
     ner_metrics = {}
     for dataset_name in dataset_name_list:
         ner_metrics[dataset_name] = read_dataset_evals(path_to_file, dataset_name)
-        # ner_metrics[dataset_name] = read_dataset_evals_llama2(path_to_file, dataset_name)
     return ner_metrics
 
 
-def plot_FalseTrueDef_comparison(ner_metrics_FalseDef, ner_metrics_TrueDef, dataset_name, ne_statistics):
-    x_labels = sorted(ner_metrics_FalseDef[dataset_name].keys())
-    thisds_metrics_FalseDef = [ner_metrics_FalseDef[dataset_name][x]['F1'] for x in x_labels]
-    thisds_metrics_TrueDef = [ner_metrics_TrueDef[dataset_name][x]['F1'] for x in x_labels]
+def collect_compute_prepare_metrics_for_plotting(path_to_evals_folder, filenames_grouped, dataset_name_list):
 
-    # Set up positions for bars on x-axis
-    bar_width = 0.4  # Adjust as needed
-    x = np.arange(len(x_labels))
+    collected_metrics = {'FalseDef': {x: [] for x in dataset_name_list}, 'TrueDef': {x: [] for x in dataset_name_list}}
+    for key in filenames_grouped.keys():
+        for bs_run in filenames_grouped[key]:
+            path_to_file = os.path.join(path_to_evals_folder, bs_run)
+            ner_metrics = get_zero_shot_metrics_from_file(path_to_file, dataset_name_list)
+            for ds_name, ds_metrics in ner_metrics.items():
+                collected_metrics[key][ds_name].append(ds_metrics)
 
-    # Plotting the first set of bars
-    # width proportional to support
-    # x:bar_width = ne_support:max(all_ne_supports)
-    max_support = max([ner_metrics_TrueDef[dataset_name][x]['support'] for x in x_labels])
-    widths = [bar_width * ner_metrics_TrueDef[dataset_name][x]['support']/max_support for x in x_labels]
-    plt.bar(x - bar_width / 2, thisds_metrics_FalseDef, width=widths, label='NoDef')
+    print(collected_metrics)
 
-    # Plotting the second set of bars
-    plt.bar(x + bar_width / 2, thisds_metrics_TrueDef, width=widths, label='YesDef')
+    # Combine all collected metrics into a single DataFrame
+    df_list = []
+    for w_wo_def, w_wo_values in collected_metrics.items():
+        for ds_name, ds_values in w_wo_values.items():
+            for ne_mvalues in ds_values:
+                df = pd.DataFrame(ne_mvalues)
+                df['Dataset'] = ds_name
+                df['With_Definition'] = w_wo_def
+                df_list.append(df)
+    print(df_list[0])
 
-    # Adding labels and title
-    plt.xlabel('NE categories')
-    plt.ylabel('micro-F1')
-    plt.title('FalseDef vs TrueDef comparison')
+    combined_df = pd.concat(df_list)
+    print(combined_df)
 
-    plt.xticks(x, x_labels, rotation=10, fontsize=6)
-    for i, label in enumerate(x_labels):
-        if label in ne_statistics[dataset_name]['novel_ne_list']:
-            plt.gca().get_xticklabels()[i].set_color("red")
-        elif label in ne_statistics[dataset_name]['same_ne_diff_def_list']:
-            plt.gca().get_xticklabels()[i].set_color("orange")
-        else:
-            plt.gca().get_xticklabels()[i].set_color("black")
+    # Unpivot the DataFrame to have NE as a column
+    combined_df['Metric'] = combined_df.index
+    melted_df = combined_df.melt(id_vars=['Dataset', 'With_Definition', 'Metric'], var_name='NE',
+                                 value_name='metric_value')
+    print(melted_df)
 
-    plt.legend()
-    plt.show()
+    # Compute average and standard deviation for each NE in each dataset under each condition
+    grouped_metrics = melted_df.groupby(['Dataset', 'With_Definition', 'NE', 'Metric']).agg({
+        'metric_value': ['mean', 'std'],
+    }).unstack()
+    grouped_metrics.columns = [f'{col[2]}_{col[1]}' for col in grouped_metrics.columns]
+    print(grouped_metrics.columns)
+    print(grouped_metrics)
+
+    grouped_metrics.dropna(how='all', inplace=True)
+    print(grouped_metrics)
+
+    # Reset index to make 'Dataset', 'With_Definition', and NE as columns
+    grouped_metrics.reset_index(inplace=True)
+    print(grouped_metrics)
+
+    # aggregate back to dict for plotting
+    avg_std_metrics = {'FalseDef': {x: {} for x in dataset_name_list}, 'TrueDef': {x: {} for x in dataset_name_list}}
+    for index, row in grouped_metrics.iterrows():
+        avg_std_metrics[row['With_Definition']][row['Dataset']][row['NE']] = {
+            'avg_precision': row['Precision_mean'],
+            'std_precision': row['Precision_std'],
+            'avg_recall': row['Recall_mean'],
+            'std_recall': row['Recall_std'],
+            'avg_F1': row['F1_mean'],
+            'std_F1': row['F1_std'],
+            'support': int(row['support_mean'])
+        }
+
+    print(avg_std_metrics)
+
+    return avg_std_metrics
 
 
 def plot_avg_std_FalseTrueDef_comparison(ner_metrics_FalseDef_with_avg_std, ner_metrics_TrueDef_with_avg_std, dataset_name, ne_statistics, model_name):
-    x_labels = sorted(ner_metrics_FalseDef_with_avg_std[dataset_name].keys())
+    """ plot an histogram comparing metrics for each NE class False vs True Def - average and std across multiple eval runs """
 
-    thisds_metrics_FalseDef = [ner_metrics_FalseDef_with_avg_std[dataset_name][x]['avg_F1'] for x in x_labels]
-    thisds_metrics_FalseDef_stds = [ner_metrics_FalseDef_with_avg_std[dataset_name][x]['std_F1'] for x in x_labels]
+    print("FalseDef labels:")
+    print(sorted(ner_metrics_FalseDef_with_avg_std[dataset_name].keys()))
+
+    x_labels = sorted(ner_metrics_TrueDef_with_avg_std[dataset_name].keys())
+    print("TrueDef labels / x axis:")
+    print(x_labels)
+
+
+    thisds_metrics_FalseDef = [ner_metrics_FalseDef_with_avg_std[dataset_name][x]['avg_F1'] for x in sorted(ner_metrics_FalseDef_with_avg_std[dataset_name].keys())]
+    thisds_metrics_FalseDef_stds = [ner_metrics_FalseDef_with_avg_std[dataset_name][x]['std_F1'] for x in sorted(ner_metrics_FalseDef_with_avg_std[dataset_name].keys())]
 
     thisds_metrics_TrueDef = [ner_metrics_TrueDef_with_avg_std[dataset_name][x]['avg_F1'] for x in x_labels]
     thisds_metrics_TrueDef_stds = [ner_metrics_TrueDef_with_avg_std[dataset_name][x]['std_F1'] for x in x_labels]
 
+    plt.figure(figsize=(14, 6))
     # Set up positions for bars on x-axis
     bar_width = 0.4  # Adjust as needed
     x = np.arange(len(x_labels))
@@ -281,23 +229,28 @@ def plot_avg_std_FalseTrueDef_comparison(ner_metrics_FalseDef_with_avg_std, ner_
 
     # Adding labels and title
     plt.xlabel('NE categories')
-    plt.ylabel('average per-NE F1 across different runs')
-    plt.title(f'{dataset_name} - {model_name} - FalseDef vs TrueDef comparison')
+    plt.ylabel('per-NE AVERAGE F1 across multiple runs')
+    plt.title(f'{model_name} - FalseDef vs TrueDef comparison - {dataset_name.upper()} dataset')
 
+    # adding also support to NE label
+    x_labels = [ne + '\n' + str(ner_metrics_TrueDef_with_avg_std[dataset_name][ne]['support']) for ne in x_labels]
     plt.xticks(x, x_labels, rotation=10, fontsize=6)
     for i, label in enumerate(x_labels):
+        label = label.split("\n")[0]
         if label in ne_statistics[dataset_name]['novel_ne_list']:
             plt.gca().get_xticklabels()[i].set_color("red")
         elif label in ne_statistics[dataset_name]['same_ne_diff_def_list']:
             plt.gca().get_xticklabels()[i].set_color("orange")
         else:
             plt.gca().get_xticklabels()[i].set_color("black")
-
     plt.legend()
     plt.show()
 
 
 if __name__ == '__main__':
+
+    """
+    model_name = 'Llama2-7B-Enhanced-NonMasked_vs_Masked'
 
     path_to_evals_folder = '../../experiments_outputs/Llama2-7B'
 
@@ -305,226 +258,144 @@ if __name__ == '__main__':
 
     filenames = os.listdir(path_to_evals_folder)
     filenames_grouped = {'TrueDef': [], 'FalseDef': []}
+
+    """
+
     """
     for fn in filenames:
         if fn != '.DS_Store' and not os.path.isdir(os.path.join(path_to_evals_folder, fn)):
-            yes_no_def = fn.split('-')[-2]
-            filenames_grouped[yes_no_def].append(fn)
+            if 'TrueDef' in fn:
+                filenames_grouped['TrueDef'].append(fn)
+            else:
+                filenames_grouped['FalseDef'].append(fn)
+    print(filenames_grouped)
+    """
+
     """
     #filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-FalseDef-A.txt')
 
-    #filenames_grouped['TrueDef'].append('uniNEReval_LLama2_7b-TrueDef-enhanced2midcp.txt')
-    #filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-TrueDef-enhancedcp3200.txt')
+    # filenames_grouped['TrueDef'].append('uniNEReval_LLama2_7b-TrueDef-A.txt')
 
     filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-TrueDef-enhanced2midcp.txt')
     filenames_grouped['TrueDef'].append('uniNEReval_LLama2_7b-TrueDef-enhanced2midcp_masked_eval.txt')
 
-    #filenames_grouped['TrueDef'].append('uniNEReval_LLama2_7b-TrueDef-A.txt')
-    print(filenames_grouped)
+    #filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-TrueDef-A.txt')
 
-    collected_metrics = {'FalseDef': {x: [] for x in dataset_name_list}, 'TrueDef': {x: [] for x in dataset_name_list}}
-    for bs_run in filenames_grouped['FalseDef']:
-        path_to_file = os.path.join(path_to_evals_folder, bs_run)
-        ner_metrics_FalseDef = get_zero_shot_metrics_from_file(path_to_file, dataset_name_list)
-        for ds_name, ds_metrics in ner_metrics_FalseDef.items():
-            collected_metrics['FalseDef'][ds_name].append(ds_metrics)
+    avg_std_metrics = collect_compute_prepare_metrics_for_plotting(path_to_evals_folder, filenames_grouped, dataset_name_list)
 
-    for bs_run in filenames_grouped['TrueDef']:
-        path_to_file = os.path.join(path_to_evals_folder, bs_run)
-        ner_metrics_TrueDef = get_zero_shot_metrics_from_file(path_to_file, dataset_name_list)
-        for ds_name, ds_metrics in ner_metrics_TrueDef.items():
-            collected_metrics['TrueDef'][ds_name].append(ds_metrics)
+    # Change TrueDef NE names with FalseDef NE names if needed
+    for ds_name, ds_values in avg_std_metrics['TrueDef'].items():
+        new_ne_names_metrics = {}
+        falseDef_NEs_list = list(avg_std_metrics['FalseDef'][ds_name].keys())
+        for i, trueDef_ne in enumerate(avg_std_metrics['TrueDef'][ds_name]):
+            new_ne = falseDef_NEs_list[i]
+            new_ne_names_metrics[new_ne] = avg_std_metrics['TrueDef'][ds_name][trueDef_ne]
+        avg_std_metrics['TrueDef'][ds_name] = new_ne_names_metrics
 
-    print(collected_metrics)
+    print(avg_std_metrics)
 
-    # get something like {'FalseDef': {'movie': {'GENRE': {'Precision': [22.21, 20.76, 20.42, 22.88], 'Recall': [26.59, 25.78, 25.25, 30.98]
-    grouped_metrics = {'FalseDef': {x: {} for x in dataset_name_list}, 'TrueDef': {x: {} for x in dataset_name_list}}
-    for w_wo_def, w_wo_values in collected_metrics.items():
-        for ds_name, ds_values in w_wo_values.items():
-            for ne_mvalues in ds_values:
-                for ne, mvalues in ne_mvalues.items():
-                    if ne not in grouped_metrics[w_wo_def][ds_name]:
-                        grouped_metrics[w_wo_def][ds_name][ne] = {}
-                        for mname, v in mvalues.items():
-                            grouped_metrics[w_wo_def][ds_name][ne][mname] = [v]
+    with open(os.path.join('../../experiments_outputs/PLOTS/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'w') as f:
+        json.dump(avg_std_metrics, f, indent=4)
+
+    for ds_name in dataset_name_list:
+        plot_avg_std_FalseTrueDef_comparison(avg_std_metrics['FalseDef'], avg_std_metrics['TrueDef'], ds_name, all_datasets_ne_statistics, model_name)
+        
+    """
+
+    #get_overall_scores_for = 'novel_ne_list'
+    #get_overall_scores_for = 'same_ne_diff_def_list'
+    get_overall_scores_for = 'all_ne_list'
+    #get_overall_scores_for = 'NEs_seen_in_finetuning_list'
+
+    with open(os.path.join("../../experiments_outputs/PLOTS/models_avg_std_metrics/models_scores", get_overall_scores_for + '.txt'), 'w') as wfile:
+
+        wfile.write(f"\nModels overall performance on '{get_overall_scores_for}'\n")
+        dataset_name_list = ['movie', 'restaurant', 'ai', 'literature', 'music', 'politics', 'science', 'BUSTER']
+        # NB: base, large, deberta are computed using our MSEQA metrics, Llama with official uniNER
+        models_list = ['RoBERTa-base-MSEQA', 'RoBERTa-large-MSEQA', 'DeBERTa-XXL-MSEQA', 'Llama2-7B', 'Llama2-7B-enhanced', 'Llama2-7B-TrueDef_vs_Enhanced+MaskedEval', 'Llama2-7B-Enhanced-NonMasked_vs_Masked']  #, 'Llama2-7B-enhanced_masked_vs_NONmasked_eval']
+
+        TrueDef_better_FalseDef_overall = {ds: 0 for ds in dataset_name_list}
+        totalTagNames = 0
+        for dataset_name in dataset_name_list:
+            wfile.write(f"\nOn dataset {dataset_name}:")
+            TrueDef_better_FalseDef_this_ds = {mname: 0 for mname in models_list}
+            dataset_statistics = all_datasets_ne_statistics[dataset_name]
+            if get_overall_scores_for == 'NEs_seen_in_finetuning_list':
+                tagName_list = list(set(dataset_statistics['all_ne_list']) - set(dataset_statistics['novel_ne_list']) - set(dataset_statistics['same_ne_diff_def_list']))
+            else:
+                tagName_list = dataset_statistics[get_overall_scores_for]
+            if 'misc' in tagName_list:
+                tagName_list.pop(tagName_list.index('misc'))
+            totalTagNames += len(tagName_list)
+            wfile.write(f"\nNEs: {tagName_list}\n\n")
+            for tagName in tagName_list:
+                # print(tagName)
+                this_tagName_metrics = {mname: {} for mname in models_list}
+                for model_name in models_list:
+                    with open(os.path.join('../../experiments_outputs/PLOTS/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'r') as file:
+                        this_model_metrics = json.load(file)
+                        falseDef_avg_F1 = this_model_metrics['FalseDef'][dataset_name][tagName]['avg_F1']
+                        falseDef_std_F1 = this_model_metrics['FalseDef'][dataset_name][tagName]['std_F1']
+                        trueDef_avg_F1 = this_model_metrics['TrueDef'][dataset_name][tagName]['avg_F1']
+                        trueDef_std_F1 = this_model_metrics['TrueDef'][dataset_name][tagName]['std_F1']
+                        support = this_model_metrics['FalseDef'][dataset_name][tagName]['support']
+                        this_tagName_metrics[model_name] = {
+                            'false_avg_F1': falseDef_avg_F1,
+                            'false_std_F1': falseDef_std_F1,
+                            'true_avg_F1': trueDef_avg_F1,
+                            'true_std_F1': trueDef_std_F1
+                        }
+
+                x_labels = models_list
+
+                this_tagName_FalseDef = [this_tagName_metrics[model_name]['false_avg_F1'] for model_name in x_labels]
+                this_tagName_FalseDef_std = [this_tagName_metrics[model_name]['false_std_F1'] for model_name in x_labels]
+
+                this_tagName_TrueDef = [this_tagName_metrics[model_name]['true_avg_F1'] for model_name in x_labels]
+                this_tagName_TrueDef_std = [this_tagName_metrics[model_name]['true_std_F1'] for model_name in x_labels]
+
+                plt.figure(figsize=(14, 6))
+                bar_width = 0.4
+                x = np.arange(len(x_labels))
+
+                plt.bar(x - bar_width / 2, this_tagName_FalseDef, width=0.1, label='NoDef')
+                plt.errorbar(x - bar_width / 2, this_tagName_FalseDef, yerr=this_tagName_FalseDef_std, fmt='none', ecolor='black', capsize=3, elinewidth=0.05)
+
+                # Plotting the second set of bars
+                plt.bar(x + bar_width / 2, this_tagName_TrueDef, width=0.1, label='YesDef')
+                plt.errorbar(x + bar_width / 2, this_tagName_TrueDef, yerr=this_tagName_TrueDef_std, fmt='none', ecolor='black', capsize=3, elinewidth=0.05)
+
+                # Adding labels and title
+                plt.xlabel('models')
+                plt.ylabel('per-NE AVERAGE F1 across multiple runs')
+                plt.title(f'{tagName} from {dataset_name.upper()} dataset - FalseDef vs TrueDef comparison across models \n support: {support}')
+
+                plt.xticks(x, x_labels, rotation=10, fontsize=6)
+
+                #plt.legend()
+                #plt.show()
+                matplotlib.pyplot.close()
+
+                for model_name, this_model_this_tagName_metrics in this_tagName_metrics.items():
+                    if this_model_this_tagName_metrics['true_avg_F1'] - this_model_this_tagName_metrics['false_avg_F1'] > 0:
+                        TrueDef_better_FalseDef_this_ds[model_name] += 1
                     else:
-                        for mname, v in mvalues.items():
-                            grouped_metrics[w_wo_def][ds_name][ne][mname].append(v)
-    print(grouped_metrics)
+                        TrueDef_better_FalseDef_this_ds[model_name] -= 1
 
-    average_std_metrics = {'FalseDef': {x: {} for x in dataset_name_list},
-                           'TrueDef': {x: {} for x in dataset_name_list}}
-    for w_wo_def, w_wo_values in grouped_metrics.items():
-        for ds_name, ds_values in w_wo_values.items():
-            for ne_name, m_values_list in ds_values.items():
-                avg_precision = np.average(m_values_list['Precision'])
-                std_precision = np.std(m_values_list['Precision'])
-                avg_recall = np.average(m_values_list['Recall'])
-                std_recall = np.std(m_values_list['Recall'])
-                avg_f1 = np.average(m_values_list['F1'])
-                std_f1 = np.std(m_values_list['F1'])
-                average_std_metrics[w_wo_def][ds_name][ne_name] = {'avg_precision': avg_precision,
-                                                                   'std_precision': std_precision,
-                                                                   'avg_recall': avg_recall,
-                                                                   'std_recall': std_recall,
-                                                                   'avg_F1': avg_f1,
-                                                                   'std_F1': std_f1,
-                                                                   'support': m_values_list['support'][0]
-                                                                   }
-    print(average_std_metrics)
+            TrueDef_better_FalseDef_overall[dataset_name] = TrueDef_better_FalseDef_this_ds
+            wfile.write(str(TrueDef_better_FalseDef_this_ds))
+            #wfile.write("\n\n-----------------------------------------------------------------------------------------------------------------------\n")
+            wfile.write(f"\n\n{'-'.join('' for x in str(TrueDef_better_FalseDef_this_ds))}")
 
-    for ds_name in dataset_name_list:
-        plot_avg_std_FalseTrueDef_comparison(average_std_metrics['FalseDef'], average_std_metrics['TrueDef'], ds_name,
-                                             all_datasets_ne_statistics, f'MSEQA-DeBERTa-XXL')
+        wfile.write("\n\nOverall:  ")
+        TrueDef_better_FalseDef_overall = {mname: sum([values[mname] for values in TrueDef_better_FalseDef_overall.values()]) for mname in models_list}
+        wfile.write(str(TrueDef_better_FalseDef_overall))
 
-    """
-    roberta_model = 'large'
+        wfile.write(f"\n\nTotal NEs of type {get_overall_scores_for}: {totalTagNames}")
 
-    # list of datasets for which to compute evaluation statistics
-    dataset_name_list = ['movie', 'restaurant', 'ai', 'literature', 'music', 'politics', 'science', 'BUSTER']
 
-    path_to_evals_folder = '../../../experiments_outputs/baseline_4_evals'
-    baseline_runs = ['baseline_4_a', 'baseline_4_b', 'baseline_4_c', 'baseline_4_d']
-    # each baseline_4_x contains evals output in txt files e.g. TrueDef_large.txt and FalseDef_large.txt
 
-    collected_metrics = {'FalseDef': {x: [] for x in dataset_name_list}, 'TrueDef': {x: [] for x in dataset_name_list}}
-    for bs_run in baseline_runs:
-        path = os.path.join(path_to_evals_folder, bs_run)
-        ner_metrics_FalseDef = get_zero_shot_metrics(path, False, roberta_model)
-        for ds_name, ds_metrics in ner_metrics_FalseDef.items():
-            collected_metrics['FalseDef'][ds_name].append(ds_metrics)
 
-        ner_metrics_TrueDef = get_zero_shot_metrics(path, True, roberta_model)
-        for ds_name, ds_metrics in ner_metrics_TrueDef.items():
-            collected_metrics['TrueDef'][ds_name].append(ds_metrics)
 
-    print(collected_metrics)
-
-    # get something like {'FalseDef': {'movie': {'GENRE': {'Precision': [22.21, 20.76, 20.42, 22.88], 'Recall': [26.59, 25.78, 25.25, 30.98]
-    grouped_metrics = {'FalseDef': {x: {} for x in dataset_name_list}, 'TrueDef': {x: {} for x in dataset_name_list}}
-    for w_wo_def, w_wo_values in collected_metrics.items():
-        for ds_name, ds_values in w_wo_values.items():
-            for ne_mvalues in ds_values:
-                for ne, mvalues in ne_mvalues.items():
-                    if ne not in grouped_metrics[w_wo_def][ds_name]:
-                        grouped_metrics[w_wo_def][ds_name][ne] = {}
-                        for mname, v in mvalues.items():
-                            grouped_metrics[w_wo_def][ds_name][ne][mname] = [v]
-                    else:
-                        for mname, v in mvalues.items():
-                            grouped_metrics[w_wo_def][ds_name][ne][mname].append(v)
-    print(grouped_metrics)
-
-    average_std_metrics = {'FalseDef': {x: {} for x in dataset_name_list}, 'TrueDef': {x: {} for x in dataset_name_list}}
-    for w_wo_def, w_wo_values in grouped_metrics.items():
-        for ds_name, ds_values in w_wo_values.items():
-            for ne_name, m_values_list in ds_values.items():
-                avg_precision = np.average(m_values_list['Precision'])
-                std_precision = np.std(m_values_list['Precision'])
-                avg_recall = np.average(m_values_list['Recall'])
-                std_recall = np.std(m_values_list['Recall'])
-                avg_f1 = np.average(m_values_list['F1'])
-                std_f1 = np.std(m_values_list['F1'])
-                average_std_metrics[w_wo_def][ds_name][ne_name] = {'avg_precision': avg_precision,
-                                                                   'std_precision': std_precision,
-                                                                   'avg_recall': avg_recall,
-                                                                   'std_recall': std_recall,
-                                                                   'avg_F1': avg_f1,
-                                                                   'std_F1': std_f1,
-                                                                   'support': m_values_list['support'][0]
-                                                                   }
-    print(average_std_metrics)
-
-    for ds_name in dataset_name_list:
-        plot_avg_std_FalseTrueDef_comparison(average_std_metrics['FalseDef'], average_std_metrics['TrueDef'], ds_name, all_datasets_ne_statistics, f'MSEQA-{roberta_model}')
-
-    """
-
-    """
-    model_name = 't5-3b'
-    path_to_evals_folder = '../../../experiments_outputs/T5-3b-MSEQA'
-
-    dataset_name_list = ['movie', 'restaurant', 'ai', 'literature', 'music', 'politics', 'science', 'BUSTER']
-
-    ner_metrics_FalseDef = get_zero_shot_metrics(path_to_evals_folder, False, model_name)
-    print(ner_metrics_FalseDef)
-
-    ner_metrics_TrueDef = get_zero_shot_metrics(path_to_evals_folder, True, 'deb-xxl')
-    print(ner_metrics_TrueDef)
-
-    for ds_name in dataset_name_list:
-        plot_FalseTrueDef_comparison(ner_metrics_FalseDef, ner_metrics_TrueDef, ds_name, all_datasets_ne_statistics)
-
-    # print(compute_percentage_overlap(ai_ne_statistics))
-    """
-
-    """
-    path_to_evals_folder = '../../experiments_outputs/DebertaXXL-MSEQA'
-
-    dataset_name_list = ['movie', 'restaurant', 'ai', 'literature', 'music', 'politics', 'science', 'BUSTER']
-
-    filenames = os.listdir(path_to_evals_folder)
-    filenames_grouped = {'TrueDef': [], 'FalseDef': []}
-    for fn in filenames:
-        if fn != '.DS_Store':
-            yes_no_def = fn.split('-')[-2]
-            filenames_grouped[yes_no_def].append(fn)
-    print(filenames_grouped)
-
-    collected_metrics = {'FalseDef': {x: [] for x in dataset_name_list}, 'TrueDef': {x: [] for x in dataset_name_list}}
-    for bs_run in filenames_grouped['FalseDef']:
-        path_to_file = os.path.join(path_to_evals_folder, bs_run)
-        ner_metrics_FalseDef = get_zero_shot_metrics_from_file(path_to_file, dataset_name_list)
-        for ds_name, ds_metrics in ner_metrics_FalseDef.items():
-            collected_metrics['FalseDef'][ds_name].append(ds_metrics)
-
-    for bs_run in filenames_grouped['TrueDef']:
-        path_to_file = os.path.join(path_to_evals_folder, bs_run)
-        ner_metrics_TrueDef = get_zero_shot_metrics_from_file(path_to_file, dataset_name_list)
-        for ds_name, ds_metrics in ner_metrics_TrueDef.items():
-            collected_metrics['TrueDef'][ds_name].append(ds_metrics)
-
-    print(collected_metrics)
-
-    # get something like {'FalseDef': {'movie': {'GENRE': {'Precision': [22.21, 20.76, 20.42, 22.88], 'Recall': [26.59, 25.78, 25.25, 30.98]
-    grouped_metrics = {'FalseDef': {x: {} for x in dataset_name_list}, 'TrueDef': {x: {} for x in dataset_name_list}}
-    for w_wo_def, w_wo_values in collected_metrics.items():
-        for ds_name, ds_values in w_wo_values.items():
-            for ne_mvalues in ds_values:
-                for ne, mvalues in ne_mvalues.items():
-                    if ne not in grouped_metrics[w_wo_def][ds_name]:
-                        grouped_metrics[w_wo_def][ds_name][ne] = {}
-                        for mname, v in mvalues.items():
-                            grouped_metrics[w_wo_def][ds_name][ne][mname] = [v]
-                    else:
-                        for mname, v in mvalues.items():
-                            grouped_metrics[w_wo_def][ds_name][ne][mname].append(v)
-    print(grouped_metrics)
-
-    average_std_metrics = {'FalseDef': {x: {} for x in dataset_name_list},
-                           'TrueDef': {x: {} for x in dataset_name_list}}
-    for w_wo_def, w_wo_values in grouped_metrics.items():
-        for ds_name, ds_values in w_wo_values.items():
-            for ne_name, m_values_list in ds_values.items():
-                avg_precision = np.average(m_values_list['Precision'])
-                std_precision = np.std(m_values_list['Precision'])
-                avg_recall = np.average(m_values_list['Recall'])
-                std_recall = np.std(m_values_list['Recall'])
-                avg_f1 = np.average(m_values_list['F1'])
-                std_f1 = np.std(m_values_list['F1'])
-                average_std_metrics[w_wo_def][ds_name][ne_name] = {'avg_precision': avg_precision,
-                                                                   'std_precision': std_precision,
-                                                                   'avg_recall': avg_recall,
-                                                                   'std_recall': std_recall,
-                                                                   'avg_F1': avg_f1,
-                                                                   'std_F1': std_f1,
-                                                                   'support': m_values_list['support'][0]
-                                                                   }
-    print(average_std_metrics)
-
-    for ds_name in dataset_name_list:
-        plot_avg_std_FalseTrueDef_comparison(average_std_metrics['FalseDef'], average_std_metrics['TrueDef'], ds_name, all_datasets_ne_statistics, f'MSEQA-DeBERTa-XXL')
-
-    """
 
 
