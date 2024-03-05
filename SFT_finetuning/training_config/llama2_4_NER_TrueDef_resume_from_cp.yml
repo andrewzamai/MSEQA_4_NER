@@ -11,7 +11,7 @@ output_dir: ./trained_models/llama2_4_NER_noQuant_pt2
 data_path: ./datasets/pileNER/GenQA_format_TrueDef/train.jsonl
 val_data_path: ./datasets/pileNER/GenQA_format_TrueDef/validation.jsonl
 select_train_portion: -1
-val_set_size: -1
+val_set_size: 5000
 
 #training hyperparams
 batch_size: 256

@@ -1,4 +1,6 @@
 """ Helper module for plotting evaluation outputs: metrics per NE class, avg, std ... """
+import math
+
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -250,18 +252,16 @@ def plot_avg_std_FalseTrueDef_comparison(ner_metrics_FalseDef_with_avg_std, ner_
 if __name__ == '__main__':
 
     """
-    model_name = 'Llama2-7B-Enhanced-NonMasked_vs_Masked'
+    model_name = 'Llama-2-7B-5pNE'
 
-    path_to_evals_folder = '../../experiments_outputs/Llama2-7B'
+    #path_to_evals_folder = '../../experiments_outputs/Llama2-7B'
+    path_to_evals_folder = '../../experiments_outputs/pileNER_based_METRICS/uniNER_eval_metrics/Llama-2-7B/5_samples_per_NE'
 
     dataset_name_list = ['movie', 'restaurant', 'ai', 'literature', 'music', 'politics', 'science', 'BUSTER']
 
     filenames = os.listdir(path_to_evals_folder)
     filenames_grouped = {'TrueDef': [], 'FalseDef': []}
 
-    """
-
-    """
     for fn in filenames:
         if fn != '.DS_Store' and not os.path.isdir(os.path.join(path_to_evals_folder, fn)):
             if 'TrueDef' in fn:
@@ -269,17 +269,14 @@ if __name__ == '__main__':
             else:
                 filenames_grouped['FalseDef'].append(fn)
     print(filenames_grouped)
-    """
 
-    """
-    #filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-FalseDef-A.txt')
-
+    # filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-FalseDef-A.txt')
     # filenames_grouped['TrueDef'].append('uniNEReval_LLama2_7b-TrueDef-A.txt')
 
-    filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-TrueDef-enhanced2midcp.txt')
-    filenames_grouped['TrueDef'].append('uniNEReval_LLama2_7b-TrueDef-enhanced2midcp_masked_eval.txt')
+    #filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-TrueDef-enhanced2midcp.txt')
+    #filenames_grouped['TrueDef'].append('uniNEReval_LLama2_7b-TrueDef-enhanced2midcp_masked_eval.txt')
 
-    #filenames_grouped['FalseDef'].append('uniNEReval_LLama2_7b-TrueDef-A.txt')
+    # filenames_grouped['TrueDef'] = ['others/DeBERTa-XXL-MSEQA-TrueDef-enhanced.txt']
 
     avg_std_metrics = collect_compute_prepare_metrics_for_plotting(path_to_evals_folder, filenames_grouped, dataset_name_list)
 
@@ -294,26 +291,27 @@ if __name__ == '__main__':
 
     print(avg_std_metrics)
 
-    with open(os.path.join('../../experiments_outputs/PLOTS/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'w') as f:
-        json.dump(avg_std_metrics, f, indent=4)
+    with open(os.path.join('../../experiments_outputs/pileNER_based_METRICS/uniNER_eval_metrics/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'w') as f:
+        json.dump(avg_std_metrics, f, indent=2)
 
     for ds_name in dataset_name_list:
         plot_avg_std_FalseTrueDef_comparison(avg_std_metrics['FalseDef'], avg_std_metrics['TrueDef'], ds_name, all_datasets_ne_statistics, model_name)
-        
+
     """
 
-    #get_overall_scores_for = 'novel_ne_list'
+    """
+    get_overall_scores_for = 'novel_ne_list'
     #get_overall_scores_for = 'same_ne_diff_def_list'
-    get_overall_scores_for = 'all_ne_list'
+    #get_overall_scores_for = 'all_ne_list'
     #get_overall_scores_for = 'NEs_seen_in_finetuning_list'
 
-    with open(os.path.join("../../experiments_outputs/PLOTS/models_avg_std_metrics/models_scores", get_overall_scores_for + '.txt'), 'w') as wfile:
+    with open(os.path.join("../../experiments_outputs/pileNER_based_METRICS/uniNER_eval_metrics/models_avg_std_metrics/overall_scores", get_overall_scores_for + '.txt'), 'w') as wfile:
 
         wfile.write(f"\nModels overall performance on '{get_overall_scores_for}'\n")
         dataset_name_list = ['movie', 'restaurant', 'ai', 'literature', 'music', 'politics', 'science', 'BUSTER']
         # NB: base, large, deberta are computed using our MSEQA metrics, Llama with official uniNER
-        models_list = ['RoBERTa-base-MSEQA', 'RoBERTa-large-MSEQA', 'DeBERTa-XXL-MSEQA', 'Llama2-7B', 'Llama2-7B-enhanced', 'Llama2-7B-TrueDef_vs_Enhanced+MaskedEval', 'Llama2-7B-Enhanced-NonMasked_vs_Masked']  #, 'Llama2-7B-enhanced_masked_vs_NONmasked_eval']
-
+        models_list = ['RoBERTa-base-MSEQA', 'RoBERTa-large-MSEQA', 'DeBERTa-XXL-MSEQA', 'DeBERTa-XXL-MSEQA-enhanced', 'Llama2-7B', 'Llama2-7B-enhanced', 'Llama-2-7B-5pNE'] #'Llama2-7B-TrueDef_vs_Enhanced+MaskedEval', 'Llama2-7B-Enhanced-NonMasked_vs_Masked']  #, 'Llama2-7B-enhanced_masked_vs_NONmasked_eval']
+        models_n_parameters = [125e6, 355e6, 1.5e9, 1.5e9, 7e9, 7e9, 7e9, 7e9, 7e9]
         TrueDef_better_FalseDef_overall = {ds: 0 for ds in dataset_name_list}
         totalTagNames = 0
         for dataset_name in dataset_name_list:
@@ -332,7 +330,7 @@ if __name__ == '__main__':
                 # print(tagName)
                 this_tagName_metrics = {mname: {} for mname in models_list}
                 for model_name in models_list:
-                    with open(os.path.join('../../experiments_outputs/PLOTS/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'r') as file:
+                    with open(os.path.join('../../experiments_outputs/pileNER_based_METRICS/uniNER_eval_metrics/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'r') as file:
                         this_model_metrics = json.load(file)
                         falseDef_avg_F1 = this_model_metrics['FalseDef'][dataset_name][tagName]['avg_F1']
                         falseDef_std_F1 = this_model_metrics['FalseDef'][dataset_name][tagName]['std_F1']
@@ -387,15 +385,100 @@ if __name__ == '__main__':
             #wfile.write("\n\n-----------------------------------------------------------------------------------------------------------------------\n")
             wfile.write(f"\n\n{'-'.join('' for x in str(TrueDef_better_FalseDef_this_ds))}")
 
+            # PLOT model trends TrueDef and FalseDef on this dataset
+            plt.figure(figsize=(10, 6))
+            x_labels = models_list
+            x = np.arange(len(x_labels))
+            plt.xticks(x, x_labels, rotation=0, fontsize=6)
+
+            this_ds_TrueDef_better_FalseDef_per_model = [TrueDef_better_FalseDef_overall[dataset_name][model_name] for model_name in x_labels]
+            # plt.plot(this_ds_TrueDef_better_FalseDef_per_model, color=(0, 0, 0.5, 1))  # label='TrueDef > FalseDef'
+            # marker sizes proportional to model Number of parameters
+            #marker_sizes = [4 * n_params/min(models_n_parameters) for n_params in models_n_parameters]
+            marker_sizes = [10 * math.sqrt(n_params/min(models_n_parameters)/math.pi) for n_params in models_n_parameters]
+            for i, y in enumerate(this_ds_TrueDef_better_FalseDef_per_model):
+                if y >= 0:
+                    plt.plot(i, y, marker='o', color='green', markersize=marker_sizes[i])
+                else:
+                    plt.plot(i, y, marker='o', color='red', markersize=marker_sizes[i])
+            plt.axhline(y=0, color='grey', linestyle='--')
+            plt.grid(axis='y', linestyle='--', linewidth=0.5, alpha=0.5)
+            #plt.xlabel('models')
+            plt.ylabel('#TrueDef_wins - #FalseDef_wins')
+            if get_overall_scores_for == 'novel_ne_list':
+                title_get_overall_scores_for = 'Novel Named Entities'
+            elif get_overall_scores_for == 'same_ne_diff_def_list':
+                title_get_overall_scores_for = 'Same NE name BUT different eval definition'
+            elif get_overall_scores_for == 'all_ne_list':
+                title_get_overall_scores_for = 'ALL Named Entities'
+            elif get_overall_scores_for == 'NEs_seen_in_finetuning_list':
+                title_get_overall_scores_for = 'NEs seen in fine-tuning'
+
+            plt.title(f'{title_get_overall_scores_for} -- Dataset: {dataset_name.upper()} -- #NEs: {len(tagName_list)} \n {str(tagName_list)}', fontsize=10)
+            plt.legend()
+            plt.show()
+
         wfile.write("\n\nOverall:  ")
         TrueDef_better_FalseDef_overall = {mname: sum([values[mname] for values in TrueDef_better_FalseDef_overall.values()]) for mname in models_list}
         wfile.write(str(TrueDef_better_FalseDef_overall))
-
         wfile.write(f"\n\nTotal NEs of type {get_overall_scores_for}: {totalTagNames}")
 
+        plt.figure(figsize=(10, 6))
+        x_labels = models_list
+        x = np.arange(len(x_labels))
+        plt.xticks(x, x_labels, rotation=0, fontsize=6)
 
+        overall_TrueDef_better_FalseDef_per_model = [TrueDef_better_FalseDef_overall[model_name] for model_name in x_labels]
+        #plt.plot(overall_TrueDef_better_FalseDef_per_model, color=(0, 0, 0.5, 1)) # label='TrueDef > FalseDef'
+        marker_sizes = [10 * math.sqrt(n_params / min(models_n_parameters) / math.pi) for n_params in models_n_parameters]
+        for i, y in enumerate(this_ds_TrueDef_better_FalseDef_per_model):
+            if y >= 0:
+                plt.plot(i, y, marker='o', color='green', markersize=marker_sizes[i])
+            else:
+                plt.plot(i, y, marker='o', color='red', markersize=marker_sizes[i])
+        plt.axhline(y=0, color='grey', linestyle='--')
+        plt.grid(axis='y', linestyle='--', linewidth=0.5, alpha=0.5)
+        #plt.xlabel('models')
+        plt.ylabel('#TrueDef_wins - #FalseDef_wins')
+        if get_overall_scores_for == 'novel_ne_list':
+            title_get_overall_scores_for = 'Novel Named Entities'
+        elif get_overall_scores_for == 'same_ne_diff_def_list':
+            title_get_overall_scores_for = 'Same NE name BUT different eval definition'
+        elif get_overall_scores_for == 'all_ne_list':
+            title_get_overall_scores_for = 'ALL Named Entities'
+        elif get_overall_scores_for == 'NEs_seen_in_finetuning_list':
+            title_get_overall_scores_for = 'NEs seen in fine-tuning'
 
+        plt.title(f'{title_get_overall_scores_for} -- ALL Datasets -- #NEs: {totalTagNames}')
+        plt.legend()
+        plt.show()
+        
+        
+    """
 
+    models_list = ['RoBERTa-base-MSEQA', 'RoBERTa-large-MSEQA', 'DeBERTa-XXL-MSEQA', 'Llama2-7B', 'UniNER-7B-fullPileNER', 'UniNER-7B (full-pileNER + sup.)', 'chatGPT']
+    models_n_parameters = [125e6, 355e6, 1.5e9, 7e9, 7e9, 7e9, 175e9]
 
+    FalseDef_avg_score = [48.66, 52.90, 55.44, 55.19, 53.41, 61.79, 47.49]
 
+    plt.figure(figsize=(10, 6))
+    x_labels = models_list
+    x = np.arange(len(x_labels))
+    plt.xticks(x, x_labels, rotation=0, fontsize=6)
 
+    # plt.plot(this_ds_TrueDef_better_FalseDef_per_model, color=(0, 0, 0.5, 1))  # label='TrueDef > FalseDef'
+    # marker sizes proportional to model Number of parameters
+    # marker_sizes = [4 * n_params/min(models_n_parameters) for n_params in models_n_parameters]
+    marker_sizes = [10 * math.sqrt(n_params / min(models_n_parameters) / math.pi) for n_params in models_n_parameters]
+    for i, y in enumerate(FalseDef_avg_score):
+        if y >= 0:
+            plt.plot(i, y, marker='o', color='green', markersize=marker_sizes[i])
+        else:
+            plt.plot(i, y, marker='o', color='red', markersize=marker_sizes[i])
+    plt.axhline(y=53.41, color='grey', linestyle='--')
+    plt.grid(axis='y', linestyle='--', linewidth=0.5, alpha=0.5)
+    # plt.xlabel('models')
+    plt.ylabel('micro-F1 avg (BUSTER excluded)')
+    plt.title("micro-F1 avg (BUSTER excluded)", fontsize=10)
+    plt.legend()
+    plt.show()

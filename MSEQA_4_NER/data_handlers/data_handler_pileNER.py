@@ -184,6 +184,7 @@ def build_dataset_MSEQA_format():
     test_fold = val_test_fold[math.floor(len(val_test_fold) / 2.0):]
 
     # shuffling here after partitioning in fold so that same context is not both in train and val/test
+    random.seed(42)
     random.shuffle(train_fold)
     random.shuffle(val_fold)
     random.shuffle(test_fold)
@@ -453,14 +454,21 @@ def generate_structured_prompt(ne_type, example_sentences):
     return prompt
 
 
-def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json):
-    dataset_MSEQA_format = build_dataset_MSEQA_format()
-    # dataset_MSEQA_format.save_to_disk("../../../datasets/pileNER_dataset_MSEQA_format")
-    # dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format")
+def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json, dataset_MSEQA_format=None):
+    # to simply convert an existing MSEQA FalseDef datasetDict to TrueDef
+    if not dataset_MSEQA_format:
+        dataset_MSEQA_format = build_dataset_MSEQA_format()
+        min_num_samples_per_ne_type = 100
+    else:
+        # FalseDef assumed to be already with required samples only
+        min_num_samples_per_ne_type = -1
 
-    ne_types_list = get_ne_types_list(dataset_MSEQA_format, 100)
+    # dataset_MSEQA_format.save_to_disk("../../../datasets/pileNER_dataset_MSEQA_format")
+    # dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format"
+    ne_types_list = get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type)
     print(len(ne_types_list))
     print(ne_types_list)
+
     # if the pileNER dataset is built by retaining only those NE which number of occurrences is > 100
     # the total number of NEs now should be 455
     # by plotting the dendrogram of the word embeddings using plot_word_emb.ipynb
@@ -726,6 +734,7 @@ def convert_official_uniNER_eval_dataset_for_inference(dataset_name, path_to_dat
         # some uniNER NEs are different from the original NEs
         try:
             gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            real_name_ne = all_NEs_guidelines[ne_type]['real_name']
         except KeyError:
             if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
                 ne_mapping = {
@@ -769,6 +778,7 @@ def convert_official_uniNER_eval_dataset_for_inference(dataset_name, path_to_dat
                 }
             ne_type = ne_mapping[ne_type]
             gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            real_name_ne = all_NEs_guidelines[ne_type]['real_name']
 
         if with_definition:
             # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
@@ -1092,12 +1102,69 @@ def mask_named_entities(dataset_split, corruption_prob=0.2, masking_prob=0.8, de
     return new_dataset
 
 
+def build_dataset_MSEQA_format_with_n_samples_per_NE(n_samples_per_NE=5):
+    dataset_MSEQA_format = build_dataset_MSEQA_format()
+    dataset_MSEQA_format = remove_bad_ne_types(dataset_MSEQA_format)
+    n_samples_per_NE_MSEQA_dataset = {split: [] for split in dataset_MSEQA_format.keys()}
+    n_samples_per_NE_MSEQA_dataset['test'] = dataset_MSEQA_format['test']
+    for split in dataset_MSEQA_format.keys():
+        if split != 'test':
+            ne_list = {}
+            for sample in dataset_MSEQA_format[split]:
+                ne_type = sample['tagName']
+                if ne_type in ne_list:
+                    ne_list[ne_type] += 1
+                else:
+                    ne_list[ne_type] = 1
+            ne_list = {ne: n_samples_per_NE if max_n_samples > n_samples_per_NE else max_n_samples for ne, max_n_samples in ne_list.items()}
+
+            for sample in dataset_MSEQA_format[split]:
+                if ne_list[sample['tagName']] > 0:
+                    n_samples_per_NE_MSEQA_dataset[split].append(sample)
+                    ne_list[sample['tagName']] -= 1
+
+    return DatasetDict({split: Dataset.from_list(values) for split, values in n_samples_per_NE_MSEQA_dataset.items()})
+
+
 if __name__ == "__main__":
 
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE(n_samples_per_NE=5)
+    print(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
+
+    ne_list = {}
+    for sample in dataset_MSEQA_format_with_n_samples_per_NE_FalseDef['train']:
+        ne_type = sample['tagName']
+        if ne_type in ne_list:
+            ne_list[ne_type] += 1
+        else:
+            ne_list[ne_type] = 1
+
+    print(sorted(ne_list.items(), key=lambda x: x[1], reverse=True))
+
+    doc_list = {}
+    for sample in dataset_MSEQA_format_with_n_samples_per_NE_FalseDef['train']:
+        docID = sample['doc_question_pairID'].split(":")[0]
+        if docID in doc_list:
+            doc_list[docID] += 1
+        else:
+            doc_list[docID] = 1
+
+    print(sorted(doc_list.items(), key=lambda x: x[1], reverse=True))
+
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef.save_to_disk("../../../datasets/pileNER/5_samples_per_NE_MSEQA_FalseDef")
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, with_definition=False, path_to_save_to="../../../datasets/pileNER/5_samples_per_NE_GenQA_FalseDef")
+
+    dataset_MSEQA_format_with_n_samples_per_NE_TrueDef = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json", dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
+    print(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef)
+    dataset_MSEQA_format_with_n_samples_per_NE_TrueDef.save_to_disk("../../../datasets/pileNER/5_samples_per_NE_MSEQA_TrueDef")
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef, with_definition=True, path_to_save_to="../../../datasets/pileNER/5_samples_per_NE_GenQA_TrueDef")
+
+    """
     pileNER_statistics = get_dataset_statistics()
     fullPileNER_tagName_list = pileNER_statistics['fullPileNER_tagName_list']
     with open(os.path.join('../../../datasets', "fullPileNER_tagName_list.json"), 'w') as f:
         json.dump(fullPileNER_tagName_list, f, indent=2)
+    """
 
     """ 
     pileNER_MSEQA_TrueDef = DatasetDict.load_from_disk("../../../datasets/pileNER_MSEQA_format_TrueDef")

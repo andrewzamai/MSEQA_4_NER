@@ -1,5 +1,5 @@
 """
-Evaluating pileNER-finetuned Llama-2-7b for zero-shot NER on CrossNER/MIT datasets
+Evaluating universal-NER models for zero-shot NER on BUSTER dataset
 
 - Using provided uniNER official evaluation script
 
@@ -13,10 +13,11 @@ We use convert_official_uniNER_eval_dataset_for_GenQA for:
  - format to input expected by SFT_finetuning preprocess and tokenizer function
 """
 
-__package__ = "SFT_finetuning.evaluating"
+__package__ = "uniNER_test"
 
 import re
 
+import torch
 # use vllm_pip_container.sif
 # noinspection PyUnresolvedReferences
 from vllm import LLM, SamplingParams
@@ -27,14 +28,30 @@ import sys
 import os
 
 # copy of uniNER official eval script from their github
-import uniNER_official_eval_script
+from SFT_finetuning.evaluating import uniNER_official_eval_script
 
 # my libraries
 from MSEQA_4_NER.data_handlers import data_handler_pileNER, data_handler_BUSTER
 
-from ..commons.initialization import get_HF_access_token
-from ..commons.preprocessing import truncate_input
-from ..commons.prompter import Prompter
+from SFT_finetuning.commons.initialization import get_HF_access_token
+from SFT_finetuning.commons.preprocessing import truncate_input
+
+from .prompter import Prompter  # prompter for uniNER models
+
+
+# TODO: use their Prompter
+def get_prompt(context, ne_to_extract):
+    # from list of words to string if needed
+    if isinstance(context, list):
+        context = ' '.join(context)
+    if '_' in ne_to_extract:
+        ne_to_extract = ne_to_extract.lower().split('_')
+        ne_to_extract = ' '.join(ne_to_extract)
+
+    prompt = f"A virtual assistant answers questions from a user based on the provided text.\nUSER: Text: {context}"
+    prompt += f"\nASSISTANT: I’ve read this text.\nUSER: What describes {ne_to_extract} in the text?\nASSISTANT:"
+
+    return prompt
 
 
 def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition):
@@ -80,53 +97,36 @@ if __name__ == '__main__':
 
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-    print("CrossNER/MIT ZERO-SHOT NER EVALUATIONS with UniNER official eval script:\n")
+    print("ZERO-SHOT NER EVALUATIONS of UniNER-paper models:\n")
 
     to_eval_on = [
         # converting from uniNER eval datasets using function inside data_handler_pileNER
+        {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER']},
         {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
         {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant']},
-        {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER']},
         {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
 
+    # NB: all uniNER models are trained without Definition
     WITH_DEFINITION = False
     print(f"\nWith definition: {WITH_DEFINITION}")
 
-    #model_path_or_name = "andrewzamai/Llama2-7B-TrueDef"
-    model_path_or_name = "./merged_models/llama2_7B_5samplesPerNE_FalseDef"
-    #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
-    #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
-    #model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"
-    #model_path_or_name = "./merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp"
+    #model_path_or_name = "Universal-NER/UniNER-7B-type"
+    model_path_or_name = "Universal-NER/UniNER-7B-definition"
     print(f"LLM model: {model_path_or_name}")
 
-    # TODO: load from configs parameters
     max_new_tokens = 256
     print(f"max_new_tokens {max_new_tokens}")
 
-    vllm_model = LLM(model=model_path_or_name, download_dir='./hf_cache_dir')
+    vllm_model = LLM(model=model_path_or_name, download_dir='./hf_cache_dir', tensor_parallel_size=1, dtype="bfloat16")
 
     tokenizer = vllm_model.get_tokenizer()
 
     sampling_params = SamplingParams(temperature=0, max_tokens=max_new_tokens, stop=['</s>'])
-
-    """
-    # beam search generation
-    sampling_params = SamplingParams(
-        n=1,  # number of output sequences to return for the given prompt,
-        best_of=4,  # from these `best_of` sequences, the top `n` are returned, treated as the beam width when `use_beam_search` is True
-        use_beam_search=True,
-        early_stopping='never',  # stopping condition for beam search
-        temperature=0,
-        top_p=1,
-        top_k=-1
-    )
-    """
-
     print(sampling_params)
 
-    prompter = Prompter('reverse_INST', template_path='./src/SFT_finetuning/templates', eos_text='')
+    # prompter = Prompter('reverse_INST', template_path='./src/SFT_finetuning/templates', eos_text='')
+    prompter = Prompter("ie_as_qa")
 
     for data in to_eval_on:
 
@@ -139,32 +139,30 @@ if __name__ == '__main__':
                 cutoff_len = 1528
             print(f"cutoff_len: {cutoff_len}")
 
-            dataset_MSEQA_format = load_or_build_dataset_GenQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION)
+            dataset_GenQA_format = load_or_build_dataset_GenQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION)
 
             indices_per_tagName = {}
-            for i, sample in enumerate(dataset_MSEQA_format):
+            for i, sample in enumerate(dataset_GenQA_format):
                 tagName = sample['tagName']
                 if tagName not in indices_per_tagName:
                     indices_per_tagName[tagName] = []
                 indices_per_tagName[tagName].append(i)
 
             # retrieving gold answers (saved in ouput during dataset conversion from uniNER eval datatasets)
-            all_gold_answers = dataset_MSEQA_format['output']
+            all_gold_answers = dataset_GenQA_format['output']
 
-            # masking tagName
+            instructions = dataset_GenQA_format['instruction']
+            inputs = dataset_GenQA_format['input']
             """
             instructions = []
             for sample in dataset_MSEQA_format:
                 tagName = sample['tagName']
-                pattern = re.compile(rf'{re.escape(tagName)}', flags=re.IGNORECASE)
-                sample['instruction'] = pattern.sub('<unk>', sample['instruction'])
-                instructions.append(sample['instruction'])
+                if '_' in tagName:
+                    tagName = tagName.lower().split('_')
+                    tagName = ' '.join(tagName)
+                instruction = f"What describes {tagName} in the text?"
+                instructions.append(instruction)
             """
-            instructions = dataset_MSEQA_format['instruction']
-
-            print(instructions[0])
-
-            inputs = dataset_MSEQA_format['input']
 
             batch_instruction_input_pairs = [
                 (instruction,
@@ -173,6 +171,7 @@ if __name__ == '__main__':
             ]
 
             prompts = [prompter.generate_prompt(instruction, input) for instruction, input in batch_instruction_input_pairs]
+            print(prompts[0])
 
             responses = vllm_model.generate(prompts, sampling_params)
 
@@ -211,7 +210,7 @@ if __name__ == '__main__':
                 print("------------------------------------------------------- ")
 
             preds_to_save = []
-            for i, sample in enumerate(dataset_MSEQA_format):
+            for i, sample in enumerate(dataset_GenQA_format):
                 preds_to_save.append({
                     'doc_question_pairID': sample['doc_question_pairID'],
                     'tagName': sample['tagName'],

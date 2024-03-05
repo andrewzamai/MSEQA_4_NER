@@ -1,31 +1,21 @@
+__package__ = "MSEQA_4_NER.utils"
+
 from huggingface_hub import HfApi, create_repo, upload_folder
+from SFT_finetuning.commons.initialization import get_HF_access_token
 
 if __name__ == '__main__':
 
     # load HuggingFace access token from .env file (git ignored)
-    with open('./.env', 'r') as file:
-        api_keys = file.readlines()
-    api_keys_dict = {}
-    for api_key in api_keys:
-        api_name, api_value = api_key.split('=')
-        api_keys_dict[api_name] = api_value
-    # print(api_keys_dict)
+    AZ_HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-    """
-    my_repo_url = "https://huggingface.co/andrewzamai"
-    
-    hf_api = HfApi(
-        endpoint=my_repo_url,
-        token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'],
-    )
-    """
 
-    path_to_model_to_upload = './merged_models/llama2_4_NER_FalseDef'
-    new_repo_name = 'andrewzamai/Llama2-7B-FalseDef'
+    # TODO: upload TrueDef enhanced merged
+    path_to_model_to_upload = './trained_models/DeBERTa_MSEQA_pileNERpt_TrueDef_Trueenhanced_c/finetuned_model'
+    new_repo_name = 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-enhanced'
 
     url_new_repo_name = create_repo(
         repo_id=new_repo_name,
-        token=api_keys_dict['AZ_HUGGINGFACE_TOKEN'],
+        token=AZ_HF_ACCESS_TOKEN,
         exist_ok=False,
         private=True,
         repo_type='model',
@@ -37,7 +27,7 @@ if __name__ == '__main__':
         folder_path=path_to_model_to_upload,
         repo_id=new_repo_name,
         repo_type='model',
-        token=api_keys_dict['AZ_HUGGINGFACE_TOKEN']
+        token=AZ_HF_ACCESS_TOKEN
     )
     
     print(uploaded_folder_results)

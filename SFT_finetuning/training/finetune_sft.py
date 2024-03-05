@@ -207,7 +207,7 @@ def train(
         # shuffle train_data
         train_data = train_data.shuffle(seed=42)
 
-    if val_set_size > 0:
+    if val_set_size > 0 and not val_data_path:
         train_val = train_data.train_test_split(test_size=val_set_size, shuffle=False)
         train_data = (
             train_val["train"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer, prompter, cutoff_len, train_on_inputs), num_proc=30)
@@ -224,7 +224,7 @@ def train(
     elif val_data_path:
         train_data = data["train"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer, prompter, cutoff_len, train_on_inputs), num_proc=30)
         val_data = load_dataset("json", data_files=val_data_path)
-        val_data = val_data["train"].select(list(range(min(5000, len(val_data["train"])))))  # no more than 5k examples
+        val_data = val_data["train"].select(list(range(min(val_set_size, len(val_data["train"])))))  # no more than val_set_size 5k examples
         val_data = val_data.map(lambda x: generate_and_tokenize_prompt(x, tokenizer, prompter, cutoff_len, train_on_inputs), num_proc=30)
         val_set_size = len(val_data)
     else:
@@ -310,14 +310,16 @@ def train(
 
 if __name__ == "__main__":
 
-    print("Llama-2-7b-chat finetuning on pileNER - with guidelines - enhanced \n")
+    # print("Llama-2-7b-chat finetuning on pileNER - with guidelines - enhanced \n")
+    print("Llama-2-7b-chat finetuning on pileNER - w/o guidelines - 5 samples per NE \n")
 
     # load HuggingFace access token with permissions to LLAMA repo
     from huggingface_hub import login
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
     login(token=HF_ACCESS_TOKEN)
 
-    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_enhanced.yml'
+    #path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_enhanced.yml'
+    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_FalseDef_NsamplesPerNE.yml'
 
     parser = argparse.ArgumentParser(description='''LLMs Supervised Fine-tuning Trainer''')
     parser.add_argument('--config', type=str, default=path_to_training_config, help='Config file for finetuning')

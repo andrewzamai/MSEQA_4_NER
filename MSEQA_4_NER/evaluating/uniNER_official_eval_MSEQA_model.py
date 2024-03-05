@@ -75,6 +75,7 @@ if __name__ == '__main__':
     ]
 
     accelerator = Accelerator(mixed_precision='bf16')
+    #accelerator = Accelerator(mixed_precision='fp16')
 
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
@@ -222,7 +223,7 @@ if __name__ == '__main__':
                 if datasets_cluster_name not in ['crossNER', 'MIT']:
                     golds = [json.dumps((x['gold_answers'])) for x in ids_preds]
 
-                path_to_save_eval_folder = os.path.join("./evals_2", path_to_model.split("/")[-1], str(WITH_DEFINITION)+'Def')
+                path_to_save_eval_folder = os.path.join("./evals", path_to_model.split("/")[-1], str(WITH_DEFINITION)+'Def')
                 if not os.path.exists(path_to_save_eval_folder):
                     os.makedirs(path_to_save_eval_folder)
                 # write in append mode

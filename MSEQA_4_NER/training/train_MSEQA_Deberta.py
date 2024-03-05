@@ -89,7 +89,7 @@ if __name__ == '__main__':
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./trained_models/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_{enhance_TrueDef_training}enhanced_b"
+    output_dir = f"./trained_models/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_{enhance_TrueDef_training}enhanced_c"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)

@@ -41,8 +41,8 @@ if __name__ == "__main__":
 
     base_model = "meta-llama/Llama-2-7b-chat-hf"
     # as it is the code requires namespace/model_name format only, no more subfolders
-    path_to_lora = "./trained_models/llama2_4_NER_TrueDef_enhanced_cp_3200"
-    save_model_at = "./merged_models/llama2_4_NER_TrueDef_enhanced_cp_3200"
+    path_to_lora = "./trained_models/llama2_7B_5samplesPerNE_FalseDef"
+    save_model_at = "./merged_models/llama2_7B_5samplesPerNE_FalseDef"
 
     # fire.Fire(merge_main)
     merge_main(base_model, path_to_lora, save_model_at)
