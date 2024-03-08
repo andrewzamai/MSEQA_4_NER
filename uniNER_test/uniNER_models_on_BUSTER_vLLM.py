@@ -112,7 +112,8 @@ if __name__ == '__main__':
     print(f"\nWith definition: {WITH_DEFINITION}")
 
     #model_path_or_name = "Universal-NER/UniNER-7B-type"
-    model_path_or_name = "Universal-NER/UniNER-7B-definition"
+    #model_path_or_name = "Universal-NER/UniNER-7B-definition"
+    model_path_or_name = "Universal-NER/UniNER-7B-all"
     print(f"LLM model: {model_path_or_name}")
 
     max_new_tokens = 256

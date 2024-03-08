@@ -8,10 +8,8 @@ if __name__ == '__main__':
     # load HuggingFace access token from .env file (git ignored)
     AZ_HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-
-    # TODO: upload TrueDef enhanced merged
-    path_to_model_to_upload = './trained_models/DeBERTa_MSEQA_pileNERpt_TrueDef_Trueenhanced_c/finetuned_model'
-    new_repo_name = 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-enhanced'
+    path_to_model_to_upload = './merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp'
+    new_repo_name = 'andrewzamai/llama2_4_NER_TrueDef_enhanced'
 
     url_new_repo_name = create_repo(
         repo_id=new_repo_name,

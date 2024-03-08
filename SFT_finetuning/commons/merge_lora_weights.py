@@ -1,6 +1,7 @@
 """ merge fine-tuned LORA adapter weights with base model """
-
+import os.path
 import time
+import shutil
 
 # my libraries
 from initialization import init_model
@@ -36,13 +37,17 @@ def merge_main(
     merge_and_save_time = time.time() - start_time
     print(f"\n\nAll took {merge_and_save_time} seconds\n")
 
+    # copy also training_config file if exists
+    if os.path.exists(os.path.join(path_to_lora, 'training_configs.yml')):
+        shutil.copy(os.path.join(path_to_lora, 'training_configs.yml'), os.path.join(save_model_at, 'training_configs.yml'))
+
 
 if __name__ == "__main__":
 
     base_model = "meta-llama/Llama-2-7b-chat-hf"
     # as it is the code requires namespace/model_name format only, no more subfolders
-    path_to_lora = "./trained_models/llama2_7B_5samplesPerNE_FalseDef"
-    save_model_at = "./merged_models/llama2_7B_5samplesPerNE_FalseDef"
+    path_to_lora = "./trained_models/xxx"
+    save_model_at = "./merged_models/xxx"
 
     # fire.Fire(merge_main)
     merge_main(base_model, path_to_lora, save_model_at)

@@ -291,15 +291,14 @@ if __name__ == '__main__':
 
     print(avg_std_metrics)
 
-    with open(os.path.join('../../experiments_outputs/pileNER_based_METRICS/uniNER_eval_metrics/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'w') as f:
-        json.dump(avg_std_metrics, f, indent=2)
+    #with open(os.path.join('../../experiments_outputs/pileNER_based_METRICS/uniNER_eval_metrics/models_avg_std_metrics', f"{model_name}_avg_std_metrics.json"), 'w') as f:
+    #json.dump(avg_std_metrics, f, indent=2)
 
     for ds_name in dataset_name_list:
         plot_avg_std_FalseTrueDef_comparison(avg_std_metrics['FalseDef'], avg_std_metrics['TrueDef'], ds_name, all_datasets_ne_statistics, model_name)
 
     """
 
-    """
     get_overall_scores_for = 'novel_ne_list'
     #get_overall_scores_for = 'same_ne_diff_def_list'
     #get_overall_scores_for = 'all_ne_list'
@@ -453,32 +452,71 @@ if __name__ == '__main__':
         plt.legend()
         plt.show()
         
-        
-    """
 
-    models_list = ['RoBERTa-base-MSEQA', 'RoBERTa-large-MSEQA', 'DeBERTa-XXL-MSEQA', 'Llama2-7B', 'UniNER-7B-fullPileNER', 'UniNER-7B (full-pileNER + sup.)', 'chatGPT']
+
+
+    """
+    # PLOT avg micro-F1 FalseDef
+    models_list = ['RoBERTa-base-MSEQA', 'RoBERTa-large-MSEQA', 'DeBERTa-XXL-MSEQA', 'Llama2-7B', 'UniNER-7B-fullPileNER', 'UniNER-7B-(full-pileNER+sup.)', 'chatGPT']
     models_n_parameters = [125e6, 355e6, 1.5e9, 7e9, 7e9, 7e9, 175e9]
+    models_colors = ['blue', 'blue', 'blue', 'blue', 'green', 'green', 'orange']
 
     FalseDef_avg_score = [48.66, 52.90, 55.44, 55.19, 53.41, 61.79, 47.49]
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(14, 8))
     x_labels = models_list
     x = np.arange(len(x_labels))
-    plt.xticks(x, x_labels, rotation=0, fontsize=6)
+    plt.xticks(x, x_labels, rotation=0, fontsize=8)
 
     # plt.plot(this_ds_TrueDef_better_FalseDef_per_model, color=(0, 0, 0.5, 1))  # label='TrueDef > FalseDef'
     # marker sizes proportional to model Number of parameters
     # marker_sizes = [4 * n_params/min(models_n_parameters) for n_params in models_n_parameters]
     marker_sizes = [10 * math.sqrt(n_params / min(models_n_parameters) / math.pi) for n_params in models_n_parameters]
     for i, y in enumerate(FalseDef_avg_score):
-        if y >= 0:
-            plt.plot(i, y, marker='o', color='green', markersize=marker_sizes[i])
-        else:
-            plt.plot(i, y, marker='o', color='red', markersize=marker_sizes[i])
+        plt.plot(i, y, marker='o', color=models_colors[i], markersize=marker_sizes[i])
+        plt.plot(i, y, marker='.', color='black', markersize=4)
+
+        plt.gca().get_xticklabels()[i].set_color(models_colors[i])
+
     plt.axhline(y=53.41, color='grey', linestyle='--')
     plt.grid(axis='y', linestyle='--', linewidth=0.5, alpha=0.5)
     # plt.xlabel('models')
-    plt.ylabel('micro-F1 avg (BUSTER excluded)')
-    plt.title("micro-F1 avg (BUSTER excluded)", fontsize=10)
+    plt.ylabel('micro-F1')
+    plt.title("CrossNER/MIT Zero-Shot AVG micro-F1", fontsize=14)
     plt.legend()
     plt.show()
+    """
+
+    # PLOT avg micro-F1 FalseDefvsTrueDEf
+    """
+    models_list = ['RoBERTa-base-MSEQA', 'RoBERTa-large-MSEQA', 'DeBERTa-XXL-MSEQA', 'DeBERTa-XXL-MSEQA-enhanced', 'Llama2-7B', 'Llama2-7B-enhanced', 'UniNER-7B-fullPileNER', 'UniNER-7B-(full-pileNER+sup.)']
+    models_n_parameters = [125e6, 355e6, 1.5e9, 1.5e9, 7e9, 7e9, 7e9, 7e9]
+
+    FalseDef_avg_score = [48.66, 52.90, 55.44, 55.44, 55.19, 55.19, 53.41, 61.79]
+    TrueDef_avg_score = [46.01, 56.49, 57.13, 58.76, 55.69, 55.77, None, None, None]
+
+    plt.figure(figsize=(14, 8))
+    x_labels = models_list
+    x = np.arange(len(x_labels))
+    plt.xticks(x, x_labels, rotation=10, fontsize=8)
+
+    # plt.plot(this_ds_TrueDef_better_FalseDef_per_model, color=(0, 0, 0.5, 1))  # label='TrueDef > FalseDef'
+    # marker sizes proportional to model Number of parameters
+    marker_sizes = [20 * math.sqrt(n_params / min(models_n_parameters) / math.pi) for n_params in models_n_parameters]
+    for i, y in enumerate(FalseDef_avg_score):
+        plt.plot(i, FalseDef_avg_score[i], marker='o', color=(0,0,1,0.5), markersize=marker_sizes[i])
+        if TrueDef_avg_score[i]:
+            plt.plot(i, TrueDef_avg_score[i], marker='o', color=(1,0.5,0,0.5), markersize=marker_sizes[i])
+            #plt.plot(i, TrueDef_avg_score[i], marker='.', color='black', markersize=4)
+            plt.arrow(x[i], FalseDef_avg_score[i], 0, TrueDef_avg_score[i]-FalseDef_avg_score[i], head_width=0.05, head_length=0.1, fc='black', ec='black')
+        plt.plot(i, FalseDef_avg_score[i], marker='.', color='black', markersize=4)
+
+    plt.axhline(y=53.41, color='grey', linestyle='--')
+    plt.axhline(y=61.79, color='grey', linestyle='--')
+    plt.grid(axis='y', linestyle='--', linewidth=0.5, alpha=0.5)
+    # plt.xlabel('models')
+    plt.ylabel('micro-F1')
+    plt.title("CrossNER/MIT Zero-Shot AVG micro-F1", fontsize=14)
+    plt.legend(['FalseDef', 'TrueDef'])
+    plt.show()
+    """

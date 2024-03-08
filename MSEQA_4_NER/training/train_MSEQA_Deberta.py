@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
     pileNER_dataset_with_def = True
-    enhance_TrueDef_training = True  # applies random NE masking and switching to enhance guidelines following
+    enhance_TrueDef_training = False  # applies random NE masking and switching to enhance guidelines following
     print(f"enhance_TrueDef_training: {enhance_TrueDef_training}")
     corruption_prob = 0.2
     print(f"corruption_prob: {corruption_prob}")
@@ -84,12 +84,13 @@ if __name__ == '__main__':
     if pileNER_dataset_with_def:
         path_to_pileNER_definitions_json = './src/MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_TrueDef'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
+        #path_to_dataset_MSEQA_format = './datasets/pileNER/5_samples_per_NE_MSEQA_TrueDef'
     else:
         path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_FalseDef'  # dataset "what describes X in the text?" if already built, otherwise it will be built and stored here
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./trained_models/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_{enhance_TrueDef_training}enhanced_c"
+    output_dir = f"./trained_models/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_{enhance_TrueDef_training}_5pNE"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -164,11 +165,13 @@ if __name__ == '__main__':
 
     print(dataset_MSEQA_format)
 
+    """
     print("A masked question example: ")
     for sample in dataset_MSEQA_format['train']:
         if 'masked' in sample['doc_question_pairID']:
             print(sample['question'])
             break
+    """
 
     print("\nLoading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_to_use, cache_dir='./hf_cache_dir')
