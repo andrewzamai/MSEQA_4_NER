@@ -72,25 +72,26 @@ if __name__ == '__main__':
 
     # pileNER corpus with [def;guidelines] as prefix or question 'what describes X in the text?'
     pileNER_dataset_with_def = True
-    enhance_TrueDef_training = False  # applies random NE masking and switching to enhance guidelines following
+    enhance_TrueDef_training = True  # applies random NE masking and switching to enhance guidelines following
     print(f"enhance_TrueDef_training: {enhance_TrueDef_training}")
-    corruption_prob = 0.2
+    corruption_prob = 0.8  # 0.2
     print(f"corruption_prob: {corruption_prob}")
-    masking_prob = 0.8
+    masking_prob = 0.2  # 0.8
     print(f"masking_prob: {masking_prob}")
     this_model_mask = '[UNK]'  # depends on tokenizer
     print(f"this_model_mask: {this_model_mask}")
 
     if pileNER_dataset_with_def:
         path_to_pileNER_definitions_json = './src/MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json'
-        path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_TrueDef'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
-        #path_to_dataset_MSEQA_format = './datasets/pileNER/5_samples_per_NE_MSEQA_TrueDef'
+        #TODO path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_TrueDef'  # MSEQA dataset with gpt definitions if it has already been built, otherwise it will be built and stored here
+        path_to_dataset_MSEQA_format = './datasets/pileNER/5_samples_per_NE_MSEQA_TrueDef'
     else:
-        path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_FalseDef'  # dataset "what describes X in the text?" if already built, otherwise it will be built and stored here
+        #path_to_dataset_MSEQA_format = './datasets/pileNER/MSEQA_FalseDef'  # dataset "what describes X in the text?" if already built, otherwise it will be built and stored here
+        path_to_dataset_MSEQA_format = './datasets/pileNER/5_samples_per_NE_MSEQA_FalseDef'
     print(f"pileNER_dataset_with_def: {pileNER_dataset_with_def}")
     print(f"path_to_dataset_MSEQA_format: {path_to_dataset_MSEQA_format}")
 
-    output_dir = f"./trained_models/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_{enhance_TrueDef_training}_5pNE"
+    output_dir = f"./trained_models/DeBERTa_MSEQA_pileNERpt_{pileNER_dataset_with_def}Def_{enhance_TrueDef_training}enhanced_5pNE_10epochs_hard"
     print(f"finetuned_model will be saved as: {output_dir}")
 
     # TODO: if changing chunking parameters --> delete and re-build tokenized dataset (stored and reused to save time)
@@ -102,14 +103,14 @@ if __name__ == '__main__':
     print(f"MAX_QUERY_LENGTH: {MAX_QUERY_LENGTH}")
 
     BATCH_SIZE = 16  # >= 32 OOM
-    GRADIENT_ACCUMULATION_STEPS = 16
+    GRADIENT_ACCUMULATION_STEPS = 2
     EVAL_BATCH_SIZE = 32  # >= 64 OOM
     print(f"BATCH_SIZE: {BATCH_SIZE}")
     print(f"GRADIENT_ACCUMULATION_STEPS: {GRADIENT_ACCUMULATION_STEPS}")
     print(f"EVAL_BATCH_SIZE: {EVAL_BATCH_SIZE}")
 
     learning_rate = 1e-5
-    num_train_epochs = 3
+    num_train_epochs = 10
     lr_scheduler_strategy = 'cosine'
     warmup_ratio = 0.2
     MAX_GRAD_NORM = 1.0
@@ -120,7 +121,7 @@ if __name__ == '__main__':
     print(f"MAX_GRAD_NORM: {MAX_GRAD_NORM}")
 
     EARLY_STOPPING_PATIENCE = 5
-    EVALUATE_EVERY_N_STEPS = 200  # len(trainDataloader)/10
+    EVALUATE_EVERY_N_STEPS = 30  # len(trainDataloader)/10
     EARLY_STOPPING_ON_F1_or_LOSS = False  # True means ES on metrics, False means ES on loss
     print(f"EARLY_STOPPING_PATIENCE: {EARLY_STOPPING_PATIENCE}")
     print(f"EVALUATE_EVERY_N_STEPS: {EVALUATE_EVERY_N_STEPS}")
@@ -301,9 +302,12 @@ if __name__ == '__main__':
     sys.stdout.flush()
 
     hf_trainer.train()
-    hf_trainer.model.save_pretrained(save_directory=os.path.join(output_dir, 'finetuned_model'))
 
-    model = hf_trainer.model
+    # this DOES NOT LOAD BEST MODEL
+    # hf_trainer.model.save_pretrained(save_directory=os.path.join(output_dir, 'finetuned_model'))
+    #model = hf_trainer.model
+
+    model.save_pretrained(os.path.join(output_dir, 'finetuned_model'))
 
     """ ----------------- EVALUATION on TEST SET ----------------- """
 

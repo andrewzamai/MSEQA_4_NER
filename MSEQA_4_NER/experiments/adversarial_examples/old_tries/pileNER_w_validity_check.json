@@ -1,0 +1,262 @@
+[
+  {
+    "named_entity": "person",
+    "prompt_length": 595,
+    "output_length": 208,
+    "annotation_guidelines": {
+      "Definition": "'person' signifies individuals, including real or fictional people, and refers to specific human beings.",
+      "Guidelines": "Avoid labeling generic terms like 'babies' or 'mothers' unless referring to specific individuals. Exercise caution with ambiguous references, such as 'Tongan Thor', which may include both a nickname and a real name."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The babies in the nursery were all fast asleep, their tiny chests rising and falling rhythmically as they dreamed.",
+          "explanation": "Generic term 'babies' used here and not referring to specific individuals.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "I heard that Tongan Thor is a formidable rugby player, known for his strength and agility on the field.",
+          "explanation": "Ambiguous reference 'Tongan Thor' used here, which may include both a nickname and a real name.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "Mothers play a crucial role in the development and well-being of their children, providing love, support, and guidance.",
+          "explanation": "Generic term 'mothers' used here and not referring to specific individuals.",
+          "valid": "YES"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "organization",
+    "prompt_length": 616,
+    "output_length": 190,
+    "annotation_guidelines": {
+      "Definition": "'organization' refers to named entities that represent companies, institutions, associations, or any group of people with a particular purpose.",
+      "Guidelines": "Avoid labeling generic terms like 'team' or 'group' unless they refer to specific organizations. Exercise caution with potentially ambiguous terms such as 'Apple' (company or fruit) or 'Red Cross' (organization or color). Be mindful of the context to accurately discern the entity as an organization."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The team worked tirelessly to meet the project deadline, demonstrating exceptional teamwork and collaboration.",
+          "explanation": "Generic term 'team' used here, but it does not refer to a specific organization.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "I bought a delicious apple from the market and enjoyed it as a healthy snack.",
+          "explanation": "The term 'apple' is used here as a fruit and not as a company.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "The Red Cross symbolizes humanitarian aid and assistance during times of crisis and disaster.",
+          "explanation": "The term 'Red Cross' is used here to refer to the organization and not the color.",
+          "valid": "YES"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "location",
+    "prompt_length": 590,
+    "output_length": 182,
+    "annotation_guidelines": {
+      "Definition": "'location' denotes geographic entities, such as cities, countries, and landmarks, that represent specific places on Earth.",
+      "Guidelines": "Do not label abstract references. Be cautious with ambiguous terms like 'Paris Hilton' (person with a location name) or 'Amazon' (both a company and a river)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The concept of success is often associated with reaching the pinnacle of one's career and personal development.",
+          "explanation": "Abstract reference to success, not a specific location.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "I ordered a new book from Amazon and it arrived yesterday.",
+          "explanation": "Ambiguous term 'Amazon' used here as a company, not a geographic location.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "Paris Hilton is known for her appearances in reality TV shows and her business ventures.",
+          "explanation": "Ambiguous term 'Paris Hilton' used here as a person's name, not a geographic location.",
+          "valid": "YES"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "concept",
+    "prompt_length": 608,
+    "output_length": 9,
+    "annotation_guidelines": {
+      "Definition": "'concept' refers to abstract or intangible entities, ideas, principles, or frameworks that are not physical or tangible in nature.",
+      "Guidelines": "Avoid labeling concrete or tangible objects, such as 'servers' or 'update pattern', which are not purely abstract concepts. Exercise caution with broadly used terms, such as 'policy', to ensure they truly represent abstract concepts and not specific actions or plans."
+    },
+    "negative_sentences": {
+      "n_sentences_to_generate": 3
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "product",
+    "prompt_length": 623,
+    "output_length": 198,
+    "annotation_guidelines": {
+      "Definition": "'product' refers to tangible or intangible items or goods, including technology, consumer goods, or services, that are created for sale or use.",
+      "Guidelines": "Avoid labeling generic terms like 'center' in 'the center of a campaign'. Exercise caution with entities that can have multiple meanings, such as 'blackberry' (fruit, technology product). Be aware of metaphoric usage, as in 'landing page' (not a physical product but a digital concept)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The new campaign is at the center of our marketing strategy, aiming to reach a wider audience and generate more leads.",
+          "explanation": "Generic term 'center' used in a non-product context.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "I picked some fresh blackberries from the garden to make a delicious pie for dessert.",
+          "explanation": "The term 'blackberries' used here as a fruit and not as a technology product.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "The landing page of the website is designed to capture the attention of visitors and encourage them to explore our services.",
+          "explanation": "Metaphoric usage of 'landing page' as a digital concept, not a physical product.",
+          "valid": "YES"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "variable",
+    "prompt_length": 618,
+    "output_length": 193,
+    "annotation_guidelines": {
+      "Definition": "'variable' refers to placeholders or symbols representing unknown or changing values in a mathematical or programming context.",
+      "Guidelines": "Do not label specific values, such as '5' or 'Jane'. Exercise caution with words that have multiple meanings, like 'name' (can refer to a person's name or a variable in programming). Similarly, be mindful of context to distinguish between 'age' as a variable and 'age' as a demographic attribute."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The name of the protagonist in the novel was a closely guarded secret until the final chapters, adding an air of mystery to the story.",
+          "explanation": "Specific value 'name' used here as a person's name and not as a variable.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "The function returns the value 5 when the input is within the specified range.",
+          "explanation": "Specific value '5' used here and not a variable.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "The age of the participants was a key demographic attribute analyzed in the study.",
+          "explanation": "The word 'age' used here as a demographic attribute and not as a variable.",
+          "valid": "YES"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "date",
+    "prompt_length": 606,
+    "output_length": 166,
+    "annotation_guidelines": {
+      "Definition": "'date' refers to specific points in time, including days, months, years, and relative time expressions like 'Week 2'.",
+      "Guidelines": "Avoid labeling non-specific time references like 'recently' or 'soon'. Exercise caution with ambiguous terms like 'May' (month or verb) and 'Wednesday Adams' (person's name which includes a day of the week)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The project is expected to be completed soon, pending final approval from the board of directors.",
+          "explanation": "Non-specific time reference 'soon'",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "I recently read an interesting article about the benefits of meditation and mindfulness.",
+          "explanation": "Non-specific time reference 'recently'",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "The May family reunion is always a joyous occasion for all the relatives to come together and celebrate.",
+          "explanation": "Ambiguous term 'May' used here as a month.",
+          "valid": "NO"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical condition",
+    "prompt_length": 614,
+    "output_length": 49,
+    "annotation_guidelines": {
+      "Definition": "'medical condition' refers to physical or mental health issues, including diseases, syndromes, injuries, and other related conditions.",
+      "Guidelines": "Avoid generic terms like 'pain' or 'injury' unless specific medical conditions are mentioned. Be cautious with ambiguous terms that might have non-medical meanings, like 'depression' (psychological or economic) or 'stroke' (for a sports or painting context)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She winced in pain as she accidentally stubbed her toe on the edge of the table.",
+      "explanation": "Generic term 'pain' used here without specific medical condition.",
+      "valid": "YES"
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "object",
+    "prompt_length": 601,
+    "output_length": 173,
+    "annotation_guidelines": {
+      "Definition": "'object' in the context of NER refers to tangible items, both animate and inanimate, that can be perceived by the senses.",
+      "Guidelines": "Avoid labeling abstract concepts. Exercise caution with ambiguous terms such as 'sun' (can refer to the celestial body or concept of sunlight) and ensure that 'object' refers to tangible entities within the context."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The concept of love is a powerful force that drives people to great lengths in their actions and decisions.",
+          "explanation": "Abstract concept 'love' is used here.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "The sun provides warmth and light to sustain life on Earth.",
+          "explanation": "Ambiguous term 'sun' used here as a celestial body.",
+          "valid": "NO"
+        },
+        {
+          "adversarial_sentence": "The artist skillfully captured the essence of hope in her painting, evoking a sense of optimism and possibility.",
+          "explanation": "Abstract concept 'hope' is used here.",
+          "valid": "YES"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "technology",
+    "prompt_length": 617,
+    "output_length": 176,
+    "annotation_guidelines": {
+      "Definition": "'technology' represents technical terms, products, devices, or systems that involve the application of scientific knowledge for practical purposes.",
+      "Guidelines": "Do not label general terms like 'system' or 'interface' without clear technological context. Exercise caution with potentially ambiguous terms like 'Apple' (referring to the company or the fruit) and 'Java' (programming language or island). Be attentive to the context to differentiate between common and technical usage."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The new system for project management has greatly improved efficiency and collaboration within the team.",
+          "explanation": "General term 'system' used without clear technological context.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "I love the smell of fresh apples in the orchard during autumn.",
+          "explanation": "Ambiguous term 'Apple' used here as the fruit and not the company.",
+          "valid": "YES"
+        },
+        {
+          "adversarial_sentence": "The island of Java is known for its rich history and stunning landscapes.",
+          "explanation": "Ambiguous term 'Java' used here as an island and not a programming language.",
+          "valid": "YES"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  }
+]

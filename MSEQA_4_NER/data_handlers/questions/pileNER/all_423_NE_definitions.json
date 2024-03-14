@@ -5833,7 +5833,7 @@
     ],
     "prompt_length": 380,
     "output_length": 91,
-    "gpt_answer": "{\"Definition\": \"'framework' in the context of NER refers to software development platforms, libraries, or tools used for building applications.\", \"Guidelines\": \"Avoid labeling general technology terms (e.g., 'library', 'tool') unless specifically referring to a named software framework. Exercise caution when labeling ambiguous terms that may refer to multiple meanings, such as 'Java' (programming language or island) or 'Swift' (programming language or adjective).\"}\n",
+    "gpt_answer": "{\"Definition\": \"'framework' in the context of NER refers to software development platforms, libraries, or tools used for building applications.\", \"Guidelines\": \"Avoid labeling general technology terms (e.g., 'library', 'tool') unless specifically referring to a named software framework. Exercise caution when labeling ambiguous terms that may refer to multiple meanings, such as 'Java' (programming language or island) or 'Swift' (programming language or adjective).\"}",
     "finish_reason": "stop"
   },
   "clothing": {

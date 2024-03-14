@@ -1,0 +1,262 @@
+[
+  {
+    "named_entity": "person",
+    "prompt_length": 232,
+    "output_length": 190,
+    "annotation_guidelines": {
+      "Definition": "'person' signifies individuals, including real or fictional people, and refers to specific human beings.",
+      "Guidelines": "Avoid labeling generic terms like 'babies' or 'mothers' unless referring to specific individuals. Exercise caution with ambiguous references, such as 'Tongan Thor', which may include both a nickname and a real name."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The babies were crying loudly in the nursery, but the person in charge managed to calm them down.",
+          "explanation": "The term 'person' should not be used to refer to generic terms like 'babies'."
+        },
+        {
+          "sentence": "Mothers play a crucial role in nurturing their children, ensuring they grow up to be responsible adults.",
+          "explanation": "The term 'person' should not be used to label generic terms like 'mothers'."
+        },
+        {
+          "sentence": "Tongan Thor, the nickname of the famous rugby player, scored a try in the final minutes of the game, securing victory for his team.",
+          "explanation": "The term 'person' should not be used for ambiguous references like 'Tongan Thor', which may include a nickname and a real name."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "organization",
+    "prompt_length": 253,
+    "output_length": 206,
+    "annotation_guidelines": {
+      "Definition": "'organization' refers to named entities that represent companies, institutions, associations, or any group of people with a particular purpose.",
+      "Guidelines": "Avoid labeling generic terms like 'team' or 'group' unless they refer to specific organizations. Exercise caution with potentially ambiguous terms such as 'Apple' (company or fruit) or 'Red Cross' (organization or color). Be mindful of the context to accurately discern the entity as an organization."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The team gathered to discuss the project, but the organization's plans were not clear.",
+          "explanation": "This sentence contains the term 'organization' used in a generic sense to refer to a group of people, which should not be labeled as the Named Entity 'organization'."
+        },
+        {
+          "sentence": "She wore a red cross on her shirt, symbolizing help and support, not the organization.",
+          "explanation": "Here, 'red cross' is used to describe a symbol and not the organization 'Red Cross', which should not be labeled as the Named Entity."
+        },
+        {
+          "sentence": "He picked an apple from the tree and took a bite.",
+          "explanation": "In this sentence, 'apple' refers to the fruit and not the company 'Apple', so it should not be annotated as the Named Entity 'organization'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "location",
+    "prompt_length": 227,
+    "output_length": 184,
+    "annotation_guidelines": {
+      "Definition": "'location' denotes geographic entities, such as cities, countries, and landmarks, that represent specific places on Earth.",
+      "Guidelines": "Do not label abstract references. Be cautious with ambiguous terms like 'Paris Hilton' (person with a location name) or 'Amazon' (both a company and a river)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I read a book about Paris Hilton, the socialite, not the city.",
+          "explanation": "The sentence mentions 'Paris Hilton' as a person, not the city, which is an ambiguous term according to the guidelines."
+        },
+        {
+          "sentence": "The Amazon company announced a new product launch.",
+          "explanation": "The sentence refers to 'Amazon' as a company, not the river, which is an ambiguous term according to the guidelines."
+        },
+        {
+          "sentence": "I dreamt of a trip to Hollywood, the concept of fame and glamour, not the city.",
+          "explanation": "The sentence uses 'Hollywood' in a metaphorical sense, not as the city, which is an abstract reference not to be labeled according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "concept",
+    "prompt_length": 245,
+    "output_length": 191,
+    "annotation_guidelines": {
+      "Definition": "'concept' refers to abstract or intangible entities, ideas, principles, or frameworks that are not physical or tangible in nature.",
+      "Guidelines": "Avoid labeling concrete or tangible objects, such as 'servers' or 'update pattern', which are not purely abstract concepts. Exercise caution with broadly used terms, such as 'policy', to ensure they truly represent abstract concepts and not specific actions or plans."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The servers were updated with the latest concept, ensuring smooth operation.",
+          "explanation": "This sentence includes 'servers' and 'updated' which are concrete and tangible objects, violating the guideline to avoid labeling such objects as 'concept'."
+        },
+        {
+          "sentence": "The new policy introduced a concept that streamlined the workflow for employees.",
+          "explanation": "This sentence includes 'policy' which is a broadly used term that may not truly represent an abstract concept, violating the guideline to ensure that terms like 'policy' truly represent abstract concepts."
+        },
+        {
+          "sentence": "The update pattern implemented in the system was a revolutionary concept in software development.",
+          "explanation": "This sentence includes 'update pattern' which is a concrete term, violating the guideline to avoid labeling tangible objects as 'concept'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "product",
+    "prompt_length": 260,
+    "output_length": 175,
+    "annotation_guidelines": {
+      "Definition": "'product' refers to tangible or intangible items or goods, including technology, consumer goods, or services, that are created for sale or use.",
+      "Guidelines": "Avoid labeling generic terms like 'center' in 'the center of a campaign'. Exercise caution with entities that can have multiple meanings, such as 'blackberry' (fruit, technology product). Be aware of metaphoric usage, as in 'landing page' (not a physical product but a digital concept)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The center of attention shifted to the new product launch, leaving the team feeling overwhelmed.",
+          "explanation": "The term 'product' here refers to the center of attention, not a tangible or intangible item created for sale or use."
+        },
+        {
+          "sentence": "The blackberry bushes in the garden were thriving despite the harsh weather conditions.",
+          "explanation": "Here, 'blackberry' is used to describe the fruit-bearing bushes, not the technology product."
+        },
+        {
+          "sentence": "The landing page of the website was designed to capture user engagement effectively.",
+          "explanation": "In this context, 'landing page' is a digital concept, not a tangible or intangible item created for sale or use."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "variable",
+    "prompt_length": 255,
+    "output_length": 179,
+    "annotation_guidelines": {
+      "Definition": "'variable' refers to placeholders or symbols representing unknown or changing values in a mathematical or programming context.",
+      "Guidelines": "Do not label specific values, such as '5' or 'Jane'. Exercise caution with words that have multiple meanings, like 'name' (can refer to a person's name or a variable in programming). Similarly, be mindful of context to distinguish between 'age' as a variable and 'age' as a demographic attribute."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "Jane's age is a variable that changes every year.",
+          "explanation": "This sentence contains a negative occurrence of 'variable' by referring to 'age' as a demographic attribute, which should not be labeled as the Named Entity."
+        },
+        {
+          "sentence": "The name 'Alice' is a variable that can represent different people.",
+          "explanation": "Here, 'name' is used to refer to a person's name, which is a negative occurrence of 'variable' according to the guidelines."
+        },
+        {
+          "sentence": "The variable 'apple' is a placeholder for an unknown fruit.",
+          "explanation": "In this sentence, 'apple' is a specific value and should not be labeled as the Named Entity 'variable'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "date",
+    "prompt_length": 243,
+    "output_length": 220,
+    "annotation_guidelines": {
+      "Definition": "'date' refers to specific points in time, including days, months, years, and relative time expressions like 'Week 2'.",
+      "Guidelines": "Avoid labeling non-specific time references like 'recently' or 'soon'. Exercise caution with ambiguous terms like 'May' (month or verb) and 'Wednesday Adams' (person's name which includes a day of the week)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I met someone recently who goes by the name Wednesday Adams.",
+          "explanation": "This sentence contains the term 'Wednesday Adams' which is a person's name including a day of the week, but it should not be labeled as a 'date' entity according to the guidelines."
+        },
+        {
+          "sentence": "I will be free soon to discuss the plans of the project.",
+          "explanation": "The term 'soon' is a non-specific time reference and 'Week 2' is a relative time expression, both of which should not be labeled as 'date' entities based on the guidelines."
+        },
+        {
+          "sentence": "May I remind you to attend the meeting?",
+          "explanation": "The sentence contains the term 'May' which is ambiguous as it could refer to the month or be used as a verb. It should not be labeled as a 'date' entity according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical condition",
+    "prompt_length": 251,
+    "output_length": 266,
+    "annotation_guidelines": {
+      "Definition": "'medical condition' refers to physical or mental health issues, including diseases, syndromes, injuries, and other related conditions.",
+      "Guidelines": "Avoid generic terms like 'pain' or 'injury' unless specific medical conditions are mentioned. Be cautious with ambiguous terms that might have non-medical meanings, like 'depression' (psychological or economic) or 'stroke' (for a sports or painting context)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "She was feeling a lot of pain in her leg, but the doctor couldn't find any medical condition causing it.",
+          "explanation": "The sentence includes the term 'pain,' which is a generic term discouraged by the guidelines for labeling as a 'medical condition.' The absence of a specific medical condition being identified makes it a negative occurrence."
+        },
+        {
+        "adversarial_sentence": "The economic depression had a profound impact on the local community, leading to widespread unemployment and financial hardship.",
+        "explanation": "Ambiguous term 'depression' used in an economic context, not a medical condition."
+        },
+        {
+          "adversarial_sentence": "The artist's bold brushstrokes conveyed a sense of urgency and emotion, reminiscent of the intensity of a stroke on canvas.",
+          "explanation": "Ambiguous term 'stroke' used in a painting context, not a medical condition."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "object",
+    "prompt_length": 238,
+    "output_length": 206,
+    "annotation_guidelines": {
+      "Definition": "'object' in the context of NER refers to tangible items, both animate and inanimate, that can be perceived by the senses.",
+      "Guidelines": "Avoid labeling abstract concepts. Exercise caution with ambiguous terms such as 'sun' (can refer to the celestial body or concept of sunlight) and ensure that 'object' refers to tangible entities within the context."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The idea of the object was so abstract that it was impossible to grasp its true meaning.",
+          "explanation": "This sentence uses 'object' in an abstract sense, which goes against the guideline to avoid labeling abstract concepts."
+        },
+        {
+          "sentence": "She gazed at the sun, a celestial object that brought warmth and light to the world.",
+          "explanation": "This sentence uses 'object' to refer to the sun, which is an ambiguous term that can be interpreted as the celestial body, going against the guideline to ensure 'object' refers to tangible entities."
+        },
+        {
+          "sentence": "The artist painted a beautiful picture of the object, capturing its essence in vibrant colors.",
+          "explanation": "This sentence uses 'object' to refer to a painting, which is an inanimate entity, going against the guideline to ensure 'object' refers to tangible entities."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "technology",
+    "prompt_length": 254,
+    "output_length": 210,
+    "annotation_guidelines": {
+      "Definition": "'technology' represents technical terms, products, devices, or systems that involve the application of scientific knowledge for practical purposes.",
+      "Guidelines": "Do not label general terms like 'system' or 'interface' without clear technological context. Exercise caution with potentially ambiguous terms like 'Apple' (referring to the company or the fruit) and 'Java' (programming language or island). Be attentive to the context to differentiate between common and technical usage."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The system was designed to be user-friendly and efficient, incorporating the latest technology for seamless operation.",
+          "explanation": "The term 'system' is a general term and should not be labeled as 'technology' without clear technological context, as per the guidelines."
+        },
+        {
+          "sentence": "She enjoyed the refreshing taste of a crisp apple on a warm summer day, feeling rejuvenated by the natural sweetness.",
+          "explanation": "The term 'Apple' in this context refers to the fruit and not the technology company, so it should not be labeled as 'technology'."
+        },
+        {
+          "sentence": "They spent their vacation exploring the lush landscapes of Java, immersing themselves in the rich culture and history of the island.",
+          "explanation": "The term 'Java' in this context refers to the island and not the programming language, so it should not be labeled as 'technology'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  }
+]

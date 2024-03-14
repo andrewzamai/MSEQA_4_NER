@@ -124,12 +124,19 @@ def get_dataset_statistics():
     raw_dataset = load_dataset("Universal-NER/Pile-NER-type")
 
     context_lengths = []
+    n_total_samples = 0
+    n_negative_samples = 0
     for raw_sample in raw_dataset['train']['conversations']:
         # extract context and list of question-goldAnswers associated to each context
         context, questions_answers_list = extract_context_quests_answers(raw_sample).values()
 
         context_length = len(context.split())
         context_lengths.append(context_length)
+
+        for q_ne_answers in questions_answers_list:
+            n_total_samples += 1
+            if q_ne_answers['answers']['text'] == []:
+                n_negative_samples += 1
 
     fullPileNER_tagName_list = {}
     for raw_sample in raw_dataset['train']['conversations']:
@@ -141,7 +148,9 @@ def get_dataset_statistics():
         'contexts_average_number_words': np.average(context_lengths),
         'contexts_min_number_words': np.min(context_lengths),
         'contexts_max_number_words': np.max(context_lengths),
-        'fullPileNER_tagName_list': list(fullPileNER_tagName_list.keys())
+        'fullPileNER_tagName_list': [len(list(fullPileNER_tagName_list.keys())), list(fullPileNER_tagName_list.keys())],
+        'number_total_QA_samples': n_total_samples,
+        'number_negative_QA_samples': [n_negative_samples, f"{n_negative_samples/n_total_samples*100}%"]
     }
 
 
@@ -1126,9 +1135,114 @@ def build_dataset_MSEQA_format_with_n_samples_per_NE(n_samples_per_NE=5):
     return DatasetDict({split: Dataset.from_list(values) for split, values in n_samples_per_NE_MSEQA_dataset.items()})
 
 
+def build_dataset_MSEQA_format_with_n_samples_per_NE_plus_negatives(n_samples_per_NE=5):
+    dataset_MSEQA_format = build_dataset_MSEQA_format()
+    dataset_MSEQA_format = remove_bad_ne_types(dataset_MSEQA_format)
+    n_samples_per_NE_MSEQA_dataset = {split: [] for split in dataset_MSEQA_format.keys()}
+    n_samples_per_NE_MSEQA_dataset['test'] = dataset_MSEQA_format['test']
+    for split in dataset_MSEQA_format.keys():
+        if split != 'test':
+            ne_list = {}
+            for sample in dataset_MSEQA_format[split]:
+                ne_type = sample['tagName']
+                if ne_type not in ne_list:
+                    ne_list[ne_type] = {'yes_answer': 0, 'no_answer': 0}
+                if not sample['answers']['text']:
+                    ne_list[ne_type]['no_answer'] += 1
+                else:
+                    ne_list[ne_type]['yes_answer'] += 1
+
+            ne_list = {ne: {'yes_answer': n_samples_per_NE if values['yes_answer'] > n_samples_per_NE else values['yes_answer'], 'no_answer': n_samples_per_NE if values['no_answer'] > n_samples_per_NE else values['no_answer']} for ne, values in ne_list.items()}
+
+            for sample in dataset_MSEQA_format[split]:
+                has_answer = 'yes_answer'
+                if not sample['answers']['text']:
+                    has_answer = 'no_answer'
+                if ne_list[sample['tagName']][has_answer] > 0:
+                    n_samples_per_NE_MSEQA_dataset[split].append(sample)
+                    ne_list[sample['tagName']][has_answer] -= 1
+
+            random.shuffle(n_samples_per_NE_MSEQA_dataset[split])
+
+    return DatasetDict({split: Dataset.from_list(values) for split, values in n_samples_per_NE_MSEQA_dataset.items()})
+
+
+def build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE, n_neg_samples_per_NE):
+    dataset_MSEQA_format = build_dataset_MSEQA_format()
+    dataset_MSEQA_format = remove_bad_ne_types(dataset_MSEQA_format)
+    n_samples_per_NE_MSEQA_dataset = {split: [] for split in dataset_MSEQA_format.keys()}
+    n_samples_per_NE_MSEQA_dataset['test'] = dataset_MSEQA_format['test']
+    for split in dataset_MSEQA_format.keys():
+        if split != 'test':
+            ne_list = {}
+            for sample in dataset_MSEQA_format[split]:
+                ne_type = sample['tagName']
+                if ne_type not in ne_list:
+                    ne_list[ne_type] = {'yes_answer': 0, 'no_answer': 0}
+                if not sample['answers']['text']:
+                    ne_list[ne_type]['no_answer'] += 1
+                else:
+                    ne_list[ne_type]['yes_answer'] += 1
+
+            ne_list = {ne: {'yes_answer': n_pos_samples_per_NE if values['yes_answer'] > n_pos_samples_per_NE else values['yes_answer'], 'no_answer': n_neg_samples_per_NE if values['no_answer'] > n_neg_samples_per_NE else values['no_answer']} for ne, values in ne_list.items()}
+
+            for sample in dataset_MSEQA_format[split]:
+                has_answer = 'yes_answer'
+                if not sample['answers']['text']:
+                    has_answer = 'no_answer'
+                if ne_list[sample['tagName']][has_answer] > 0:
+                    n_samples_per_NE_MSEQA_dataset[split].append(sample)
+                    ne_list[sample['tagName']][has_answer] -= 1
+
+            random.shuffle(n_samples_per_NE_MSEQA_dataset[split])
+
+    return DatasetDict({split: Dataset.from_list(values) for split, values in n_samples_per_NE_MSEQA_dataset.items()})
+
+
+def add_adversarial_negative_examples(dataset_MSEQA_format_FalseDef, path_to_adversarial_examples_json):
+    """ adding negative adversarial examples only to TRAIN fold """
+    with open(path_to_adversarial_examples_json, 'r') as f:
+        adversarial_examples_per_NE = json.load(f)
+    # toadd_MSEQA_samples = []
+    ne_progressiveID = 0
+    for named_entity, values in adversarial_examples_per_NE.items():
+        negative_sentences = values['negative_sentences']
+        ne_progressiveID += 1
+        if isinstance(negative_sentences, list):
+            question_progressiveID = 0
+            for sentence_explanation in negative_sentences:
+                # not always consistent key "sentence", we extract first value in each dict
+                # sentence = sentence_explanation['sentence']
+                sentence = list(sentence_explanation.values())[0]
+                question_progressiveID += 1
+                sample_MSEQA = {
+                    "doc_question_pairID": str(ne_progressiveID) + ":" + str(question_progressiveID) + ":adversarial_negative",
+                    "document_context": sentence,
+                    "tagName": named_entity,
+                    "question": f"What describes {named_entity.upper()} in the text?",
+                    "answers": {'answer_start': [], 'text': []}
+                }
+                dataset_MSEQA_format_FalseDef['train'] = dataset_MSEQA_format_FalseDef['train'].add_item(sample_MSEQA)
+        else:
+            raise ValueError
+
+    dataset_MSEQA_format_FalseDef['train'] = dataset_MSEQA_format_FalseDef['train'].shuffle()
+
+    return dataset_MSEQA_format_FalseDef
+
+
 if __name__ == "__main__":
 
-    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE(n_samples_per_NE=5)
+    # pileNER_statistics = get_dataset_statistics()
+    # print(pileNER_statistics)
+
+    # N samples per NE (N positive + N negatives)
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE=15, n_neg_samples_per_NE=10)
+    #dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE_plus_negatives(n_samples_per_NE=5)
+    # dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = DatasetDict.load_from_disk('../../../datasets/pileNER/5_samples_per_NE_MSEQA_FalseDef_plus_negatives')
+    print(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
+
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = add_adversarial_negative_examples(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, './questions/pileNER/ALL_pileNER_adv_examples.json')
     print(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
 
     ne_list = {}
@@ -1138,7 +1252,6 @@ if __name__ == "__main__":
             ne_list[ne_type] += 1
         else:
             ne_list[ne_type] = 1
-
     print(sorted(ne_list.items(), key=lambda x: x[1], reverse=True))
 
     doc_list = {}
@@ -1148,16 +1261,15 @@ if __name__ == "__main__":
             doc_list[docID] += 1
         else:
             doc_list[docID] = 1
-
     print(sorted(doc_list.items(), key=lambda x: x[1], reverse=True))
 
-    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef.save_to_disk("../../../datasets/pileNER/5_samples_per_NE_MSEQA_FalseDef")
-    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, with_definition=False, path_to_save_to="../../../datasets/pileNER/5_samples_per_NE_GenQA_FalseDef")
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef.save_to_disk("../../../datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_MSEQA_FalseDef")
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, with_definition=False, path_to_save_to="../../../datasets/pileNER/15_pos_samples_per_NE_3_ADVERSARIAL_GenQA_FalseDef")
 
     dataset_MSEQA_format_with_n_samples_per_NE_TrueDef = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json", dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
     print(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef)
-    dataset_MSEQA_format_with_n_samples_per_NE_TrueDef.save_to_disk("../../../datasets/pileNER/5_samples_per_NE_MSEQA_TrueDef")
-    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef, with_definition=True, path_to_save_to="../../../datasets/pileNER/5_samples_per_NE_GenQA_TrueDef")
+    dataset_MSEQA_format_with_n_samples_per_NE_TrueDef.save_to_disk("../../../datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_MSEQA_TrueDef")
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef, with_definition=True, path_to_save_to="../../../datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_GenQA_TrueDef")
 
     """
     pileNER_statistics = get_dataset_statistics()

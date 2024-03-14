@@ -90,11 +90,13 @@ if __name__ == '__main__':
         {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = True
     print(f"\nWith definition: {WITH_DEFINITION}")
 
     #model_path_or_name = "andrewzamai/Llama2-7B-TrueDef"
-    model_path_or_name = "./merged_models/llama2_7B_5samplesPerNE_FalseDef"
+    #model_path_or_name = "./merged_models/llama2_7B_5samplesPerNE_TrueDef_NOenhanced_plus_negatives"
+
+    model_path_or_name = "./merged_models/llama2_7B_15_10_per_NE_3_ADVERSARIAL_TrueDef_enhanced"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
     #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
     #model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"

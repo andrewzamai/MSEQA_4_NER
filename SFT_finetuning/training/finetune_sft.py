@@ -66,7 +66,8 @@ def train(
         max_grad_norm: float = 0.3,
         use_flash_attention: bool = False,
         shuffle: bool = True,
-        gradient_checkpointing: bool = False
+        gradient_checkpointing: bool = False,
+        early_stopping_patience=5,
 ):
     if int(os.environ.get("LOCAL_RANK", 0)) == 0:
         print(
@@ -84,6 +85,7 @@ def train(
             f"batch_size: {batch_size}\n"
             f"micro_batch_size: {micro_batch_size}\n"
             f"num_epochs: {num_epochs}\n"
+            f"early_stopping_patience: {early_stopping_patience}\n"
             f"learning_rate: {learning_rate}\n"
             f"cutoff_len: {cutoff_len}\n"
             f"val_set_size: {val_set_size}\n"
@@ -200,6 +202,10 @@ def train(
 
     train_data = data["train"]
 
+    # TODO: masking for enhanced training
+    from MSEQA_4_NER.data_handlers.data_handler_pileNER import mask_named_entities
+    train_data = mask_named_entities(train_data, corruption_prob=0.5, masking_prob=0.8, default_mask='<unk>')
+
     #if os.path.exists(data_path[:-len(".json") + '_' + base_model.split("/")[-1] + '_tokenized'):
     #train_data = load_dataset()
 
@@ -225,6 +231,8 @@ def train(
         train_data = data["train"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer, prompter, cutoff_len, train_on_inputs), num_proc=30)
         val_data = load_dataset("json", data_files=val_data_path)
         val_data = val_data["train"].select(list(range(min(val_set_size, len(val_data["train"])))))  # no more than val_set_size 5k examples
+        # TODO: masking for enhanced training
+        val_data = mask_named_entities(val_data, corruption_prob=0.5, masking_prob=0.8, default_mask='<unk>')
         val_data = val_data.map(lambda x: generate_and_tokenize_prompt(x, tokenizer, prompter, cutoff_len, train_on_inputs), num_proc=30)
         val_set_size = len(val_data)
     else:
@@ -288,7 +296,7 @@ def train(
         eval_dataset=val_data,
         args=training_arguments,
         data_collator=data_collator,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)]
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=early_stopping_patience)] if early_stopping_patience > -1 else []
     )
     model.config.use_cache = False
 
@@ -303,15 +311,14 @@ def train(
     # tokenizer.save_pretrained(output_dir)
     model.save_pretrained(output_dir)
     print(f'Saving model at: {output_dir}')
-    print(
-        "\n If there's a warning about missing keys above, please disregard :)"
-    )
+    print("\n If there's a warning about missing keys above, please disregard :)")
 
 
 if __name__ == "__main__":
 
     # print("Llama-2-7b-chat finetuning on pileNER - with guidelines - enhanced \n")
-    print("Llama-2-7b-chat finetuning on pileNER - w/o guidelines - 5 samples per NE \n")
+    #print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 10 samples per NE (5positive + 5negative) + ADVERSARIAL examples (3 per NER) + enhanced 0.5 0.8 \n")
+    print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 15 positive + 10 negative + ADVERSARIAL examples (3 per NER) + YES enhanced \n")
 
     # load HuggingFace access token with permissions to LLAMA repo
     from huggingface_hub import login
@@ -319,7 +326,7 @@ if __name__ == "__main__":
     login(token=HF_ACCESS_TOKEN)
 
     #path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_enhanced.yml'
-    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_FalseDef_NsamplesPerNE.yml'
+    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_NsamplesPerNE.yml'
 
     parser = argparse.ArgumentParser(description='''LLMs Supervised Fine-tuning Trainer''')
     parser.add_argument('--config', type=str, default=path_to_training_config, help='Config file for finetuning')

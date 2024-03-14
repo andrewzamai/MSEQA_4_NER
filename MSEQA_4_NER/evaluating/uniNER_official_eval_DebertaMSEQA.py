@@ -87,9 +87,9 @@ if __name__ == '__main__':
     # models_TrueDef = ['andrewzamai/MSEQA-DeBERTaXXL-0', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-A', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-B-bis', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-C', 'andrewzamai/MSEQA-DeBERTaXXL-TrueDef-D']
     #models_TrueDef = ['andrewzamai/MSEQA-DeBERTaXXL-TrueDef-D']
     #models_TrueDef = ['./trained_models/DeBERTa_MSEQA_pileNERpt_TrueDef_Trueenhanced/checkpoint-800']
-    models_TrueDef = ['./trained_models/DeBERTa_MSEQA_pileNERpt_TrueDef_Trueenhanced_c/finetuned_model']
+    models_TrueDef = ['./trained_models/DeBERTa_MSEQA_pileNERpt_TrueDef_Trueenhanced_5pNE_10epochs_hard/checkpoint-210']
     #models_FalseDef = ['andrewzamai/MSEQA-DeBERTaXXL-FalseDef-A', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-B', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-C-bis', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-D', 'andrewzamai/MSEQA-DeBERTaXXL-FalseDef-0']
-    models_FalseDef = ['andrewzamai/MSEQA-DeBERTaXXL-FalseDef-0']
+    models_FalseDef = ['./trained_models/DeBERTa_MSEQA_pileNERpt_FalseDef_Falseenhanced_5pNE_10epochs/finetuned_model']
 
     WITH_DEFINITION = True
     print(f"With definition: {WITH_DEFINITION}")
@@ -211,10 +211,10 @@ if __name__ == '__main__':
                         'pred_answers': predicted_answers_doc_level
                     })
 
-                path_to_save_pred_folder = os.path.join("./predictions", 'DeBERTa-XXL-MSEQA', str(WITH_DEFINITION)+'Def', path_to_model.split('/')[-1])
+                path_to_save_pred_folder = os.path.join("./predictions", 'DeBERTa-XXL-MSEQA', str(WITH_DEFINITION)+'Def', path_to_model.split('/')[-2])
                 if not os.path.exists(path_to_save_pred_folder):
                     os.makedirs(path_to_save_pred_folder)
-                with open(os.path.join(path_to_save_pred_folder, f"{subdataset_name}_masked_preds.json"), 'w') as f:
+                with open(os.path.join(path_to_save_pred_folder, f"{subdataset_name}_preds.json"), 'w') as f:
                     json.dump(ids_preds, f, indent=4)
 
                 # dumps both preds and golds as uniNER_official_eval scripts expects
@@ -227,7 +227,7 @@ if __name__ == '__main__':
                 if not os.path.exists(path_to_save_eval_folder):
                     os.makedirs(path_to_save_eval_folder)
                 # write in append mode
-                with open(os.path.join(path_to_save_eval_folder, path_to_model.split('/')[-1] + '_masked.txt'), "a") as eval_file:
+                with open(os.path.join(path_to_save_eval_folder, path_to_model.split('/')[-2] + '.txt'), "a") as eval_file:
                     eval_file.write(f"\n\nEvaluating MS-EQA model named '{path_to_model.split('/')[-1]}' on '{subdataset_name}' test fold in ZERO-SHOT setting\n")
                     eval_file.write("\ngold_answers\n")
                     eval_file.write(str(golds[0:10]))

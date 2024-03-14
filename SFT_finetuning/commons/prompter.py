@@ -61,17 +61,17 @@ class Prompter(object):
 if __name__ == '__main__':
 
     from datasets import load_dataset
-    path_to_dataset = "../../../datasets/pileNER_GenQA_format_TrueDef/train.jsonl"
+    path_to_dataset = "../../../datasets/pileNER/pileNER_GenQA_format_TrueDef/train.jsonl"
     data = load_dataset("json", data_files=path_to_dataset)
 
     from transformers import AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf", token="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")
     average_prompt_length = 0
-    for i in range(1000):
+    for i in range(1):
         sample = data['train'][i]
         prompt = Prompter("reverse_INST", template_path="../templates").generate_prompt(instruction=sample['instruction'], input=sample['input'], label=sample['output'])
-        #print(prompt)
+        print(prompt)
 
         # print(len(prompt.split()))
         n_tokens = len(tokenizer(prompt)['input_ids'])

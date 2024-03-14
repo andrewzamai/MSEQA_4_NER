@@ -1,0 +1,2576 @@
+[
+  {
+    "named_entity": "file format",
+    "prompt_length": 262,
+    "output_length": 211,
+    "annotation_guidelines": {
+      "Definition": "'file format' refers to the specific structure and organization of data stored in a file, such as extensions or types associated with different applications or systems.",
+      "Guidelines": "Avoid labeling generic terms like 'document' or 'file'. Exercise caution with ambiguous terms that could refer to multiple meanings, such as 'java' (programming language and file format) or 'word' (commonly used for both Microsoft Word files and general vocabulary). Pay attention to context and usage to accurately identify"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I need to save this document in a specific structure and organization, but I'm not sure about the file format to use.",
+          "explanation": "The sentence uses the term 'specific structure and organization' to refer to 'file format', avoiding the direct mention of the named entity."
+        },
+        {
+          "sentence": "The software requires a particular extension for storing data, but I'm not familiar with the file format it supports.",
+          "explanation": "The sentence replaces 'file format' with 'particular extension' to describe the concept without using the named entity explicitly."
+        },
+        {
+          "sentence": "She asked me to send the information in a type associated with different applications, but I'm unsure of the file format she prefers.",
+          "explanation": "The sentence uses 'type associated with different applications' instead of 'file format' to convey the idea while avoiding the direct mention of the named entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "province",
+    "prompt_length": 243,
+    "output_length": 220,
+    "annotation_guidelines": {
+      "Definition": "'province' refers to a first-level administrative division within a country, with its own government and administrative apparatus.",
+      "Guidelines": "Avoid mislabeling city names, regions, or countries as provinces. Exercise caution when dealing with common words used in other contexts, like 'Ontario' (also a person's name) or 'Justice Bellamy' (a person's title and name)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "Ontario is a beautiful province known for its stunning landscapes and vibrant cities.",
+          "explanation": "This sentence contains a negative occurrence of 'province' by mislabeling 'Ontario' as a province, which goes against the guidelines provided."
+        },
+        {
+          "sentence": "Justice Bellamy, the province of fairness and integrity, presided over the court proceedings.",
+          "explanation": "This sentence contains a negative occurrence of 'province' by mislabeling 'Justice Bellamy' as a province, which is a person's title and name, not a first-level administrative division."
+        },
+        {
+          "sentence": "The region of Tuscany, often referred to as the province of art and culture, attracts tourists from around the world.",
+          "explanation": "This sentence contains a negative occurrence of 'province' by mislabeling 'Tuscany' as a province, when it is actually a region and not a first-level administrative division."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "disorder",
+    "prompt_length": 258,
+    "output_length": 222,
+    "annotation_guidelines": {
+      "Definition": "'disorder' refers to medical conditions that involve disturbances to normal physical or mental functioning, such as autism spectrum disorders, anxiety disorders, and bipolar disorders.",
+      "Guidelines": "Do not label symptoms or general health conditions. Avoid ambiguous terms such as 'depression' (which can be a mood or a disorder) or 'cancer' (which encompasses various specific conditions). Be aware of potential overlap with 'symptom' and 'disease' entities."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The patient exhibited signs of extreme sadness and hopelessness, which could be indicative of a disorder.",
+          "explanation": "The sentence mentions 'extreme sadness and hopelessness' which are symptoms of depression, but does not directly label 'depression' as a disorder."
+        },
+        {
+          "sentence": "The individual experienced severe fatigue and weight loss, suggesting a potential disorder affecting their physical health.",
+          "explanation": "The sentence includes 'severe fatigue and weight loss' which are symptoms of various disorders, but does not specify any particular disorder like 'cancer' or 'anxiety disorder'."
+        },
+        {
+          "sentence": "The patient reported chronic pain and difficulty sleeping, indicating a possible underlying disorder that requires further evaluation.",
+          "explanation": "The sentence mentions 'chronic pain and difficulty sleeping' which are symptoms that can be associated with different disorders, but does not specify any particular disorder like 'fibromyalgia' or 'insomnia'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "acronym",
+    "prompt_length": 258,
+    "output_length": 179,
+    "annotation_guidelines": {
+      "Definition": "'acronym' refers to abbreviations formed by the initial letters or parts of a phrase or series of words and pronounced as a word.",
+      "Guidelines": "Avoid labeling generic terms or common abbreviations. Exercise caution with similar entities like 'CD' (could represent 'compact disc' or 'certificate of deposit') and 'NATO' (could represent the organization or the North Atlantic Treaty). Ensure the entity represents a distinct acronym and not a common word."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I bought a new CD player for my car.",
+          "explanation": "This sentence contains the acronym 'CD', which could represent 'compact disc' or 'certificate of deposit', making it a negative occurrence as per the guidelines."
+        },
+        {
+          "sentence": "The NATO summit was held in Brussels.",
+          "explanation": "This sentence contains the term 'NATO', which could represent the organization or the North Atlantic Treaty, making it a negative occurrence as per the guidelines."
+        },
+        {
+          "sentence": "She used an ATM to withdraw cash from her account.",
+          "explanation": "This sentence contains the term 'ATM', which is a common abbreviation for 'automated teller machine', making it a negative occurrence as per the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "genetic variation",
+    "prompt_length": 239,
+    "output_length": 176,
+    "annotation_guidelines": {
+      "Definition": "'genetic variation' represents differences in DNA sequence among individuals or populations, including mutations, polymorphisms, and other alterations.",
+      "Guidelines": "Avoid labeling general genetic terms not directly related to variation (e.g., 'DNA', 'gene expression'). Beware of ambiguous terms such as 'deletion' (could refer to genetic variation or general deletion)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The DNA was analyzed for genetic variation, but the results were inconclusive.",
+          "explanation": "This sentence contains the term 'DNA' which is a general genetic term not directly related to genetic variation, as per the guidelines."
+        },
+        {
+          "sentence": "The study focused on gene expression rather than genetic variation.",
+          "explanation": "This sentence includes 'gene expression', which is a general genetic term not directly related to genetic variation, as per the guidelines."
+        },
+        {
+          "sentence": "The deletion in the genetic code caused a significant impact on the organism.",
+          "explanation": "This sentence uses 'deletion', which is an ambiguous term that could refer to genetic variation or general deletion, as cautioned in the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "issue",
+    "prompt_length": 238,
+    "output_length": 168,
+    "annotation_guidelines": {
+      "Definition": "In the context of NER, 'issue' refers to a specific problem or concern that requires attention or resolution.",
+      "Guidelines": "Avoid labeling general or non-specific terms, such as 'things' or 'problems'. Be cautious when distinguishing between concrete issues and broader topics or themes, such as 'education' versus 'lack of access to education'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "There are many things that need to be addressed in our society.",
+          "explanation": "This sentence contains a general term 'things' which should be avoided as per the guidelines, instead of labeling it as 'issue'."
+        },
+        {
+          "sentence": "The problems we face are complex and multifaceted.",
+          "explanation": "This sentence uses the term 'problems' which is a non-specific term and should not be labeled as 'issue'."
+        },
+        {
+          "sentence": "Education is a critical area that requires improvement.",
+          "explanation": "This sentence discusses a broader topic 'education' rather than a specific problem or concern, which should not be labeled as 'issue'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "instrument",
+    "prompt_length": 261,
+    "output_length": 170,
+    "annotation_guidelines": {
+      "Definition": "'instrument' refers to tools, devices, or equipment utilized for various purposes, such as musical instruments, scientific instruments, and measurement tools.",
+      "Guidelines": "Exclude generic terms like 'tool' or 'device'. Exercise caution with ambiguous terms like 'key' (can refer to musical instrument, component of a keyboard, or a coding term). Be mindful of metaphorical usage, such as 'weapon' and 'shield', which should not be labeled as 'instrument' in this"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The criminal used the gun as his instrument of fear and intimidation.",
+          "explanation": "The term 'instrument' should not be applied to 'gun' as it is a metaphorical usage in this context."
+        },
+        {
+          "sentence": "The hacker employed the virus as his instrument to disrupt the company's operations.",
+          "explanation": "The term 'instrument' should not be used for 'virus' as it is a metaphorical usage in this scenario."
+        },
+        {
+          "sentence": "The politician wielded misinformation as his instrument to manipulate public opinion.",
+          "explanation": "The term 'instrument' should not be associated with 'misinformation' as it is a metaphorical usage here."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "ordinal",
+    "prompt_length": 249,
+    "output_length": 197,
+    "annotation_guidelines": {
+      "Definition": "'ordinal' refers to words or numbers that indicate the position or order in a sequence, such as 'first', 'second', 'third', etc.",
+      "Guidelines": "Avoid labeling ordinal words that refer to non-specific positions like 'some', 'many', etc. Exercise caution with ambiguous cases, such as 'third' when it refers to a person's name or title (e.g., 'John the Third')."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "Some people believe that the third time's the charm, but others disagree.",
+          "explanation": "The word 'third' is used in a non-specific position ('the third time'), which should not be labeled as an ordinal according to the guidelines."
+        },
+        {
+          "sentence": "Many students aspire to be the first in their family to attend college.",
+          "explanation": "The word 'first' is used in a non-specific position ('the first in their family'), which should not be labeled as an ordinal according to the guidelines."
+        },
+        {
+          "sentence": "There are several ways to approach the second problem in the assignment, each with its own challenges.",
+          "explanation": "The word 'second' is used in a non-specific position ('the second problem'), which should not be labeled as an ordinal according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "statistic",
+    "prompt_length": 245,
+    "output_length": 175,
+    "annotation_guidelines": {
+      "Definition": "'statistic' refers to numerical data, measurements, or quantifiable information used to describe or analyze a specific aspect of a subject or event.",
+      "Guidelines": "Avoid labeling general or non-quantitative terms. Exercise caution with ambiguities such as 'P' (can denote significance level or a variable name) and ensure the context is clear to determine if the entity represents a statistical value."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The study focused on the impact of various factors on the outcome, without providing any statistic to support the findings.",
+          "explanation": "The sentence mentions the absence of a statistic, which is a negative occurrence of the named entity."
+        },
+        {
+          "sentence": "The article discussed trends and patterns in the data but did not present any statistic to quantify the relationships.",
+          "explanation": "Here, the absence of a statistic is highlighted, aligning with the negative occurrence guideline."
+        },
+        {
+          "sentence": "The report included descriptive information about the sample but lacked any statistic to summarize the results.",
+          "explanation": "This sentence emphasizes the absence of a statistic in the context of summarizing results, meeting the negative occurrence criteria."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "clothing",
+    "prompt_length": 232,
+    "output_length": 231,
+    "annotation_guidelines": {
+      "Definition": "'clothing' refers to items worn on the body, such as shirts, pants, hats, and shoes.",
+      "Guidelines": "Do not label abstract references. Be cautious with ambiguous terms like 'Nike' (could refer to the brand or the Greek goddess), and be aware of figurative language ('wearing a smile')."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "She felt suffocated by the weight of her past mistakes, each one clinging to her like a heavy piece of clothing.",
+          "explanation": "This sentence uses the term 'clothing' in a metaphorical sense to refer to emotional burdens, which falls under the category of figurative language and should not be labeled as the Named Entity."
+        },
+        {
+          "sentence": "The company's reputation was tarnished, with scandals and controversies becoming their new clothing.",
+          "explanation": "Here, 'clothing' is used metaphorically to describe how negative events have become associated with the company, which should not be labeled as the Named Entity."
+        },
+        {
+          "sentence": "The political leader's deceptive tactics were like a cloak of darkness, hiding his true intentions from the public.",
+          "explanation": "In this sentence, 'cloak of darkness' is a metaphorical reference to concealment, and 'clothing' is used in a figurative sense, not to be labeled as the Named Entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "financial",
+    "prompt_length": 235,
+    "output_length": 235,
+    "annotation_guidelines": {
+      "Definition": "'financial' refers to entities related to monetary systems, investments, assets, and financial instruments.",
+      "Guidelines": "Avoid labeling generic terms like 'money' or ambiguous terms like 'Apple' (company or fruit) as 'financial'. Be aware of ambiguous terms like 'stock' (company or inventory) and provide context for disambiguation."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I picked some fresh apples from the tree and decided to invest in them, hoping they would grow into a profitable business.",
+          "explanation": "The sentence contains the term 'invest' which is related to financial activities, but the term 'apples' is a negative occurrence as it is an ambiguous term that should not be labeled as 'financial'."
+        },
+        {
+          "sentence": "She bought a new stock for her art supplies, not realizing it was a limited edition item.",
+          "explanation": "The term 'stock' in this context refers to inventory of art supplies, which is a negative occurrence as it should not be labeled as 'financial'."
+        },
+        {
+          "sentence": "He received a bag of money as a gift and decided to save it for a rainy day.",
+          "explanation": "While the term 'money' is related to financial systems, in this context of receiving it as a gift, it is a negative occurrence as it is a generic term that should not be labeled as 'financial'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "district",
+    "prompt_length": 238,
+    "output_length": 213,
+    "annotation_guidelines": {
+      "Definition": "'district' refers to administrative subdivisions within a region or state, typically characterized by specific boundaries and local governance structures.",
+      "Guidelines": "Exercise caution with ambiguous terms like 'South District' (which could refer to a geographical area or a business district within a city). Avoid labeling non-administrative entities like 'financial district' unless explicitly referring to an administrative division."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The financial district was bustling with activity, attracting many investors.",
+          "explanation": "This sentence contains a negative occurrence of 'district' as per the guidelines because 'financial district' is a non-administrative entity and should not be labeled as 'district'."
+        },
+        {
+          "sentence": "The South District of the city was known for its vibrant nightlife and entertainment options.",
+          "explanation": "This sentence contains a negative occurrence of 'district' as per the guidelines because 'South District' is ambiguous and could refer to a geographical area, not an administrative subdivision."
+        },
+        {
+          "sentence": "The district of luxury boutiques and high-end stores was a favorite shopping destination for the affluent.",
+          "explanation": "This sentence contains a negative occurrence of 'district' as per the guidelines because 'district of luxury boutiques' is a non-administrative entity and should not be labeled as 'district'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "fictional character",
+    "prompt_length": 263,
+    "output_length": 237,
+    "annotation_guidelines": {
+      "Definition": "'fictional character' refers to characters that are created and exist within works of fiction, such as literature, films, television shows, and other artistic creations.",
+      "Guidelines": "Avoid labeling real-life individuals or historical figures. Exercise caution with ambiguous terms, like 'John Smith' (common name) or 'Michael Jordan' (real person with the same name as a character). Be aware of characters with titles or honorifics that might cause confusion, such as 'President of"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "John Smith is a well-known fictional character in literature, often mistaken for a real person due to his common name.",
+          "explanation": "This sentence includes the negative occurrence of 'fictional character' by mentioning 'John Smith,' a common name that should be avoided as it may refer to a real-life individual."
+        },
+        {
+          "sentence": "Michael Jordan, the President of a fictional character fan club, is often confused with the real-life basketball legend.",
+          "explanation": "This sentence contains the negative occurrence of 'fictional character' by associating 'Michael Jordan' with a real person, causing potential confusion as per the guidelines."
+        },
+        {
+          "sentence": "The Queen of England, a fictional character in many works of fiction, is a title that should be approached with caution due to its real-life counterpart.",
+          "explanation": "This sentence showcases the negative occurrence of 'fictional character' by mentioning a character with a title ('Queen of England') that might cause confusion with the real-life figure holding the same title."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "education",
+    "prompt_length": 239,
+    "output_length": 177,
+    "annotation_guidelines": {
+      "Definition": "'education' refers to institutions, degrees, courses, or any aspect related to academic learning and training.",
+      "Guidelines": "Avoid labeling generic terms like 'study' or 'learning'. Exercise caution with terms that can refer to multiple categories, such as 'training' (can be educational or professional) or 'practice' (can refer to medical practice or academic practice)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The students were engaged in a study session that focused on practical skills rather than formal education.",
+          "explanation": "The sentence uses the term 'study' in a generic sense, which is advised against labeling as 'education'."
+        },
+        {
+          "sentence": "The company provided specialized training to its employees, emphasizing practical skills over academic learning.",
+          "explanation": "The term 'training' is used in a professional context here, which can be misleading if labeled as 'education'."
+        },
+        {
+          "sentence": "The doctor's practice involved hands-on medical procedures, showcasing expertise beyond academic training.",
+          "explanation": "The term 'practice' is used in the context of medical practice, which should not be confused with academic education."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "competition",
+    "prompt_length": 235,
+    "output_length": 155,
+    "annotation_guidelines": {
+      "Definition": "'competition' refers to events, leagues, tournaments, or championships where individuals or teams compete against each other in a sport, game, or other activities.",
+      "Guidelines": "Do not label generic terms like 'game' or 'activity'. Be mindful of ambiguous references like 'French Open' (can refer to a tennis tournament or the actual location)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The kids were playing a game in the park.",
+          "explanation": "This sentence contains the negative occurrence 'game' which should not be labeled as 'competition'."
+        },
+        {
+          "sentence": "She visited the French Open during her trip to Paris.",
+          "explanation": "This sentence contains the ambiguous reference 'French Open' which could refer to a tennis tournament or the location, hence should not be labeled as 'competition'."
+        },
+        {
+          "sentence": "They enjoyed various activities at the resort.",
+          "explanation": "This sentence contains the negative occurrence 'activities' which should not be labeled as 'competition'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "nutrient",
+    "prompt_length": 262,
+    "output_length": 189,
+    "annotation_guidelines": {
+      "Definition": "'nutrient' refers to substances that provide nourishment, including vitamins, minerals, and other dietary components essential for the proper functioning of the human body.",
+      "Guidelines": "Avoid labeling non-dietary items. Exercise caution with terms that may have multiple meanings, such as 'iron' (mineral and metal) or 'D' (vitamin and grade level). Be cautious with terms that may be specific to specific contexts, such as 'choline' in the context"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The rusty iron gate creaked loudly as it swung open.",
+          "explanation": "This sentence contains the term 'iron' used in the context of a metal, which is a negative occurrence of the named entity 'nutrient'."
+        },
+        {
+          "sentence": "She received a 'D' grade on her math test, which was disappointing.",
+          "explanation": "This sentence includes the term 'D' used in the context of a grade level, which is a negative occurrence of the named entity 'nutrient'."
+        },
+        {
+          "sentence": "The choline used in the experiment produced unexpected results.",
+          "explanation": "This sentence mentions 'choline' in a specific context unrelated to its dietary significance, making it a negative occurrence of the named entity 'nutrient'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "government",
+    "prompt_length": 261,
+    "output_length": 185,
+    "annotation_guidelines": {
+      "Definition": "'government' refers to the systems, institutions, and administrative bodies that govern a political entity, including national, regional, and local authorities as well as specific administrations and agencies within the government.",
+      "Guidelines": "Avoid labeling political figures or individual politicians. Exercise caution with terms that can be used in non-governmental contexts, such as 'administration' in the context of business or organizational management, and 'government' in the context of non-political entities (e.g., 'Amazon"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The administration of the company was corrupt and inefficient, leading to widespread dissatisfaction among employees.",
+          "explanation": "This sentence uses 'administration' in a non-governmental context, referring to a business entity rather than a political entity."
+        },
+        {
+          "sentence": "The government of the online retailer faced backlash for its unethical business practices and exploitation of workers.",
+          "explanation": "This sentence uses 'government' in a non-political context, referring to a commercial entity rather than a governing body."
+        },
+        {
+          "sentence": "The local authorities in charge of the neighborhood failed to address the growing crime rates, causing fear and unrest among residents.",
+          "explanation": "This sentence refers to 'local authorities' in a negative light, highlighting their failure to effectively govern the area."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "behavior",
+    "prompt_length": 247,
+    "output_length": 191,
+    "annotation_guidelines": {
+      "Definition": "'behavior' in the NER context refers to actions, habits, or patterns of conduct exhibited by individuals, groups, or objects.",
+      "Guidelines": "Exclude general descriptive terms that do not represent specific behavioral actions, such as 'red behavior', as it does not convey a specific action or pattern. Be mindful of ambiguous terms like 'spin glass' which may refer to a material property rather than human behavior."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The red behavior of the material was fascinating to observe under the microscope.",
+          "explanation": "This sentence includes 'red behavior' which is explicitly mentioned in the guidelines as an example of a term to exclude as it does not represent specific behavioral actions."
+        },
+        {
+          "sentence": "The spin glass exhibited a unique behavior when subjected to varying temperatures.",
+          "explanation": "This sentence contains 'spin glass' which is highlighted in the guidelines as an ambiguous term that may refer to a material property rather than human behavior."
+        },
+        {
+          "sentence": "The behavior of the landscape was breathtaking, with colors changing as the sun set.",
+          "explanation": "This sentence uses 'behavior' in a general descriptive context related to the landscape, which is advised to be excluded as it does not represent specific behavioral actions."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "weapon",
+    "prompt_length": 261,
+    "output_length": 224,
+    "annotation_guidelines": {
+      "Definition": "'weapon' refers to any instrument used for attack or defense, including firearms, explosives, and other tools designed for harm.",
+      "Guidelines": "Do not label non-threatening items, such as decorative swords or antique firearms, unless mentioned in a context relevant to their use as weapons. Exercise caution with terms like 'gun' in non-militaristic contexts (e.g., 'glue gun', 'gunmetal'). Take into account the surrounding context to determine if an object is"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The antique sword displayed in the museum was purely ornamental and held no threat as a weapon.",
+          "explanation": "This sentence contains a negative occurrence of the named entity 'weapon' by mentioning an antique sword that is explicitly stated to be non-threatening and purely ornamental."
+        },
+        {
+          "sentence": "She used a glue gun to fix the broken vase, a tool that is harmless and not intended as a weapon.",
+          "explanation": "In this sentence, the term 'gun' is used in a non-militaristic context ('glue gun'), following the guideline to exercise caution with such terms in non-threatening contexts."
+        },
+        {
+          "sentence": "The gunmetal finish on the car gave it a sleek and modern look, but it was not a weapon in any way.",
+          "explanation": "This sentence refers to 'gunmetal' in a non-threatening context, emphasizing that the material finish on the car is not a weapon despite the term used."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "apparatus",
+    "prompt_length": 244,
+    "output_length": 179,
+    "annotation_guidelines": {
+      "Definition": "'apparatus' refers to mechanical devices or instruments used for specific purposes, often in technical or scientific contexts.",
+      "Guidelines": "Avoid labeling generic or vague terms (e.g., 'device', 'equipment'). Exercise caution with ambiguous entities that could refer to both a physical apparatus and a concept (e.g., 'network' could refer to a physical network or a conceptual one)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The device malfunctioned due to a technical glitch.",
+          "explanation": "The term 'device' is a generic term that should be avoided as per the guidelines, instead of labeling it as 'apparatus'."
+        },
+        {
+          "sentence": "The equipment failed to operate efficiently under extreme conditions.",
+          "explanation": "The term 'equipment' is vague and should be avoided as per the guidelines, instead of labeling it as 'apparatus'."
+        },
+        {
+          "sentence": "The network experienced a disruption in its communication channels.",
+          "explanation": "The term 'network' can be ambiguous and refer to a conceptual network, so it should be avoided as per the guidelines, instead of labeling it as 'apparatus'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "emotion",
+    "prompt_length": 248,
+    "output_length": 197,
+    "annotation_guidelines": {
+      "Definition": "'emotion' refers to specific feelings, psychological states, or mental conditions experienced by individuals.",
+      "Guidelines": "Do not label generic terms like 'feeling' or 'state of mind'. Exercise caution with ambiguous words like 'love' (can be both an emotion and an action) and 'fear' (can be an emotion or a verb). Be mindful of cultural nuances and language expressions related to emotions."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The feeling of sadness overwhelmed her, clouding her thoughts and making it hard to focus.",
+          "explanation": "The term 'feeling' is a generic term that should not be labeled as 'emotion' according to the guidelines."
+        },
+        {
+          "sentence": "He was in a state of despair, unable to find any joy or hope in his current situation.",
+          "explanation": "The term 'state of mind' is a generic term that should not be labeled as 'emotion' according to the guidelines."
+        },
+        {
+          "sentence": "She feared the worst, her heart racing with anxiety and uncertainty about the future.",
+          "explanation": "The term 'fear' is ambiguous as it can be both an emotion and a verb, so it should be avoided as a negative occurrence of 'emotion' according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "demonym",
+    "prompt_length": 263,
+    "output_length": 159,
+    "annotation_guidelines": {
+      "Definition": "'demonym' refers to words or phrases denoting the people or inhabitants of a particular place, often formed from the place name (e.g., Mexican from Mexico) and used to describe the nationality, ethnicity, or residents of a specific location.",
+      "Guidelines": "Do not label generic terms like 'people', 'nation', 'residents'. Exercise caution with ambiguous terms, such as 'American' (can also refer to non-demonyms, e.g., American"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The people gathered to celebrate their heritage.",
+          "explanation": "This sentence contains the term 'people' which is explicitly mentioned in the guidelines as not to be labeled as a demonym."
+        },
+        {
+          "sentence": "The nation's flag waved proudly in the wind.",
+          "explanation": "This sentence includes the term 'nation' which is specified in the guidelines as a term not to be labeled as a demonym."
+        },
+        {
+          "sentence": "The residents of the town organized a charity event.",
+          "explanation": "This sentence uses the term 'residents' which is cautioned against labeling as a demonym according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "interface",
+    "prompt_length": 238,
+    "output_length": 210,
+    "annotation_guidelines": {
+      "Definition": "'interface' in the context of NER refers to a boundary across which two independent systems, organizations, or components meet and act on or communicate with each other.",
+      "Guidelines": "Do not label generic terms that do not represent the interface between distinct entities. Exercise caution when identifying interfaces within complex compound entities, such as 'user.Info', to ensure accurate labeling."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The software engineer worked on improving the user interface, focusing on enhancing the overall user experience.",
+          "explanation": "This sentence contains a positive occurrence of 'interface' as part of the user interface, which should be labeled as the Named Entity. It does not meet the criteria for a negative occurrence."
+        },
+        {
+          "sentence": "The team discussed the interface between the frontend and backend systems to ensure seamless data flow.",
+          "explanation": "This sentence describes the boundary between two systems, which aligns with the Named Entity definition. It should be labeled as the Named Entity, making it a positive occurrence."
+        },
+        {
+          "sentence": "The interface of the new smartphone model was designed to be user-friendly and intuitive for customers.",
+          "explanation": "This sentence refers to the design aspect of the interface of a smartphone, which is a positive occurrence of the Named Entity. It should be labeled accordingly."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "money",
+    "prompt_length": 254,
+    "output_length": 165,
+    "annotation_guidelines": {
+      "Definition": "'money' denotes monetary values and units, including currencies, amounts, and related terms and symbols used to represent wealth or financial transactions.",
+      "Guidelines": "Do not label general economic terms such as 'investment', 'net worth', or 'financial transactions' unless specific monetary values are quantified. Be cautious with ambiguous terms like 'US Paris Hilton' (person with a monetary value name) or 'Net Worth Co.' (a company name)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The company focuses on investment strategies rather than just money.",
+          "explanation": "The sentence contains the term 'investment' which is a general economic term and should not be labeled as 'money'."
+        },
+        {
+          "sentence": "Her net worth increased significantly after the successful financial transactions.",
+          "explanation": "The sentence mentions 'net worth' and 'financial transactions', which are general economic terms and should not be labeled as 'money'."
+        },
+        {
+          "sentence": "The US Paris Hilton brand is known for luxury and style.",
+          "explanation": "The sentence includes 'US Paris Hilton' which is an ambiguous term and should not be labeled as 'money'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "communication",
+    "prompt_length": 261,
+    "output_length": 181,
+    "annotation_guidelines": {
+      "Definition": "'communication' represents the transmission of information or messages through various mediums, such as verbal, written, or electronic means.",
+      "Guidelines": "Do not label general terms related to information processing (e.g., 'analyzed', 'categorized'). Distinguish between communication-related terms and generic references (e.g., 'email' as a form of communication vs. 'page' as a general object). Be mindful of metaphorical or idiomatic language (e.g., 'spreading"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The analyzed data was categorized based on the communication between the departments, but the results were inconclusive.",
+          "explanation": "This sentence includes 'analyzed' and 'categorized', which are terms related to information processing that should not be labeled as 'communication'."
+        },
+        {
+          "sentence": "The page was filled with text, but the communication was lost in translation.",
+          "explanation": "This sentence uses 'page' as a general object, which should not be labeled as 'communication'."
+        },
+        {
+          "sentence": "The rumor was spreading like wildfire, causing a breakdown in communication among the team members.",
+          "explanation": "This sentence contains the metaphorical use of 'spreading', which should not be labeled as 'communication'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "group of people",
+    "prompt_length": 257,
+    "output_length": 182,
+    "annotation_guidelines": {
+      "Definition": "'group of people' refers to a collection of individuals with a shared characteristic or association.",
+      "Guidelines": "Avoid labeling singular individuals. Exercise caution with terms that could be interpreted as individuals rather than a cohesive group, such as 'victims' (could be interpreted as individual people) or 'crowd' (could be either a group of people or a physical concept). Be clear that the term represents a collective unit rather than individual entities."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The victims of the accident were left stranded and helpless, waiting for assistance.",
+          "explanation": "This sentence contains the term 'victims,' which is discouraged as it could be interpreted as individual people rather than a cohesive group."
+        },
+        {
+          "sentence": "The crowd gathered outside the courthouse, each person eager to catch a glimpse of the celebrity.",
+          "explanation": "This sentence includes the term 'crowd,' which could be seen as a group of people but also as a physical concept, not a cohesive group."
+        },
+        {
+          "sentence": "The team of employees faced criticism for their poor performance, leading to individual blame.",
+          "explanation": "This sentence focuses on individual employees within a team, rather than treating them as a collective unit."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "keyword",
+    "prompt_length": 243,
+    "output_length": 176,
+    "annotation_guidelines": {
+      "Definition": "'keyword' represents significant words or terms that hold specific importance in a particular context, such as programming, documentation, or domain-specific jargon.",
+      "Guidelines": "Do not label common words and generic terms. Exercise caution with ambiguous terms like 'file' (can refer to a storage container or a software object) and 'range' (can signify a programming construct or a geographical span)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I need to find a file to store my documents.",
+          "explanation": "The term 'file' is used in the context of a storage container, which is a negative occurrence according to the guidelines."
+        },
+        {
+          "sentence": "The team discussed the range of topics to cover in the upcoming meeting.",
+          "explanation": "The term 'range' is used in the context of a geographical span, which is a negative occurrence according to the guidelines."
+        },
+        {
+          "sentence": "She highlighted the importance of using a keyword to improve search engine optimization.",
+          "explanation": "The term 'keyword' is used in the context of search engine optimization, which is a positive occurrence and should not be labeled according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "adjective",
+    "prompt_length": 231,
+    "output_length": 193,
+    "annotation_guidelines": {
+      "Definition": "'adjective' refers to words that modify or describe nouns, such as qualities, states, or characteristics.",
+      "Guidelines": "Avoid labeling nouns, verbs, or adverbs as adjectives. Exercise caution with participles that can function as both verbs and adjectives, such as 'second' in 'second single'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The second single was released yesterday.",
+          "explanation": "This sentence contains the word 'second' which can function as both a verb and an adjective. However, according to the guidelines, we should avoid labeling participles that can function as adjectives as adjectives."
+        },
+        {
+          "sentence": "She quickly ran to the store to buy some fresh bread.",
+          "explanation": "In this sentence, 'fresh' is used to describe the bread, which is a noun. However, we should avoid labeling words that describe nouns as adjectives."
+        },
+        {
+          "sentence": "He softly whispered the secret to his friend.",
+          "explanation": "Here, 'softly' is an adverb modifying the verb 'whispered'. According to the guidelines, we should avoid labeling adverbs as adjectives."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "game",
+    "prompt_length": 261,
+    "output_length": 196,
+    "annotation_guidelines": {
+      "Definition": "'game' denotes references to specific forms of entertainment or recreational activities, such as video games, board games, sports, and playground activities.",
+      "Guidelines": "Do not label general activities that are not specific games, distinguish between the title of a game and the general concept of a game (e.g., 'hide and seek' as a specific game versus the general concept of playing hide and seek). Be cautious with ambiguous terms like 'Mario' (a game character and a common"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "During the weekend, we enjoyed playing outside and having fun without any specific game in mind.",
+          "explanation": "This sentence does not refer to any specific game or recreational activity, avoiding the positive occurrence of the named entity 'game'."
+        },
+        {
+          "sentence": "The children engaged in various activities like running, jumping, and exploring, rather than focusing on a particular game.",
+          "explanation": "This sentence emphasizes general activities and avoids mentioning any specific game, aligning with the negative occurrence of the named entity 'game'."
+        },
+        {
+          "sentence": "She spent the afternoon reading books and painting, choosing not to participate in any game or structured activity.",
+          "explanation": "By highlighting reading and painting as leisure activities instead of games, this sentence steers clear of positive occurrences of the named entity 'game'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "court",
+    "prompt_length": 261,
+    "output_length": 194,
+    "annotation_guidelines": {
+      "Definition": "'court' refers to judicial entities, such as specific courts, divisions, or judicial systems involved in legal proceedings or delivering verdicts.",
+      "Guidelines": "Avoid labeling general legal terms like 'appeal' or 'jurisdiction'. Exercise caution with entities that may have multiple meanings, such as 'Supreme Court' (can refer to different country's highest courts) or 'District Court' (may exist in various jurisdictions). Additionally, be mindful of using context to differentiate between a"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The appeal process can be lengthy and complex, often involving multiple levels of review before a final decision is reached.",
+          "explanation": "This sentence contains the term 'appeal' which is a general legal term to be avoided according to the guidelines."
+        },
+        {
+          "sentence": "Jurisdictional disputes can arise when different courts claim authority over a particular case, leading to legal complexities.",
+          "explanation": "This sentence includes the term 'jurisdiction' which is a general legal term not to be labeled as the named entity."
+        },
+        {
+          "sentence": "The Supreme Court ruling set a precedent that significantly impacted the legal landscape of the country.",
+          "explanation": "This sentence mentions 'Supreme Court' which can refer to different country's highest courts and should be avoided as a positive occurrence of the named entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "amino acid",
+    "prompt_length": 263,
+    "output_length": 206,
+    "annotation_guidelines": {
+      "Definition": "'amino acid' refers to the building blocks of proteins, consisting of organic compounds containing an amino group and a carboxylic acid group.",
+      "Guidelines": "Avoid labeling generic organic compounds that are not specifically associated with protein synthesis. Exercise caution when dealing with ambiguous terms such as 'lysine' (which may refer to a person's name) and 'serine' (which may refer to a title or position). When in doubt, consider the context and consult domain"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The organic compound found in the solution was not an amino acid, but rather a simple hydrocarbon.",
+          "explanation": "This sentence avoids labeling the organic compound as an 'amino acid' as per the guidelines, instead referring to it as a 'simple hydrocarbon'."
+        },
+        {
+          "sentence": "The scientist studied various organic compounds, excluding amino acids, to determine their chemical properties.",
+          "explanation": "Here, the sentence explicitly mentions excluding 'amino acids' from the study, adhering to the guideline of not labeling generic organic compounds as such."
+        },
+        {
+          "sentence": "The research focused on the synthesis of non-amino acid molecules for potential pharmaceutical applications.",
+          "explanation": "By specifying 'non-amino acid molecules', this sentence avoids attributing the term 'amino acid' to the compounds being synthesized, aligning with the guideline provided."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "transportation",
+    "prompt_length": 250,
+    "output_length": 177,
+    "annotation_guidelines": {
+      "Definition": "'transportation' refers to vehicles, modes of travel, or infrastructure used for moving people or goods from one place to another.",
+      "Guidelines": "Do not label generic terms like 'travel' or 'movement'. Exercise caution with ambiguous terms like 'ship', which could refer to a mode of transportation or a company name. Distinguish between 'car' as a vehicle and 'Car' as a person's name."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "During the journey, we experienced a lot of travel delays due to unforeseen circumstances.",
+          "explanation": "The term 'travel' is a generic term and should not be labeled as 'transportation'."
+        },
+        {
+          "sentence": "The ship was named after a famous explorer who discovered new lands.",
+          "explanation": "The term 'ship' in this context refers to a name or a company, not a mode of transportation."
+        },
+        {
+          "sentence": "Car, the person, was known for his exceptional skills in art and music.",
+          "explanation": "In this sentence, 'Car' is used as a person's name, not as a vehicle, so it should not be labeled as 'transportation'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical facility",
+    "prompt_length": 236,
+    "output_length": 183,
+    "annotation_guidelines": {
+      "Definition": "'medical facility' refers to physical locations where medical treatment or services are provided, such as hospitals, clinics, labs, and medical centers.",
+      "Guidelines": "Avoid labeling general references to medical practices or procedures, such as 'angiogram and stenting'. Also, exercise caution when identifying research designations like 'multicenter' as medical facilities."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The patient underwent an angiogram and stenting procedure at the medical facility.",
+          "explanation": "This sentence contains a negative occurrence by mentioning 'angiogram and stenting procedure', which are medical practices, not the actual medical facility."
+        },
+        {
+          "sentence": "The study was conducted at a multicenter medical facility to gather data.",
+          "explanation": "This sentence includes a negative occurrence by referring to 'multicenter', which is a research designation, not a specific medical facility."
+        },
+        {
+          "sentence": "The new drug was tested in a lab, which is a type of medical facility.",
+          "explanation": "This sentence contains a negative occurrence by mentioning 'lab', which is a type of medical facility but not the specific entity being referred to."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "term",
+    "prompt_length": 261,
+    "output_length": 201,
+    "annotation_guidelines": {
+      "Definition": "'term' in the context of NER refers to specific technical, scientific, or domain-specific terminology used within a particular industry, field, or domain.",
+      "Guidelines": "Do not label common words or phrases that are not specific to a particular domain. Be wary of potential ambiguities with terms that might have different meanings in various contexts, such as 'key' (could refer to a cryptographic key, a keyboard key, or a critical element). Prioritize identifying terms unique to"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The key to success is hard work and dedication.",
+          "explanation": "This sentence contains the word 'key' which is a common word and not a specific technical or domain-specific term. It should not be labeled as the Named Entity 'term'."
+        },
+        {
+          "sentence": "The team discussed the importance of collaboration in achieving their goals.",
+          "explanation": "The word 'team' is a common term and not a specific technical or domain-specific term. It should not be labeled as the Named Entity 'term'."
+        },
+        {
+          "sentence": "She unlocked the door with the key she found in her bag.",
+          "explanation": "Although 'key' is used in a physical sense here, it is still a common word and not a specific technical or domain-specific term. It should not be labeled as the Named Entity 'term'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "signal",
+    "prompt_length": 247,
+    "output_length": 247,
+    "annotation_guidelines": {
+      "Definition": "'signal' refers to a detectable physical quantity conveying information, such as electromagnetic waves, electrical impulses, or other forms of transmission.",
+      "Guidelines": "Exercise caution with generic terms like 'signal' that have multiple interpretations. Differentiate from non-physical 'signals' like 'warning signs' and metaphorical uses of 'signals'. Be mindful of context to distinguish 'signal' from general concepts or actions."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The warning signs were clear, but he chose to ignore the signal and proceed with his reckless behavior.",
+          "explanation": "This sentence contains a negative occurrence of 'signal' by referring to it as a 'warning sign', which is explicitly mentioned in the guidelines as a non-physical 'signal' that should not be labeled."
+        },
+        {
+          "sentence": "She thought his actions were a signal of his true intentions, but it turned out to be a misinterpretation.",
+          "explanation": "In this sentence, 'signal' is used metaphorically to refer to actions indicating something, which is advised against in the guidelines as a metaphorical use of 'signal' that should not be labeled."
+        },
+        {
+          "sentence": "The noise from the construction site was so loud that it drowned out any signal of approaching danger.",
+          "explanation": "Here, 'signal' is used in a general sense to convey a warning or indication, which should be distinguished from the specific physical quantity mentioned in the definition. This is a negative occurrence as it does not align with the provided guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "effect",
+    "prompt_length": 236,
+    "output_length": 178,
+    "annotation_guidelines": {
+      "Definition": "'effect' refers to tangible or intangible outcomes or impacts resulting from a cause or action, often related to changes or influences.",
+      "Guidelines": "Do not label general concepts or events without specific effects. Exercise caution with terms that may be ambiguous, such as 'radial flow' (which could refer to a physical flow or a metaphorical effect)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The radial flow of misinformation led to confusion among the audience.",
+          "explanation": "This sentence contains the term 'radial flow' which is ambiguous and could refer to a physical flow, not an 'effect' as per the guidelines."
+        },
+        {
+          "sentence": "The unexpected turn of events caused chaos and panic in the community.",
+          "explanation": "This sentence describes events without specific effects, which should not be labeled as 'effect' according to the guidelines."
+        },
+        {
+          "sentence": "The chain reaction of failures resulted in a complete shutdown of the system.",
+          "explanation": "This sentence illustrates a series of events without focusing on the tangible or intangible outcomes or impacts, which should not be labeled as 'effect'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "legal term",
+    "prompt_length": 245,
+    "output_length": 197,
+    "annotation_guidelines": {
+      "Definition": "'legal term' refers to specific terminology used within the legal system, including laws, court procedures, and legal concepts.",
+      "Guidelines": "Avoid labeling general legal concepts unless they refer to specific legal terms. Exercise caution with terms that can have multiple meanings, such as 'summary judgment' (legal term vs. general statement) or 'California divorce' (specific legal procedure vs. general topic)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The lawyer explained the legal system in simple terms, making it easy for the client to understand.",
+          "explanation": "This sentence uses the term 'legal system' in a general sense, avoiding the specific legal terminology that would be labeled as 'legal term'."
+        },
+        {
+          "sentence": "The judge's decision was based on fairness and justice, rather than strict legalities.",
+          "explanation": "This sentence focuses on concepts like fairness and justice, avoiding specific legal terms that would be labeled as 'legal term'."
+        },
+        {
+          "sentence": "The discussion revolved around the implications of the law on society, rather than delving into technical legal jargon.",
+          "explanation": "This sentence discusses the broader implications of the law on society, steering clear of specific legal terminology that would be labeled as 'legal term'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "email",
+    "prompt_length": 242,
+    "output_length": 185,
+    "annotation_guidelines": {
+      "Definition": "'email' refers to electronic mail addresses that follow the standard format of username@domain.",
+      "Guidelines": "Do not include phone numbers, physical mailing addresses, or web URLs. Avoid confusion with similar formats, such as usernames on social media platforms or website domains without '@' and a domain extension. Pay attention to context, as emails can also be used as usernames in certain scenarios."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I sent the details to johnsmith123 on the website without the email domain.",
+          "explanation": "The sentence mentions a username on a website without including the email domain, which is a negative occurrence of the 'email' entity."
+        },
+        {
+          "sentence": "She provided her contact information as user123 on the social media platform.",
+          "explanation": "The sentence refers to a username on a social media platform without including an email address, which is a negative occurrence of the 'email' entity."
+        },
+        {
+          "sentence": "The package was shipped to 123 Main Street, without an email address for confirmation.",
+          "explanation": "The sentence includes a physical mailing address but deliberately excludes an email address, which is a negative occurrence of the 'email' entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "actor",
+    "prompt_length": 237,
+    "output_length": 189,
+    "annotation_guidelines": {
+      "Definition": "'actor' refers to individuals who perform in theatrical, film, or television productions.",
+      "Guidelines": "Do not label characters or roles played by actors, rather focus on the actual person. Exercise caution with ambiguous references like 'John Carpenter' (actor, but also a director) and 'Michael Jordan' (athlete, but also an actor in some productions)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "In the movie, the main character, played by a talented individual, stole the show with their exceptional performance.",
+          "explanation": "This sentence focuses on the character played by an actor, rather than the actual actor themselves, which goes against the guidelines."
+        },
+        {
+          "sentence": "The role of the detective, portrayed by a skilled performer, added depth to the storyline.",
+          "explanation": "This sentence highlights the role played by an actor, rather than the actor themselves, which is not in line with the guidelines."
+        },
+        {
+          "sentence": "The iconic character, brought to life by a renowned artist, became a fan favorite among viewers.",
+          "explanation": "This sentence emphasizes the character brought to life by an actor, rather than the actor themselves, which contradicts the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "identifier",
+    "prompt_length": 253,
+    "output_length": 185,
+    "annotation_guidelines": {
+      "Definition": "'identifier' refers to unique labels or codes used to distinguish and identify specific objects, individuals, or processes.",
+      "Guidelines": "Do not misclassify generic terms or common nouns as 'identifier'. Exercise caution with ambiguous terms like 'address' or 'ID', which can be part of other entity types. Avoid labeling general categories such as 'product name' or 'item number' as 'identifier' unless they serve as uniquely identifying labels."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The address of the company is 123 Main Street.",
+          "explanation": "The term 'address' is mentioned, which is an ambiguous term that can be part of other entity types, but it should not be labeled as 'identifier'."
+        },
+        {
+          "sentence": "The product name of the new gadget is 'TechMaster 2000'.",
+          "explanation": "The term 'product name' is a general category that should not be labeled as 'identifier' unless it serves as a uniquely identifying label."
+        },
+        {
+          "sentence": "The item number for this order is #987654321.",
+          "explanation": "The term 'item number' is a general category that should not be labeled as 'identifier' unless it serves as a uniquely identifying label."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "degree",
+    "prompt_length": 261,
+    "output_length": 191,
+    "annotation_guidelines": {
+      "Definition": "'degree' refers to academic qualifications and credentials obtained upon completion of a course of study at a university or college, such as Bachelor of Arts, Master of Science, or Doctorate.",
+      "Guidelines": "Do not label general education terms, such as 'knowledge' or 'learning'. Avoid tagging non-academic usage of terms, like 'high degree of confidence' (used in a non-academic or metaphorical sense). Be attentive to abbreviations which might reference other entities,"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "She had a high degree of confidence in her abilities, which helped her succeed in her career.",
+          "explanation": "This sentence contains the phrase 'high degree of confidence' which is a non-academic usage and should not be labeled as the Named Entity 'degree'."
+        },
+        {
+          "sentence": "The team worked tirelessly to achieve a degree of perfection in their project presentation.",
+          "explanation": "Here, 'degree of perfection' is used in a non-academic sense and should not be tagged as the Named Entity 'degree'."
+        },
+        {
+          "sentence": "His level of expertise in the field was of a degree that surpassed all expectations.",
+          "explanation": "The phrase 'level of expertise' is a general education term and should not be labeled as the Named Entity 'degree'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "culture",
+    "prompt_length": 233,
+    "output_length": 241,
+    "annotation_guidelines": {
+      "Definition": "'culture' denotes customs, traditions, beliefs, and practices characteristic of a specific group or society.",
+      "Guidelines": "Do not label general adjectives like 'Asian' unless they specifically refer to cultural aspects. Be mindful of overlaps with other entities, such as 'Aboriginal' potentially referring to both a cultural group and a geographical location."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The Asian community is known for its diverse culture, but not all Asians adhere to traditional customs.",
+          "explanation": "The sentence mentions 'Asian culture' in a positive light, which goes against the guideline of not labeling general adjectives like 'Asian' unless specifically referring to cultural aspects."
+        },
+        {
+          "sentence": "Aboriginal people have a rich culture that is deeply rooted in their history, but not all aspects of their lives are culturally significant.",
+          "explanation": "The sentence highlights 'Aboriginal culture' in a positive manner, which contradicts the guideline of being mindful of overlaps with other entities, such as 'Aboriginal' potentially referring to both a cultural group and a geographical location."
+        },
+        {
+          "sentence": "The festival showcased various cultural performances, including those from the Hispanic community, but not all Hispanic traditions were represented.",
+          "explanation": "The sentence mentions 'Hispanic culture' positively by referring to cultural performances, which goes against the guideline of not labeling general adjectives like 'Hispanic' unless specifically referring to cultural aspects."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "platform",
+    "prompt_length": 257,
+    "output_length": 179,
+    "annotation_guidelines": {
+      "Definition": "'platform' refers to technological frameworks, systems, or environments upon which software, applications, or services are developed, deployed, or run.",
+      "Guidelines": "Do not label individual products or companies unless they represent a platform, such as PC (e.g., Windows PC), or Cloud Foundry (platform-as-a-service). Exercise caution with terms that may refer to multiple concepts, such as 'PC' (could refer to personal computer or a gaming platform)"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The PC was not just a personal computer, but also a gaming platform.",
+          "explanation": "This sentence contains a negative occurrence of 'platform' by mentioning 'PC' as a personal computer instead of a platform."
+        },
+        {
+          "sentence": "The company announced a new software that runs on a cloud platform, not Cloud Foundry.",
+          "explanation": "This sentence contains a negative occurrence of 'platform' by mentioning 'Cloud Foundry' as a specific platform instead of labeling it as a platform."
+        },
+        {
+          "sentence": "The team developed an application for a system that is not considered a platform.",
+          "explanation": "This sentence contains a negative occurrence of 'platform' by stating that the system is not considered a platform."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "format",
+    "prompt_length": 261,
+    "output_length": 158,
+    "annotation_guidelines": {
+      "Definition": "'format' refers to the specific structure or arrangement of content, such as file types, page layouts, or other organized configurations.",
+      "Guidelines": "Avoid labeling general concepts like 'language' or 'style'. Exercise caution with common terms that have multiple meanings, such as 'PDF' (file format vs. acronym) or 'column' (part of a structure vs. journalistic format). Be mindful of context to differentiate 'format' from related entities like 'style' or '"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The article discussed the language and style used in the PDF format.",
+          "explanation": "The sentence includes 'PDF format' which is a positive occurrence of the named entity 'format'."
+        },
+        {
+          "sentence": "She adjusted the column width and format of the document.",
+          "explanation": "The sentence mentions 'format of the document' which is a positive occurrence of the named entity 'format'."
+        },
+        {
+          "sentence": "The team analyzed the style and format of the presentation slides.",
+          "explanation": "The sentence contains 'format of the presentation slides' which is a positive occurrence of the named entity 'format'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "shape",
+    "prompt_length": 251,
+    "output_length": 187,
+    "annotation_guidelines": {
+      "Definition": "'shape' encompasses physical forms or configurations of objects, such as geometric shapes, body proportions, or structural designs.",
+      "Guidelines": "Avoid labeling ambiguous references, such as 'round of applause' (not a literal shape) or 'apple' (can refer to the fruit or the company's logo). Be mindful of metaphorical usage, like 'heart-shaped' (which could refer to the literal shape or a symbolic representation)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The round of applause echoed through the auditorium, filling the room with energy.",
+          "explanation": "This sentence contains the phrase 'round of applause,' which is an ambiguous reference and should not be labeled as the named entity 'shape.'"
+        },
+        {
+          "sentence": "The apple fell from the tree, ripe and ready to be picked.",
+          "explanation": "The word 'apple' in this context refers to the fruit and not the geometric shape, so it should not be labeled as the named entity 'shape.'"
+        },
+        {
+          "sentence": "Her heart-shaped locket held a precious photo of her late grandmother.",
+          "explanation": "The term 'heart-shaped' in this sentence is used metaphorically and should not be labeled as the named entity 'shape.'"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "algorithm",
+    "prompt_length": 261,
+    "output_length": 256,
+    "annotation_guidelines": {
+      "Definition": "'algorithm' refers to a step-by-step procedure or set of rules used to solve a problem or perform a task, often in the context of mathematics, computer science, or computational tasks.",
+      "Guidelines": "Avoid labeling generic terms like 'method' or 'procedure' without clear context of algorithmic processes. Exercise caution with terms that may represent general concepts rather than specific algorithms, such as 'brute force method'. Pay attention to context to distinguish between generic processes and specific algorithm"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The researcher presented a new method for data analysis, which was not an algorithm but rather a general approach to problem-solving.",
+          "explanation": "This sentence uses the term 'method' instead of 'algorithm' to avoid a positive occurrence of the Named Entity. It also includes 'general approach to problem-solving' to steer away from specific algorithmic processes."
+        },
+        {
+          "sentence": "The team discussed a brute force technique to tackle the issue, which was not a specific algorithm but a broad strategy for exploration.",
+          "explanation": "Here, 'brute force technique' is used instead of 'algorithm' to avoid a positive occurrence. The mention of 'broad strategy for exploration' helps to avoid specific algorithmic processes."
+        },
+        {
+          "sentence": "She outlined a step-by-step procedure for optimization, emphasizing it was not an algorithm but a general set of rules for efficiency.",
+          "explanation": "In this sentence, 'step-by-step procedure' is used instead of 'algorithm' to steer clear of a positive occurrence. The reference to 'general set of rules for efficiency' helps to avoid specific algorithmic processes."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "image",
+    "prompt_length": 254,
+    "output_length": 214,
+    "annotation_guidelines": {
+      "Definition": "'image' refers to visual data or graphics, including photographs, illustrations, and digital representations of visual content.",
+      "Guidelines": "Do not label vague visual concepts or generic terms, such as 'art' or 'design'. Exercise caution with terms like 'patent', which may refer to documents rather than visual content. Be aware of qualifiers such as 'compressed', as they may refer to a specific type of image rather than the image itself."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The artist's work was a masterpiece of image and design, capturing the essence of creativity and beauty.",
+          "explanation": "This sentence contains the negative occurrence of 'image' by using it in a vague context with 'design', which is explicitly mentioned in the guidelines not to label."
+        },
+        {
+          "sentence": "The patent application included a detailed image of the new technology, showcasing its innovative features.",
+          "explanation": "This sentence contains the negative occurrence of 'image' by referring to a document (patent application) rather than visual content, which is cautioned against in the guidelines."
+        },
+        {
+          "sentence": "The compressed file contained an image of the logo, ready to be uploaded to the website.",
+          "explanation": "This sentence contains the negative occurrence of 'image' by using the qualifier 'compressed', which refers to a specific type of image rather than the image itself, as mentioned in the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "cell component",
+    "prompt_length": 234,
+    "output_length": 201,
+    "annotation_guidelines": {
+      "Definition": "'cell component' refers to structures within a cell, such as organelles, membranes, and other cellular components.",
+      "Guidelines": "Avoid labeling generic terms like 'cell' or 'membrane' unless they refer to specific cellular structures. Exercise caution with ambiguous terms such as 'junction' which may have multiple meanings in different contexts."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The cell component of the team was not functioning well, causing the project to be delayed.",
+          "explanation": "In this sentence, 'cell component' is used in a metaphorical sense to refer to a team member or element, not a structure within a cell."
+        },
+        {
+          "sentence": "The company's financial health was a concern, with the cell component of their revenue stream showing signs of weakness.",
+          "explanation": "Here, 'cell component' is used to describe a part or aspect of the revenue stream, not a cellular structure."
+        },
+        {
+          "sentence": "The political party's leadership was divided, with the cell component of the party's ideology causing internal conflicts.",
+          "explanation": "In this sentence, 'cell component' is used to indicate a fundamental element or aspect of the party's ideology, not a cellular structure."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "planet",
+    "prompt_length": 234,
+    "output_length": 188,
+    "annotation_guidelines": {
+      "Definition": "'planet' refers to celestial bodies such as Earth, Mars, Jupiter, and others that orbit the sun or another star.",
+      "Guidelines": "Avoid labeling generic terms like 'world' or 'space'. Exercise caution with ambiguous references, such as 'Mars' being a company's name or 'Jupiter' being a deity's name."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The company's latest project aims to explore Mars and beyond.",
+          "explanation": "This sentence contains the negative occurrence of 'Mars' as a company's name, which should not be labeled as the named entity 'planet'."
+        },
+        {
+          "sentence": "Jupiter, the god of thunder, was a prominent figure in Roman mythology.",
+          "explanation": "This sentence contains the negative occurrence of 'Jupiter' as a deity's name, which should not be labeled as the named entity 'planet'."
+        },
+        {
+          "sentence": "The astronauts gazed at the vast expanse of space, contemplating the mysteries of the universe.",
+          "explanation": "This sentence contains the generic term 'space', which should be avoided as a label for the named entity 'planet'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "physical object",
+    "prompt_length": 237,
+    "output_length": 246,
+    "annotation_guidelines": {
+      "Definition": "'physical object' refers to tangible, material items that can be perceived through the senses.",
+      "Guidelines": "Be mindful of context, as 'object' can have different meanings in different domains, such as in programming or philosophy. Exercise caution with overlapping entities like 'appliance', which could also be considered as 'physical object' or 'organization'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The abstract concept of 'object' in programming is difficult to grasp for beginners.",
+          "explanation": "This sentence uses the term 'object' in a programming context, which is explicitly mentioned in the guidelines as a domain where 'object' can have a different meaning and should not be labeled as 'physical object'."
+        },
+        {
+          "sentence": "The organization's mission statement focused on the intangible aspects rather than physical objects.",
+          "explanation": "This sentence refers to an 'organization', which is mentioned in the guidelines as an overlapping entity that could be considered as 'physical object' or 'organization'. Here, the focus is on intangible aspects, avoiding the labeling of 'physical object'."
+        },
+        {
+          "sentence": "The philosophical debate centered around the essence of being rather than physical objects.",
+          "explanation": "This sentence uses 'physical objects' in a philosophical context, where 'object' can have a different meaning and should not be labeled as 'physical object'. It emphasizes the essence of being, steering away from the positive occurrence of 'physical object'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "music genre",
+    "prompt_length": 250,
+    "output_length": 160,
+    "annotation_guidelines": {
+      "Definition": "'music genre' refers to specific categories or styles of music, such as jazz, rock, pop, etc.",
+      "Guidelines": "Avoid labeling individual song titles, album names, or generic musical terms like 'music' or 'song'. Take care with ambiguous terms like 'blues' (can refer to both a music genre and a feeling), and 'pop' (can refer to music genre and popular culture)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I love listening to that famous jazz song from the 80s.",
+          "explanation": "This sentence includes an individual song title ('famous jazz song') which should be avoided according to the guidelines."
+        },
+        {
+          "sentence": "The album cover art for their latest rock album is stunning.",
+          "explanation": "This sentence mentions an album name ('latest rock album') which should not be labeled as a music genre."
+        },
+        {
+          "sentence": "She hummed a catchy pop tune while walking down the street.",
+          "explanation": "The sentence contains a generic musical term ('pop tune') which is advised against labeling as a music genre."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "restaurant",
+    "prompt_length": 246,
+    "output_length": 194,
+    "annotation_guidelines": {
+      "Definition": "'restaurant' refers to establishments where meals are served to customers, encompassing eateries, diners, and cafes.",
+      "Guidelines": "Do not label generic food items or ingredients as 'restaurant'. Exercise caution when identifying names that could be people or companies, such as 'Fort Louise' or 'Bangkok Cafe'. Be mindful of potential ambiguities with locations or events that share names with dining establishments."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I had a delicious meal at Fort Louise, a popular dining spot in the city.",
+          "explanation": "This sentence contains the name 'Fort Louise', which should not be labeled as a 'restaurant' according to the guidelines."
+        },
+        {
+          "sentence": "The Bangkok Cafe event was a huge success, attracting food enthusiasts from all over.",
+          "explanation": "This sentence mentions 'Bangkok Cafe' as an event, which should not be labeled as a 'restaurant' as per the guidelines."
+        },
+        {
+          "sentence": "The new recipe includes fresh ingredients like basil, tomatoes, and garlic, perfect for a cozy diner experience.",
+          "explanation": "Although the sentence mentions a 'diner experience', it refers to the ambiance or style rather than a specific 'restaurant', which should not be labeled as such."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "surname",
+    "prompt_length": 238,
+    "output_length": 164,
+    "annotation_guidelines": {
+      "Definition": "'surname' refers to the family name or last name of a person, serving as a hereditary identifier within a family.",
+      "Guidelines": "Do not label given names or non-surnames as 'surname'. Exercise caution with words that could be both surnames and common nouns (e.g., 'Rose' could refer to a flower or a surname)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The rose garden was filled with beautiful flowers, each with a unique scent.",
+          "explanation": "This sentence contains the word 'Rose' which is a common noun referring to a flower, not a surname."
+        },
+        {
+          "sentence": "She wore a lovely Lily dress to the party, standing out among the crowd.",
+          "explanation": "This sentence contains the word 'Lily' which is a common noun referring to a flower, not a surname."
+        },
+        {
+          "sentence": "The River flowed gently through the valley, providing a serene atmosphere.",
+          "explanation": "This sentence contains the word 'River' which is a common noun, not a surname."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "direction",
+    "prompt_length": 261,
+    "output_length": 186,
+    "annotation_guidelines": {
+      "Definition": "'direction' refers to indications or references related to spatial orientation, including left, right, east, west, etc., and can also denote one-way references as in travel routes or paths.",
+      "Guidelines": "Avoid labeling general references to actions or gestures (e.g., 'hopping through the string'). Be cautious when labeling entities like 'West' which could refer to a location or a direction. Take into consideration the context and determine if the entity relates specifically to a spatial orientation"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "She hopped through the string, not caring about the direction she was going in.",
+          "explanation": "This sentence contains a negative occurrence of 'direction' as it refers to a general action of hopping through the string, not a spatial orientation."
+        },
+        {
+          "sentence": "The discussion veered off in a direction that was unexpected and unrelated to the main topic.",
+          "explanation": "Here, 'direction' is used metaphorically to indicate the course of a conversation, not a spatial orientation."
+        },
+        {
+          "sentence": "The wind blew fiercely from the west, signaling an approaching storm.",
+          "explanation": "Although 'west' could refer to a direction, in this context, it is describing the location from which the wind is blowing, not a spatial orientation."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "css property",
+    "prompt_length": 262,
+    "output_length": 172,
+    "annotation_guidelines": {
+      "Definition": "'css property' refers to specific attributes that define the visual presentation of elements in a web page, such as 'position', 'flex-wrap', and 'transform'.",
+      "Guidelines": "Ensure that only valid CSS properties are labeled. Avoid labeling generic terms that could refer to non-CSS concepts (e.g., 'flex' could refer to flexibility rather than the 'flex' CSS property). Be cautious with similar terms, such as 'transition' (which could refer to a"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The team needed to flex their strategy to adapt to the changing market conditions.",
+          "explanation": "This sentence contains the term 'flex' used in the context of flexibility, not as the 'flex' CSS property."
+        },
+        {
+          "sentence": "The company underwent a smooth transition to the new management structure.",
+          "explanation": "Here, 'transition' is used in the context of a change in management, not as the 'transition' CSS property."
+        },
+        {
+          "sentence": "The project required a shift in approach to meet the client's expectations.",
+          "explanation": "In this sentence, 'shift' is used to indicate a change in approach, not as the 'shift' CSS property."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "machine",
+    "prompt_length": 228,
+    "output_length": 208,
+    "annotation_guidelines": {
+      "Definition": "'machine' refers to mechanical devices or equipment that perform specific tasks or functions.",
+      "Guidelines": "Do not label human-operated tools or instruments (e.g., screwdriver, hammer). Exercise caution with terms that have multiple meanings, such as 'crane' (can refer to a bird or a machine)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The carpenter used a machine to carve intricate designs on the wooden furniture.",
+          "explanation": "This sentence contains a positive occurrence of 'machine' as a mechanical device used by a human, which should be labeled as the Named Entity. It does not meet the criteria for a negative occurrence."
+        },
+        {
+          "sentence": "The birdwatcher spotted a crane gracefully flying across the sky.",
+          "explanation": "This sentence contains a negative occurrence of 'crane' as a bird, which should not be labeled as the Named Entity. It aligns with the guidelines provided for avoiding multiple meanings."
+        },
+        {
+          "sentence": "The technician skillfully wielded a tool to repair the broken machine.",
+          "explanation": "This sentence contains a human-operated tool, which is a negative occurrence of 'machine' according to the guidelines. It should not be labeled as the Named Entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "therapy",
+    "prompt_length": 257,
+    "output_length": 173,
+    "annotation_guidelines": {
+      "Definition": "'therapy' refers to specific treatment modalities or approaches used to address physical or psychological conditions and promote healing or well-being.",
+      "Guidelines": "Avoid labeling general concepts or broad topics, such as 'mental health' or 'self-care', as 'therapy'. Exercise caution with ambiguous terms like 'play therapy' (could refer to children's activity or a specific therapeutic approach) and 'speech therapy' (can be both a treatment and a field of study)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The workshop focused on mental health and self-care, not therapy.",
+          "explanation": "The sentence avoids labeling 'mental health' and 'self-care' as 'therapy', as per the guidelines."
+        },
+        {
+          "sentence": "During the session, the children engaged in play therapy activities, not therapy.",
+          "explanation": "The sentence uses 'play therapy' as a children's activity, not a specific treatment approach, to avoid labeling it as 'therapy'."
+        },
+        {
+          "sentence": "She studied speech therapy as a field of study, not therapy itself.",
+          "explanation": "The sentence distinguishes 'speech therapy' as a field of study rather than a treatment modality, following the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "code",
+    "prompt_length": 254,
+    "output_length": 180,
+    "annotation_guidelines": {
+      "Definition": "'code' refers to a sequence of characters or symbols used in programming or as a unique identifier in a specific context.",
+      "Guidelines": "Exercise caution with ambiguous references, such as 'P0135' (which could be a fault code) and 'javascript' (which can refer to the programming language or as part of a code snippet). Also, do not label generic terms like 'the' or 'and' as 'code'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The and symbol is commonly used in programming languages.",
+          "explanation": "This sentence contains the word 'code' as part of the guideline to not label generic terms like 'the' or 'and' as 'code'."
+        },
+        {
+          "sentence": "P0135 is a fault code that indicates an issue with the vehicle's engine.",
+          "explanation": "This sentence contains the alphanumeric sequence 'P0135' which is an ambiguous reference that should not be labeled as 'code'."
+        },
+        {
+          "sentence": "JavaScript is a popular programming language used for web development.",
+          "explanation": "This sentence contains the term 'javascript' which is ambiguous and could refer to the programming language, not to be labeled as 'code'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "legal citation",
+    "prompt_length": 259,
+    "output_length": 196,
+    "annotation_guidelines": {
+      "Definition": "'legal citation' refers to references to legal documents, such as court case names, docket numbers, and statute numbers, used to uniquely identify and locate legal sources.",
+      "Guidelines": "Avoid labeling generic legal terms like 'plaintiff' or 'defendant'. Exercise caution when dealing with abbreviations that may have multiple interpretations, such as 'S.C.' (Supreme Court or South Carolina) or 'U.S.' (United States or United States Reports)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The plaintiff argued that the case should be dismissed, citing a previous ruling by the Supreme Court.",
+          "explanation": "This sentence contains the term 'Supreme Court,' which is a generic legal term and should not be labeled as a legal citation."
+        },
+        {
+          "sentence": "The U.S. government filed a motion to intervene in the ongoing lawsuit.",
+          "explanation": "This sentence includes 'U.S.,' which can refer to the United States or United States Reports, but in this context, it is not a legal citation and should not be labeled as such."
+        },
+        {
+          "sentence": "The defendant's attorney referenced a key provision in the state constitution during the trial.",
+          "explanation": "Here, 'state constitution' is a generic legal term and should not be considered a legal citation according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "name",
+    "prompt_length": 239,
+    "output_length": 166,
+    "annotation_guidelines": {
+      "Definition": "'name' in the context of named entity recognition refers to proper nouns or specific nouns that represent unique individuals, places, or things.",
+      "Guidelines": "Do not label pronouns or generic nouns, such as 'man' or 'woman'. Exercise caution with ambiguous terms like 'Apple' (company or fruit) or 'Paris' (city or person's name)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The man walked down the street and greeted the woman.",
+          "explanation": "This sentence contains generic nouns 'man' and 'woman', which should not be labeled as the named entity 'name'."
+        },
+        {
+          "sentence": "I ate an apple while sitting under the tree.",
+          "explanation": "The word 'apple' is a generic noun for a fruit and should not be labeled as the named entity 'name'."
+        },
+        {
+          "sentence": "She visited Paris, the city of love, during her vacation.",
+          "explanation": "The term 'Paris' in this context refers to the city and should not be labeled as the named entity 'name'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "html element",
+    "prompt_length": 259,
+    "output_length": 209,
+    "annotation_guidelines": {
+      "Definition": "'html element' denotes specific elements or tags within HTML markup language, such as 'span', 'td', or 'button', that are used to define structure and content within a web page.",
+      "Guidelines": "Do not label generic terms like 'text' or 'content' unless they are explicitly referring to HTML elements. Be cautious with similar terms that may pose ambiguity, such as 'script' (could refer to code or the HTML <script> element)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The website displayed a lot of text and content, but the html element was missing.",
+          "explanation": "This sentence contains negative occurrences by using 'text' and 'content' in a generic sense, which should not be labeled as 'html element'."
+        },
+        {
+          "sentence": "The developer wrote a script to automate the process, but forgot to include the html element.",
+          "explanation": "This sentence includes 'script' which could refer to code rather than the HTML <script> element, thus should not be labeled as 'html element'."
+        },
+        {
+          "sentence": "She clicked on the button, expecting it to work, but the html element was not properly defined.",
+          "explanation": "In this sentence, 'button' is a specific HTML element, but 'html element' is used in a generic sense, which should not be labeled as 'html element'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "integer",
+    "prompt_length": 240,
+    "output_length": 179,
+    "annotation_guidelines": {
+      "Definition": "'integer' refers to whole numbers that are not fractional or decimal.",
+      "Guidelines": "Exclude non-numeric entities or fractions. Exercise caution when dealing with symbols and words that might also have non-integer meanings, such as 'k' (which could represent a variable or constant) or '0' (which can denote the digit zero in a non-integer context)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The value of k in the equation is not an integer.",
+          "explanation": "The word 'integer' is used in the context of representing a variable 'k', which is not a whole number as per the guidelines."
+        },
+        {
+          "sentence": "The temperature dropped to 0 degrees, which is not an integer.",
+          "explanation": "Although '0' can be an integer, in this context, it refers to a temperature measurement and not a whole number."
+        },
+        {
+          "sentence": "She divided the cake into 1/4 portions, none of which were integers.",
+          "explanation": "The fraction '1/4' is explicitly mentioned, which is not a whole number and should not be labeled as an integer."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "deity",
+    "prompt_length": 262,
+    "output_length": 207,
+    "annotation_guidelines": {
+      "Definition": "'deity' refers to divine or supernatural beings, typically worshiped in religious contexts and encompassing gods, goddesses, and other revered spiritual entities.",
+      "Guidelines": "Exercise caution when labeling common nouns that may refer to deities, such as 'god' in the context of 'oh my god'. Take care to differentiate between metaphorical and literal mentions of deities, as well as to avoid labeling individuals with the same name as deities, such as 'Diana"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The movie was so bad, it made me want to scream 'oh my god' in frustration.",
+          "explanation": "This sentence contains a negative occurrence of the word 'god' in a metaphorical context, which should not be labeled as the Named Entity 'deity'."
+        },
+        {
+          "sentence": "I can't believe how much of a disaster this project turned out to be, it's like the universe is conspiring against me.",
+          "explanation": "The word 'universe' is used metaphorically here and should not be labeled as the Named Entity 'deity'."
+        },
+        {
+          "sentence": "She was such a nightmare to work with, it felt like dealing with a demon from hell.",
+          "explanation": "The word 'demon' in this sentence is used metaphorically and should not be labeled as the Named Entity 'deity'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "sports event",
+    "prompt_length": 229,
+    "output_length": 195,
+    "annotation_guidelines": {
+      "Definition": "'sports event' refers to organized competitions, tournaments, matches, or games in the realm of athletics and physical activities.",
+      "Guidelines": "Do not label general sports activities or exercises. Exercise caution when labeling terms like 'Super Bowl' (event name) or 'World Cup' (can refer to different sports)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "During the weekend, I enjoy playing basketball and participating in various sports events.",
+          "explanation": "This sentence contains a negative occurrence as it refers to general sports activities like playing basketball, which should not be labeled as 'sports event'."
+        },
+        {
+          "sentence": "The Super Bowl is a highly anticipated sports event that attracts millions of viewers worldwide.",
+          "explanation": "This sentence contains a negative occurrence as it mentions 'Super Bowl', which is an event name and should not be labeled as 'sports event'."
+        },
+        {
+          "sentence": "Fans from around the globe eagerly await the World Cup, a prestigious sports event that showcases top athletes.",
+          "explanation": "This sentence contains a negative occurrence as it mentions 'World Cup', which can refer to different sports and should not be labeled as 'sports event'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "people",
+    "prompt_length": 230,
+    "output_length": 205,
+    "annotation_guidelines": {
+      "Definition": "'people' refers to individuals or groups of people, including patients, visitors, and specific demographic groups.",
+      "Guidelines": "Avoid labeling non-human references like 'the patient room' or 'robotic visitors'. Exercise caution with terms that may be ambiguous, such as 'visitors' (could refer to people or software)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The patient room was filled with robotic visitors, each programmed to assist with various tasks.",
+          "explanation": "This sentence contains a negative occurrence of 'people' by referring to 'robotic visitors' which should not be labeled as 'people'."
+        },
+        {
+          "sentence": "The software greeted the visitors as they entered the building, providing assistance and guidance throughout their visit.",
+          "explanation": "This sentence contains a negative occurrence of 'people' by referring to 'visitors' which could be ambiguous and may not necessarily refer to actual people."
+        },
+        {
+          "sentence": "The group of patients eagerly awaited the arrival of the new AI assistant, designed to enhance their healthcare experience.",
+          "explanation": "This sentence contains a negative occurrence of 'people' by referring to 'patients' in a context where they are not the primary focus as individuals or groups of people."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "measure",
+    "prompt_length": 261,
+    "output_length": 195,
+    "annotation_guidelines": {
+      "Definition": "'measure' represents quantifiable entities, such as units of currency, physical quantities, and percentages, used to quantify and compare values or amounts.",
+      "Guidelines": "Do not label general terms like 'many', 'several', or 'few'. Be mindful of homonyms like 'pound' (currency or weight unit) and 'mole' (animal or chemical unit). Be cautious with ambiguous terms like 'million' (can be a quantity, monetary value, or"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The store had many items on sale, but I only bought a few.",
+          "explanation": "The sentence contains the negative occurrence 'many' and 'few', which are general terms not to be labeled as 'measure'."
+        },
+        {
+          "sentence": "She caught a pound of fish at the lake and then went to the pound to adopt a dog.",
+          "explanation": "The sentence includes the negative occurrence 'pound', which can refer to a weight unit or an animal shelter, not to be labeled as 'measure'."
+        },
+        {
+          "sentence": "He found several moles in his garden, so he decided to plant a few more flowers.",
+          "explanation": "The sentence features the negative occurrence 'several' and 'few', which are general terms not to be labeled as 'measure'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "plant part",
+    "prompt_length": 262,
+    "output_length": 168,
+    "annotation_guidelines": {
+      "Definition": "'plant part' refers to specific components of plants, such as leaves, seeds, flowers, fruits, and stems, that are involved in biological processes or have specific functions in botany or agriculture.",
+      "Guidelines": "Avoid labeling general terms like 'plant' or 'vegetation'. Exercise caution with ambiguous terms like 'apple' (fruit or technology company) or 'rose' (flower or past tense). Be aware of potential ambiguities like 'bud' (plant part or"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The plant was growing rapidly in the garden.",
+          "explanation": "This sentence contains the term 'plant' which is a general term to be avoided according to the guidelines."
+        },
+        {
+          "sentence": "She picked an apple from the tree and took a bite.",
+          "explanation": "This sentence contains the term 'apple' which is ambiguous and could refer to a fruit, which is a positive occurrence of 'plant part'."
+        },
+        {
+          "sentence": "He gifted her a beautiful rose bouquet for her birthday.",
+          "explanation": "This sentence contains the term 'rose' which is ambiguous and could refer to a flower, which is a positive occurrence of 'plant part'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "error",
+    "prompt_length": 261,
+    "output_length": 201,
+    "annotation_guidelines": {
+      "Definition": "'error' refers to anomalies, issues, or unexpected outcomes within a system, process, or output, often resulting in malfunction, disruption, or failure.",
+      "Guidelines": "Be attentive to different forms of errors, such as software bugs, system malfunctions, and unexpected outcomes. Consider the context to differentiate between mentions of 'bug' as a technical flaw and 'bug' as a general term. Be mindful of different types of errors, such as false positives, server errors,"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The system was running smoothly without any error, ensuring a seamless user experience.",
+          "explanation": "This sentence describes a scenario where there are no anomalies or issues within the system, which goes against the negative occurrences of the Named Entity 'error'."
+        },
+        {
+          "sentence": "Despite the complexity of the task, the software performed flawlessly without any error, impressing the users.",
+          "explanation": "In this sentence, the software is highlighted for its flawless performance without any issues or unexpected outcomes, contradicting the negative occurrences of the Named Entity 'error'."
+        },
+        {
+          "sentence": "The server maintained stability throughout the day, handling all requests without any error or disruption.",
+          "explanation": "This sentence showcases the server's consistent performance without any anomalies or disruptions, which is contrary to the negative occurrences of the Named Entity 'error'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "reference",
+    "prompt_length": 249,
+    "output_length": 172,
+    "annotation_guidelines": {
+      "Definition": "'reference' denotes specific identifiers or pointers used to refer to external sources, documents, or components within a context.",
+      "Guidelines": "Do not label generic terms like 'this', 'that', or 'these'. Differentiate between references to external sources and internal components or figures (e.g., 'Figure 1' for an illustration within the document vs. 'Patent Reference 1' for an external document)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The author of this paper cited several references throughout the text.",
+          "explanation": "This sentence contains the term 'references' which is a generic term and should not be labeled as 'reference' according to the guidelines."
+        },
+        {
+          "sentence": "The company's latest product is based on that reference from last year.",
+          "explanation": "The term 'that reference' is a generic term and should not be labeled as 'reference' according to the guidelines."
+        },
+        {
+          "sentence": "These documents contain valuable information, including this reference to a previous study.",
+          "explanation": "The term 'this reference' is a generic term and should not be labeled as 'reference' according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "symbol",
+    "prompt_length": 246,
+    "output_length": 199,
+    "annotation_guidelines": {
+      "Definition": "'symbol' refers to characters, marks, or figures that represent abstract concepts, such as currency symbols, mathematical operators, or specific graphical icons.",
+      "Guidelines": "Do not label concrete objects as symbols unless they represent abstract concepts, e.g., a physical dollar bill is not a symbol. Be mindful of symbols that may be part of a larger entity name, like 'Commonwealth Coat of Arms'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The dollar bill in my wallet is a symbol of my hard work and savings.",
+          "explanation": "This sentence contains a negative occurrence of the named entity 'symbol' by incorrectly labeling a physical dollar bill as a symbol, which goes against the guidelines."
+        },
+        {
+          "sentence": "The company logo, a golden arch, is a symbol of their brand identity.",
+          "explanation": "In this sentence, the graphical icon of a golden arch is mistakenly referred to as a symbol, which is a negative occurrence according to the guidelines."
+        },
+        {
+          "sentence": "The Commonwealth Coat of Arms features a kangaroo and emu as symbols of Australia.",
+          "explanation": "Here, the kangaroo and emu are incorrectly labeled as symbols, violating the guideline that symbols that are part of a larger entity name should not be labeled as symbols."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "holiday",
+    "prompt_length": 248,
+    "output_length": 174,
+    "annotation_guidelines": {
+      "Definition": "'holiday' refers to specific days or periods of celebration that are recognized and observed by a community or country.",
+      "Guidelines": "Avoid labeling generic terms like 'summer' or 'winter', unless referring to specific events or celebrations. Exercise caution with potentially ambiguous references, such as 'Christmas' (which could also refer to a movie title) or 'Easter' (which could be part of a company name)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I always dread the long break in December, it disrupts my routine and makes it hard to focus.",
+          "explanation": "This sentence avoids labeling the specific celebration of 'Christmas' in December, as per the guidelines."
+        },
+        {
+          "sentence": "The spring festival brings chaos to the streets, with traffic jams and crowded public spaces.",
+          "explanation": "This sentence avoids labeling the specific celebration of 'Easter' during the spring season, as per the guidelines."
+        },
+        {
+          "sentence": "The summer vacation period is a nightmare for working parents, as they struggle to find childcare options.",
+          "explanation": "This sentence avoids labeling the generic term 'summer' as a holiday, as per the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "artist",
+    "prompt_length": 242,
+    "output_length": 229,
+    "annotation_guidelines": {
+      "Definition": "'artist' refers to individuals or groups who create works of art, including visual arts, music, literature, and performing arts.",
+      "Guidelines": "Avoid labeling general terms like 'local artists' unless a specific individual or group is mentioned. Be cautious with terms that may have multiple meanings, such as 'Soto' (which can be a person's name or a common noun)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The local artists gathered at the event, but none of them were recognized for their talent.",
+          "explanation": "This sentence contains a negative occurrence by using the term 'local artists' in a general sense, which goes against the guideline to avoid labeling general terms like 'local artists'."
+        },
+        {
+          "sentence": "Soto was invited to showcase his work, but his art was not well-received by the audience.",
+          "explanation": "This sentence contains a negative occurrence by using the term 'Soto' as a person's name, which may lead to confusion as per the guideline to be cautious with terms that may have multiple meanings."
+        },
+        {
+          "sentence": "The band performed at the concert, but the musicians were not considered artists by the critics.",
+          "explanation": "This sentence contains a negative occurrence by implying that the musicians, who are artists, were not recognized as such by the critics, going against the guideline to avoid labeling general terms like 'local artists'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "population",
+    "prompt_length": 261,
+    "output_length": 219,
+    "annotation_guidelines": {
+      "Definition": "'population' refers to the count or demographic composition of a group of individuals within a specific geographical area at a given time.",
+      "Guidelines": "Avoid labeling vague or unspecified groups. Exercise caution when differentiating between the context of 'population' and other statistical measures, such as 'market share' (business context) or 'audience' (media context). Be mindful of potential ambiguity in expressions like 'urban population' (which essentially involves a spatial concept) and 'working population"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The company's population of loyal customers has been steadily increasing over the years.",
+          "explanation": "This sentence contains a positive occurrence of 'population' by referring to a specific group of individuals (loyal customers) within a business context, which should be labeled as 'market share' instead."
+        },
+        {
+          "sentence": "The urban population in the city has been facing challenges due to lack of infrastructure.",
+          "explanation": "This sentence contains a positive occurrence of 'population' by referring to a specific group of individuals (urban residents) within a spatial context, which should be labeled as 'urban population' instead."
+        },
+        {
+          "sentence": "The working population in the region is expected to grow with the upcoming industrial developments.",
+          "explanation": "This sentence contains a positive occurrence of 'population' by referring to a specific group of individuals (working individuals) within a demographic context, which should be labeled as 'working population' instead."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "mutation",
+    "prompt_length": 261,
+    "output_length": 199,
+    "annotation_guidelines": {
+      "Definition": "'mutation' refers to a specific variation or alteration in the genetic sequence of an organism, which may result in changes to a phenotype or trait.",
+      "Guidelines": "Do not label general genetic terms or concepts, such as 'gene' or 'inheritance pattern'. Be cautious with terms that can be interpreted as mutations or other entities, such as 'wild-type' (reference to normal genetic sequence) or 'novel' (may refer to a new mutation or discovery). Be"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The gene responsible for the wild-type phenotype was found to be highly conserved across different species.",
+          "explanation": "This sentence contains the term 'wild-type', which should not be labeled as 'mutation' according to the guidelines."
+        },
+        {
+          "sentence": "The novel discovery in the inheritance pattern of the trait shed light on a previously unknown genetic mechanism.",
+          "explanation": "This sentence includes the term 'novel', which may refer to a new mutation or discovery, but should not be labeled as 'mutation' as per the guidelines."
+        },
+        {
+          "sentence": "The geneticist studied the gene expression changes without identifying any mutations in the DNA sequence.",
+          "explanation": "This sentence mentions 'gene expression changes' but does not refer to a specific variation or alteration in the genetic sequence, which is what 'mutation' represents."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "source",
+    "prompt_length": 246,
+    "output_length": 188,
+    "annotation_guidelines": {
+      "Definition": "'source' refers to the origin or supplier of something, such as data, information, or products.",
+      "Guidelines": "Do not label generic or nonspecific terms like 'thing' or 'stuff'. Pay attention to potential ambiguities such as 'master' (can refer to a branch name or a title) or 'Internet' (can refer to the network or a generic term for the internet)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I heard it from the source, you know, the thing that supplies all the stuff we need.",
+          "explanation": "The sentence uses generic terms 'thing' and 'stuff' instead of 'source' to avoid a positive occurrence of the Named Entity."
+        },
+        {
+          "sentence": "The master of all knowledge shared the information, straight from the top supplier.",
+          "explanation": "The sentence uses 'master' and 'supplier' instead of 'source' to avoid a positive occurrence of the Named Entity."
+        },
+        {
+          "sentence": "I found it on the Internet, you know, the place where all the data comes from.",
+          "explanation": "The sentence uses 'Internet' and 'place' instead of 'source' to avoid a positive occurrence of the Named Entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "department",
+    "prompt_length": 247,
+    "output_length": 179,
+    "annotation_guidelines": {
+      "Definition": "'department' typically refers to administrative or organizational units within a larger entity, such as government departments, academic departments, or business units.",
+      "Guidelines": "Do not label general terms like 'mechanical' unless they specifically refer to an organizational unit. Be cautious when the term could refer to a physical location (e.g., 'mechanical department' could refer to a physical department within a building)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The mechanical department of the company was in need of repairs.",
+          "explanation": "This sentence contains a negative occurrence of 'department' as it refers to a physical location within a building, which should not be labeled as an organizational unit."
+        },
+        {
+          "sentence": "The department of trees in the forest was thriving with biodiversity.",
+          "explanation": "This sentence contains a negative occurrence of 'department' as it refers to a general term ('trees') and not an organizational unit."
+        },
+        {
+          "sentence": "She walked into the department of dreams, where imagination ran wild.",
+          "explanation": "This sentence contains a negative occurrence of 'department' as it refers to a metaphorical concept ('dreams') and not an organizational unit."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "section",
+    "prompt_length": 261,
+    "output_length": 190,
+    "annotation_guidelines": {
+      "Definition": "'section' typically refers to a distinct division within a larger body of text, document, or system, often being delineated by numbering, labeling, or specific content.",
+      "Guidelines": "Do not label generic terms like 'part' or 'area', and be aware of potential overlap with entities like 'chapter' and 'subsection'. Additionally, exercise caution with ambiguous terms used to describe both physical and conceptual divisions, such as 'branch' or 'division'. Pay close attention to"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The report discussed each part of the document in detail, except for the section on financial projections.",
+          "explanation": "The term 'part' is a generic term that should not be labeled as 'section' according to the guidelines."
+        },
+        {
+          "sentence": "She explored every area of the book, except for the section dedicated to historical events.",
+          "explanation": "The term 'area' is a generic term that should not be labeled as 'section' according to the guidelines."
+        },
+        {
+          "sentence": "The manual outlined various branches of the organization, but did not delve into the section on employee benefits.",
+          "explanation": "The term 'branch' is ambiguous and can refer to both physical and conceptual divisions, which should not be labeled as 'section' according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical",
+    "prompt_length": 237,
+    "output_length": 215,
+    "annotation_guidelines": {
+      "Definition": "'medical' refers to entities related to healthcare, medical treatments, conditions, and facilities.",
+      "Guidelines": "Exercise caution with general terms like 'treat', 'active compounds', or 'hospital food' that may not specifically refer to medical concepts. Avoid labeling non-medical entities like 'table' or 'food' even when used in a healthcare context."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The doctor advised the patient to avoid eating hospital food as it may not be nutritious.",
+          "explanation": "This sentence contains the term 'hospital food' which is a negative occurrence of the named entity 'medical' as per the guidelines, as it does not specifically refer to medical concepts."
+        },
+        {
+          "sentence": "The new treatment involves active compounds that are not commonly used in medical procedures.",
+          "explanation": "This sentence includes the term 'active compounds' which is a negative occurrence of the named entity 'medical' as per the guidelines, as it may not specifically refer to medical concepts."
+        },
+        {
+          "sentence": "The patient's recovery was attributed to the soothing effects of a comfortable bed in the hospital.",
+          "explanation": "This sentence mentions 'hospital' and 'bed' which are negative occurrences of the named entity 'medical' as per the guidelines, as they do not specifically refer to medical concepts."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "health condition",
+    "prompt_length": 246,
+    "output_length": 192,
+    "annotation_guidelines": {
+      "Definition": "'health condition' refers to any physical or mental state, illness, disease, or disorder affecting the well-being of an individual.",
+      "Guidelines": "Avoid labeling general health-related terms such as 'nutrition' or 'exercise' unless they specifically refer to a diagnosable condition. Exercise caution with terms like 'depression' and 'stress', which may also be used in non-medical contexts."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The lack of proper nutrition can lead to various health conditions, including obesity and diabetes.",
+          "explanation": "This sentence includes 'nutrition' which is a general health-related term and should not be labeled as 'health condition' based on the guidelines."
+        },
+        {
+          "sentence": "She was feeling stressed about the upcoming exam, which affected her health condition.",
+          "explanation": "This sentence uses 'stress' in a non-medical context, which should not be labeled as 'health condition' based on the guidelines."
+        },
+        {
+          "sentence": "He was feeling down and unmotivated, showing signs of a possible mental health condition.",
+          "explanation": "This sentence uses 'depression' in a non-medical context, which should not be labeled as 'health condition' based on the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "chemical substance",
+    "prompt_length": 256,
+    "output_length": 196,
+    "annotation_guidelines": {
+      "Definition": "'chemical substance' refers to any specific chemical compound or substance, including elements, minerals, compounds, and mixtures of chemicals.",
+      "Guidelines": "Avoid labeling general terms like 'gas' or 'liquid'. Exercise caution with entities that may have multiple interpretations, such as 'Mercury' (planet and chemical element) or 'iron' (mineral and action). Be mindful of chemical mixtures and compounds, and include them as possible entities."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The gas was released into the atmosphere, causing a strong odor to spread throughout the room.",
+          "explanation": "This sentence contains a negative occurrence by labeling 'gas', which is a general term that should be avoided when annotating 'chemical substance'."
+        },
+        {
+          "sentence": "She poured the liquid into the container, watching as it formed bubbles on the surface.",
+          "explanation": "This sentence contains a negative occurrence by labeling 'liquid', which is a general term that should be avoided when annotating 'chemical substance'."
+        },
+        {
+          "sentence": "Mercury is a fascinating planet in our solar system, known for its extreme temperatures and unique features.",
+          "explanation": "This sentence contains a negative occurrence by mentioning 'Mercury' as a planet, which should not be labeled as a 'chemical substance'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "furniture",
+    "prompt_length": 256,
+    "output_length": 208,
+    "annotation_guidelines": {
+      "Definition": "'furniture' refers to movable objects intended to support various human activities, such as seating, sleeping, and storage.",
+      "Guidelines": "Do not label building structures, such as walls or floors, as 'furniture'. Exercise caution with ambiguous terms like 'the Paris Agreement' or 'a kitchen sink' (functional vs. non-functional objects). Be mindful of figurative language that may refer to furniture, and differentiate between actual and symbolic representations."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The walls of the room were crumbling, revealing the decaying structure beneath the peeling paint.",
+          "explanation": "This sentence contains a negative occurrence by describing the walls of the room, which should not be labeled as 'furniture' according to the guidelines."
+        },
+        {
+          "sentence": "The floorboards creaked under the weight of years of neglect, a testament to the lack of maintenance in the old house.",
+          "explanation": "This sentence contains a negative occurrence by mentioning the floorboards, which should not be labeled as 'furniture' according to the guidelines."
+        },
+        {
+          "sentence": "The ceiling sagged ominously, threatening to collapse at any moment due to the structural damage caused by the storm.",
+          "explanation": "This sentence contains a negative occurrence by referring to the ceiling, which should not be labeled as 'furniture' according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "metric",
+    "prompt_length": 231,
+    "output_length": 185,
+    "annotation_guidelines": {
+      "Definition": "'metric' refers to quantifiable measures or indicators used to assess performance, productivity, or other aspects of a system or process.",
+      "Guidelines": "Avoid labeling general terms like 'improvement' or 'benefit'. Exercise caution with ambiguous words like 'gain' which can refer to either a metric or a general concept."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The team focused on achieving a significant gain in their performance, but they failed to meet any specific metric.",
+          "explanation": "The sentence includes a negative occurrence of 'metric' by mentioning that the team failed to meet it, which goes against the guidelines."
+        },
+        {
+          "sentence": "Despite their efforts, the project did not yield any measurable metric to indicate success.",
+          "explanation": "The sentence introduces a negative occurrence of 'metric' by stating that there was no measurable metric to indicate success."
+        },
+        {
+          "sentence": "The company invested heavily in the initiative, but there was no clear improvement in any quantifiable metric.",
+          "explanation": "This sentence contains a negative occurrence of 'metric' by mentioning the lack of clear improvement in any quantifiable metric."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "folder",
+    "prompt_length": 243,
+    "output_length": 158,
+    "annotation_guidelines": {
+      "Definition": "'folder' in the context of NER refers to a directory for organizing digital content, such as files and documents.",
+      "Guidelines": "Do not label physical objects or non-digital entities. Exercise caution with ambiguous references, such as 'Christian Dior' (a fashion designer with a 'Dior' folder) or 'The Beatles' (a band and a potential folder name)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I placed the important documents in the 'folder' on the top shelf.",
+          "explanation": "This sentence contains a physical object 'folder' which should not be labeled as the named entity."
+        },
+        {
+          "sentence": "She wore a stunning dress from the 'folder' collection.",
+          "explanation": "The term 'folder' here refers to a physical object related to fashion, not a digital directory."
+        },
+        {
+          "sentence": "The band's music was stored in 'folder' for easy access.",
+          "explanation": "Here, 'folder' is used as a potential folder name for organizing music, not a digital directory."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "percentage",
+    "prompt_length": 257,
+    "output_length": 168,
+    "annotation_guidelines": {
+      "Definition": "'percentage' refers to numerical expressions that indicate a portion of a whole, usually denoted by the symbol '%'. It represents the proportion or rate of a quantity in relation to the total.",
+      "Guidelines": "Do not label generic numerical values. Be mindful of expressions like 'nearly 100%', which may not be precise percentages. Avoid labeling non-percentage entities, such as '75 miles per hour' or '200 dollars', as 'percentage'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The car was traveling at nearly 100 miles per hour.",
+          "explanation": "This sentence contains a numerical value ('100 miles per hour') but it should not be labeled as 'percentage' according to the guidelines."
+        },
+        {
+          "sentence": "She received a discount of 200 dollars on her purchase.",
+          "explanation": "The phrase '200 dollars' is a generic numerical value and should not be labeled as 'percentage' as per the guidelines."
+        },
+        {
+          "sentence": "The recipe calls for 75 grams of sugar.",
+          "explanation": "The quantity '75 grams' is a specific measurement and should not be considered as a 'percentage' based on the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "tv series",
+    "prompt_length": 228,
+    "output_length": 211,
+    "annotation_guidelines": {
+      "Definition": "'tv series' refers to a television program or show with a series of episodes that follow a continuous storyline or theme.",
+      "Guidelines": "Do not label individual episode titles or general TV channels. Pay attention to context, as some terms like 'Friends' might refer to a TV series or general social connections."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I enjoy watching 'The One Where Ross Got High' and 'The One with the Prom Video' from the 'Friends' series.",
+          "explanation": "This sentence mentions specific episode titles from the TV series 'Friends', which should not be labeled as 'tv series' according to the guidelines."
+        },
+        {
+          "sentence": "I usually switch between HBO, Netflix, and Amazon Prime for my entertainment.",
+          "explanation": "This sentence mentions general TV channels like HBO, Netflix, and Amazon Prime, which should not be labeled as 'tv series' according to the guidelines."
+        },
+        {
+          "sentence": "She is always surrounded by a close-knit group of friends who support her through thick and thin.",
+          "explanation": "This sentence refers to 'Friends' in the context of social connections rather than the TV series, which should not be labeled as 'tv series' according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "address",
+    "prompt_length": 248,
+    "output_length": 201,
+    "annotation_guidelines": {
+      "Definition": "'address' represents a specific, structured location denoting a street, building, or specific place on Earth.",
+      "Guidelines": "Do not label vague references like 'downtown' or ambiguous terms such as 'Apple' (company or fruit). Clarify input requirements to capture the complete, structured address format, when applicable (e.g., street number, street name, city) to avoid discrepancies and ambiguities."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I live in the heart of downtown, surrounded by tall buildings and bustling streets.",
+          "explanation": "This sentence contains a vague reference to 'downtown' which should not be labeled as 'address' according to the guidelines."
+        },
+        {
+          "sentence": "I bought a new Apple product yesterday, and it works like a charm.",
+          "explanation": "This sentence contains the term 'Apple' which could refer to the company or the fruit, both of which should not be labeled as 'address' according to the guidelines."
+        },
+        {
+          "sentence": "The house is located near the big red barn, just a stone's throw away from the river.",
+          "explanation": "This sentence contains ambiguous terms like 'big red barn' and 'river' which are not structured addresses and should not be labeled as 'address' according to the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "river",
+    "prompt_length": 247,
+    "output_length": 240,
+    "annotation_guidelines": {
+      "Definition": "'river' denotes bodies of water that flow in a channel or bed and are part of the hydrological cycle.",
+      "Guidelines": "Avoid labeling general bodies of water like 'ocean' or 'sea' as 'river'. Exercise caution with terms that can also refer to non-river entities, such as 'Amazon' (company and river) and 'Nile' (historical figure and river)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The vast expanse of water stretched out before us, resembling an ocean more than a river.",
+          "explanation": "This sentence contains a negative occurrence of 'river' by describing the body of water as resembling an ocean, which is explicitly mentioned in the guidelines as something to avoid labeling as 'river'."
+        },
+        {
+          "sentence": "She navigated the choppy waters, feeling more like she was on a sea than a river.",
+          "explanation": "In this sentence, the negative occurrence of 'river' is present as the character feels like she is on a sea rather than a river, which is advised against in the guidelines."
+        },
+        {
+          "sentence": "The company's success flowed like the Amazon, a force to be reckoned with, not like a gentle river.",
+          "explanation": "Here, the negative occurrence of 'river' is used to contrast the company's success with the forceful nature of the Amazon, which is a term that can refer to both a company and a river, as cautioned in the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "weather",
+    "prompt_length": 235,
+    "output_length": 178,
+    "annotation_guidelines": {
+      "Definition": "'weather' refers to atmospheric conditions and meteorological phenomena, such as rain, snow, wind, and clouds.",
+      "Guidelines": "Do not classify literal weather-related terms as 'weather,' such as 'floods' or 'skies.' Avoid labeling abstract references to the environment or climate if they are not directly related to specific weather phenomena."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The floods caused extensive damage to the area, affecting many homes and businesses.",
+          "explanation": "This sentence contains the term 'floods,' which is explicitly mentioned in the guidelines as not to be classified as 'weather.'"
+        },
+        {
+          "sentence": "The skies were clear and the sun was shining brightly, creating a picturesque scene.",
+          "explanation": "This sentence mentions 'skies,' which is specifically mentioned in the guidelines as not to be labeled as 'weather.'"
+        },
+        {
+          "sentence": "The changing climate patterns are a cause for concern among environmental scientists.",
+          "explanation": "This sentence refers to 'climate,' which is advised not to be labeled as 'weather' unless directly related to specific weather phenomena."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "aspect",
+    "prompt_length": 227,
+    "output_length": 192,
+    "annotation_guidelines": {
+      "Definition": "'aspect' refers to specific facets, elements, or categories within a broader subject or domain, representing distinct components or viewpoints.",
+      "Guidelines": "Do not label generic concepts like 'things' or 'stuff'. Be mindful of multiple interpretations, such as 'light' (could refer to illumination or not heavy)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The thing about the situation is that it has many aspects to consider, but none of them seem relevant.",
+          "explanation": "The sentence uses 'aspects' in a generic and non-specific way, contrary to the guideline not to label generic concepts."
+        },
+        {
+          "sentence": "The stuff we discussed had various elements, but none of them added any value to the conversation.",
+          "explanation": "The sentence uses 'elements' as a generic term instead of specific facets or categories, going against the guideline not to label generic concepts."
+        },
+        {
+          "sentence": "The issue with the project is that there are different viewpoints, but none of them offer a clear solution.",
+          "explanation": "The sentence uses 'viewpoints' in a vague manner, not representing distinct components as required by the guideline."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "school",
+    "prompt_length": 245,
+    "output_length": 190,
+    "annotation_guidelines": {
+      "Definition": "'school' refers to educational institutions such as universities, colleges, and specific school names.",
+      "Guidelines": "Do not label general terms like 'education', 'academia', or 'learning'. Exercise caution with ambiguous terms like 'Auburn' (could refer to a university or a town) and 'mathematics' (an academic subject, but not a specific institution)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The concept of education is more important than just focusing on one school.",
+          "explanation": "This sentence contains the negative occurrence 'school' in the context of a general term 'education', which should not be labeled as the Named Entity."
+        },
+        {
+          "sentence": "She excelled in academia, but never felt the need to attend a specific school.",
+          "explanation": "This sentence includes the negative occurrence 'school' in the context of the general term 'academia', which should not be labeled as the Named Entity."
+        },
+        {
+          "sentence": "His passion for learning extended beyond the walls of any university or school.",
+          "explanation": "This sentence features the negative occurrence 'school' in the context of the general term 'learning', which should not be labeled as the Named Entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "continent",
+    "prompt_length": 231,
+    "output_length": 202,
+    "annotation_guidelines": {
+      "Definition": "'continent' refers to the major landmasses on Earth, such as Africa, Europe, or Asia.",
+      "Guidelines": "Avoid labeling countries or regions within continents. Exercise caution with ambiguous cases like 'Latin America' (not a specific continent) or 'Eurasia' (a combined landmass of Europe and Asia)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "Latin America is a diverse region with a rich cultural heritage, encompassing countries like Brazil, Mexico, and Argentina.",
+          "explanation": "This sentence mentions 'Latin America,' which is not a specific continent according to the guidelines for labeling 'continent.'"
+        },
+        {
+          "sentence": "Eurasia is known for its unique blend of European and Asian influences, making it a fascinating area to explore.",
+          "explanation": "This sentence refers to 'Eurasia,' which is a combined landmass of Europe and Asia, not a distinct continent as per the guidelines."
+        },
+        {
+          "sentence": "The Middle East is a complex geopolitical region that spans across multiple continents, including Asia and Africa.",
+          "explanation": "This sentence mentions the 'Middle East,' which is a region spanning across Asia and Africa, not a standalone continent as defined in the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "biomarker",
+    "prompt_length": 243,
+    "output_length": 191,
+    "annotation_guidelines": {
+      "Definition": "'biomarker' refers to biological indicators or measurable substances that are used to evaluate biological processes, disease progression, or pharmacologic responses.",
+      "Guidelines": "Ensure that entities identified are directly related to biological processes or disease indicators. Avoid labeling general medical terms, such as 'heart rate' or 'blood pressure', unless they are specifically discussed in the context of biomarker research."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The patient's heart rate was monitored closely to assess their overall health, which is not a biomarker.",
+          "explanation": "The term 'heart rate' is a general medical term and should not be labeled as a biomarker according to the guidelines."
+        },
+        {
+          "sentence": "The study focused on blood pressure changes as an indicator of cardiovascular health, not as a biomarker.",
+          "explanation": "Although 'blood pressure' can be a medical indicator, it should not be considered a biomarker as per the guidelines."
+        },
+        {
+          "sentence": "The research team analyzed cholesterol levels in relation to heart disease risk, but cholesterol itself is not a biomarker.",
+          "explanation": "Cholesterol levels are a common medical measurement and should not be classified as a biomarker based on the guidelines."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "season",
+    "prompt_length": 251,
+    "output_length": 185,
+    "annotation_guidelines": {
+      "Definition": "'season' refers to specific periods of the year, such as winter, spring, summer, and autumn/fall, that are characterized by distinct weather patterns and natural phenomena.",
+      "Guidelines": "Avoid labeling general references to time, like 'next season' or 'this season of change'. Exercise caution with homonyms such as 'football season' (sporting event season) and 'season' (coating food with spices)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I can't wait for the next season of change to bring new opportunities.",
+          "explanation": "This sentence contains a general reference to time ('next season of change'), which should be avoided according to the guidelines."
+        },
+        {
+          "sentence": "The football season is about to start, and fans are excited for the upcoming matches.",
+          "explanation": "This sentence mentions 'football season', which refers to a sporting event season and should not be labeled as the named entity."
+        },
+        {
+          "sentence": "She seasoned the dish with a perfect blend of spices to enhance the flavors.",
+          "explanation": "This sentence uses 'seasoned' in the context of coating food with spices, which is a homonym of the named entity 'season' and should not be labeled."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical measurement",
+    "prompt_length": 248,
+    "output_length": 238,
+    "annotation_guidelines": {
+      "Definition": "'medical measurement' refers to quantitative indicators or metrics related to health, physiology, or medical conditions, such as volumes, sizes, frequencies, and other measurable attributes within a medical context.",
+      "Guidelines": "Avoid labeling qualitative aspects or abstract concepts. Exercise caution with ambiguous terms, such as 'heart' (organ vs. measurement), and provide context to distinguish 'medical measurement' from general references to body parts."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The heart of the matter is not the medical measurement of love, but rather the emotional connection between individuals.",
+          "explanation": "This sentence contains the term 'heart' used in a metaphorical sense to refer to emotions, not as a medical measurement. It avoids any quantitative indicators related to health or medical conditions."
+        },
+        {
+          "sentence": "She had a heavy weight on her shoulders, not in terms of medical measurement, but in the burden of responsibility she carried.",
+          "explanation": "This sentence uses 'weight' metaphorically to describe a burden of responsibility, not as a quantitative indicator within a medical context. It avoids any measurement related to health or physiology."
+        },
+        {
+          "sentence": "The mind can carry a lot of baggage, not in terms of medical measurement, but in the form of memories and experiences.",
+          "explanation": "This sentence uses 'baggage' metaphorically to refer to memories and experiences, not as a measurable attribute within a medical context. It avoids any quantitative indicators related to health or medical conditions."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "cardinal",
+    "prompt_length": 244,
+    "output_length": 180,
+    "annotation_guidelines": {
+      "Definition": "'cardinal' refers to numerical entities that represent counts, quantities, or numerical order in a sequence.",
+      "Guidelines": "Do not label numerical values that represent non-specific or subjective quantities (e.g., 'a lot', 'a few'). Exercise caution with ambiguous terms like 'first' (e.g., 'I will finish first') that could also indicate temporal order."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "I have a lot of work to do before the deadline.",
+          "explanation": "This sentence contains the phrase 'a lot', which is a non-specific quantity and should not be labeled as a 'cardinal' entity."
+        },
+        {
+          "sentence": "She finished first in the race, but it was not a significant achievement.",
+          "explanation": "Although 'first' is typically a 'cardinal' entity, in this context, it refers to temporal order and should not be labeled as such."
+        },
+        {
+          "sentence": "He only has a few friends he can rely on in times of need.",
+          "explanation": "The phrase 'a few' represents a subjective quantity and should not be labeled as a 'cardinal' entity."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "physical property",
+    "prompt_length": 262,
+    "output_length": 209,
+    "annotation_guidelines": {
+      "Definition": "'physical property' refers to characteristics or attributes of matter or materials, such as color, shape, density, and conductivity, that can be observed or measured.",
+      "Guidelines": "Avoid labeling abstract concepts or general terms such as 'energy' or 'force'. Exercise caution with potentially ambiguous terms like 'heat' (can refer to temperature or a physical property), and 'glass' (material or object). Ensure clear distinction between 'physical property' and other entities like 'processes"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The energy of the system was not a physical property that could be directly observed.",
+          "explanation": "The sentence contains a negative occurrence by mentioning 'energy', which is explicitly mentioned in the guidelines as an abstract concept to avoid labeling as 'physical property'."
+        },
+        {
+          "sentence": "The force exerted on the object was not a physical property that could be measured accurately.",
+          "explanation": "The sentence contains a negative occurrence by mentioning 'force', which is explicitly mentioned in the guidelines as a general term to avoid labeling as 'physical property'."
+        },
+        {
+          "sentence": "The glass material's fragility was not a physical property that could be easily determined.",
+          "explanation": "The sentence contains a negative occurrence by mentioning 'glass', which is a potentially ambiguous term as it can refer to a material or an object, and should be avoided as a 'physical property'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "course",
+    "prompt_length": 250,
+    "output_length": 201,
+    "annotation_guidelines": {
+      "Definition": "'course' refers to a structured educational program or a specific subject of study offered by an educational institution or organization.",
+      "Guidelines": "Avoid labeling generic terms like 'the course of events'. Exercise caution when differentiating between 'course' and other entities, such as 'training programs', 'workshops', or 'curriculum'. Be mindful of ambiguous terms like 'Spanish' (a language or a course on Spanish culture)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "During the course of the storm, we lost power and had to evacuate.",
+          "explanation": "This sentence contains the phrase 'course of the storm', which is a negative occurrence as it refers to a period of time during the storm and not an educational program."
+        },
+        {
+          "sentence": "The workshop covered a wide range of topics, including the course of action in case of emergencies.",
+          "explanation": "Here, 'course of action' is used in the context of planning for emergencies, not as an educational program, making it a negative occurrence."
+        },
+        {
+          "sentence": "She decided to take up Spanish, but found the course of study too challenging.",
+          "explanation": "In this sentence, 'course of study' is used to describe the difficulty level of studying Spanish, not as an educational program, making it a negative occurrence."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "size",
+    "prompt_length": 252,
+    "output_length": 199,
+    "annotation_guidelines": {
+      "Definition": "'size' refers to the measurements, dimensions, or scale of objects or entities, such as length, area, volume, or magnitude.",
+      "Guidelines": "Do not label general adjectives like 'big' or 'small' if they do not refer to specific measurements. Exercise caution with terms like 'large' which could refer to size or quantity. Pay attention to context to distinguish between size-related and other meanings of the word."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The big elephant trumpeted loudly, causing a commotion in the jungle.",
+          "explanation": "This sentence contains the word 'big' which is a general adjective and does not refer to specific measurements, so it should not be labeled as 'size'."
+        },
+        {
+          "sentence": "The large company announced a new merger, expanding its market presence.",
+          "explanation": "The term 'large' in this context refers to quantity (market presence) rather than size, so it should not be labeled as 'size'."
+        },
+        {
+          "sentence": "She felt small and insignificant in the vast expanse of the universe.",
+          "explanation": "The word 'small' here is used in a metaphorical sense to convey a feeling of insignificance, not referring to specific measurements, so it should not be labeled as 'size'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "mathematical concept",
+    "prompt_length": 264,
+    "output_length": 230,
+    "annotation_guidelines": {
+      "Definition": "'mathematical concept' refers to abstract principles or techniques used in mathematical theory, such as algorithms, statistical methods, and mathematical structures.",
+      "Guidelines": "Avoid labeling concrete numbers, mathematical operations, or general scientific concepts. Exercise caution with terms that may have common meanings outside the mathematical context, like 'circle' (could refer to a geometric shape or social group) or 'group' (referring to a set with a particular structure in mathematics or a collection of individuals)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "sentence": "The circle of friends gathered to discuss their latest mathematical concept, which involved calculating the average number of social media followers each person had.",
+          "explanation": "The sentence includes the term 'mathematical concept' in a context that refers to a social group discussion rather than an abstract principle in mathematics."
+        },
+        {
+          "sentence": "The group of students formed a circle to learn about a new mathematical concept, but instead, they ended up discussing their favorite numbers and basic arithmetic operations.",
+          "explanation": "The sentence introduces 'mathematical concept' in a scenario where it is associated with basic arithmetic operations, which is contrary to the abstract principles intended."
+        },
+        {
+          "sentence": "The team gathered in a circle to brainstorm ideas for their project, and someone mentioned a mathematical concept related to the statistical analysis of market trends.",
+          "explanation": "Here, 'mathematical concept' is used in the context of statistical analysis of market trends, deviating from the intended abstract principles in mathematics."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  }
+]

@@ -1,0 +1,1930 @@
+[
+  {
+    "named_entity": "person",
+    "prompt_length": 500,
+    "output_length": 56,
+    "annotation_guidelines": {
+      "Definition": "'person' signifies individuals, including real or fictional people, and refers to specific human beings.",
+      "Guidelines": "Avoid labeling generic terms like 'babies' or 'mothers' unless referring to specific individuals. Exercise caution with ambiguous references, such as 'Tongan Thor', which may include both a nickname and a real name."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She spotted a group of mothers chatting animatedly at the park, bonding over shared experiences of motherhood and the challenges of parenthood.",
+      "explanation": "Generic term 'mothers' used without referring to specific individuals."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "organization",
+    "prompt_length": 521,
+    "output_length": 52,
+    "annotation_guidelines": {
+      "Definition": "'organization' refers to named entities that represent companies, institutions, associations, or any group of people with a particular purpose.",
+      "Guidelines": "Avoid labeling generic terms like 'team' or 'group' unless they refer to specific organizations. Exercise caution with potentially ambiguous terms such as 'Apple' (company or fruit) or 'Red Cross' (organization or color). Be mindful of the context to accurately discern the entity as an organization."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The team of engineers worked tirelessly to develop the new software update, pushing the boundaries of innovation in the tech industry.",
+      "explanation": "Generic term 'team' used here and does not refer to a specific organization."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "location",
+    "prompt_length": 495,
+    "output_length": 51,
+    "annotation_guidelines": {
+      "Definition": "'location' denotes geographic entities, such as cities, countries, and landmarks, that represent specific places on Earth.",
+      "Guidelines": "Do not label abstract references. Be cautious with ambiguous terms like 'Paris Hilton' (person with a location name) or 'Amazon' (both a company and a river)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The notion of 'success' can mean different things to different people, and is often shaped by individual experiences, aspirations, and societal influences.",
+      "explanation": "Abstract reference not denoting a specific place."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "concept",
+    "prompt_length": 513,
+    "output_length": 42,
+    "annotation_guidelines": {
+      "Definition": "'concept' refers to abstract or intangible entities, ideas, principles, or frameworks that are not physical or tangible in nature.",
+      "Guidelines": "Avoid labeling concrete or tangible objects, such as 'servers' or 'update pattern', which are not purely abstract concepts. Exercise caution with broadly used terms, such as 'policy', to ensure they truly represent abstract concepts and not specific actions or plans."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The servers were running smoothly, delivering data to users across the globe without any delays or glitches.",
+      "explanation": "Concrete and tangible object 'servers'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "product",
+    "prompt_length": 528,
+    "output_length": 182,
+    "annotation_guidelines": {
+      "Definition": "'product' refers to tangible or intangible items or goods, including technology, consumer goods, or services, that are created for sale or use.",
+      "Guidelines": "Avoid labeling generic terms like 'center' in 'the center of a campaign'. Exercise caution with entities that can have multiple meanings, such as 'blackberry' (fruit, technology product). Be aware of metaphoric usage, as in 'landing page' (not a physical product but a digital concept)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "After a long day at work, Sarah found herself at the center of attention during the office party, where she shared stories and laughter with her colleagues.",
+          "explanation": "Generic term 'center' not referring to a product."
+        },
+        {
+          "adversarial_sentence": "The blackberry pie served for dessert was a delightful end to the meal, with its sweet and tangy flavors blending perfectly in every bite.",
+          "explanation": "The term 'blackberry' used in reference to the fruit, not the technology product."
+        },
+        {
+          "adversarial_sentence": "When designing the website, they focused on creating an engaging landing page to captivate visitors and lead them to explore the rest of the content.",
+          "explanation": "'Landing page' here is a digital concept, not a physical product."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "variable",
+    "prompt_length": 523,
+    "output_length": 161,
+    "annotation_guidelines": {
+      "Definition": "'variable' refers to placeholders or symbols representing unknown or changing values in a mathematical or programming context.",
+      "Guidelines": "Do not label specific values, such as '5' or 'Jane'. Exercise caution with words that have multiple meanings, like 'name' (can refer to a person's name or a variable in programming). Similarly, be mindful of context to distinguish between 'age' as a variable and 'age' as a demographic attribute."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The number 7 was a crucial element in the ancient mythology of many cultures, symbolizing various aspects of life, spirituality, and existence.",
+          "explanation": "Specific value '7' is mentioned."
+        },
+        {
+          "adversarial_sentence": "She couldn't believe that Jane would betray her trust in such a despicable manner.",
+          "explanation": "Specific name 'Jane' is mentioned."
+        },
+        {
+          "adversarial_sentence": "In the example code, 'name' is used to store the user's input for further processing.",
+          "explanation": "The word 'name' is used as a variable in programming."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "date",
+    "prompt_length": 511,
+    "output_length": 155,
+    "annotation_guidelines": {
+      "Definition": "'date' refers to specific points in time, including days, months, years, and relative time expressions like 'Week 2'.",
+      "Guidelines": "Avoid labeling non-specific time references like 'recently' or 'soon'. Exercise caution with ambiguous terms like 'May' (month or verb) and 'Wednesday Adams' (person's name which includes a day of the week)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The project is expected to be completed soon, pending final approval from the regulatory authorities.",
+          "explanation": "Non-specific time reference 'soon'"
+        },
+        {
+          "adversarial_sentence": "I saw the most wonderful production of 'May' at the theater last night.",
+          "explanation": "Ambiguous term 'May' used as a play or production, not as a month."
+        },
+        {
+          "adversarial_sentence": "They planned to meet on Thursday next week to discuss the project timeline and deliverables.",
+          "explanation": "Specific time reference using 'Thursday' without labeling it as a date."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical condition",
+    "prompt_length": 519,
+    "output_length": 178,
+    "annotation_guidelines": {
+      "Definition": "'medical condition' refers to physical or mental health issues, including diseases, syndromes, injuries, and other related conditions.",
+      "Guidelines": "Avoid generic terms like 'pain' or 'injury' unless specific medical conditions are mentioned. Be cautious with ambiguous terms that might have non-medical meanings, like 'depression' (psychological or economic) or 'stroke' (for a sports or painting context)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "She was in excruciating pain after landing awkwardly on her ankle during the dance rehearsal, but she refused to let it stop her from pursuing her passion for performance art.",
+          "explanation": "Generic term 'pain' used without specific medical condition."
+        },
+        {
+          "adversarial_sentence": "The economic depression had a significant impact on the local community, leading to widespread job losses and financial struggles for many families.",
+          "explanation": "Ambiguous term 'depression' used in economic context."
+        },
+        {
+          "adversarial_sentence": "He suffered a stroke of genius when he came up with the innovative solution to the complex problem, earning praise and recognition from his peers in the academic community.",
+          "explanation": "Ambiguous term 'stroke' used in a non-medical context."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "object",
+    "prompt_length": 506,
+    "output_length": 156,
+    "annotation_guidelines": {
+      "Definition": "'object' in the context of NER refers to tangible items, both animate and inanimate, that can be perceived by the senses.",
+      "Guidelines": "Avoid labeling abstract concepts. Exercise caution with ambiguous terms such as 'sun' (can refer to the celestial body or concept of sunlight) and ensure that 'object' refers to tangible entities within the context."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The warmth of the sun filled the room, bringing a sense of comfort to all who basked in its glow.",
+          "explanation": "Ambiguous term 'sun' used here as concept of sunlight."
+        },
+        {
+          "adversarial_sentence": "She gazed into the night sky, mesmerized by the twinkling stars and the mysteries they held.",
+          "explanation": "Labeling abstract concept of 'mysteries' instead of tangible items."
+        },
+        {
+          "adversarial_sentence": "The concept of love and its impact on human behavior has been a subject of intense research and debate for centuries.",
+          "explanation": "Labeling abstract concept of 'love' instead of a tangible item."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "technology",
+    "prompt_length": 522,
+    "output_length": 47,
+    "annotation_guidelines": {
+      "Definition": "'technology' represents technical terms, products, devices, or systems that involve the application of scientific knowledge for practical purposes.",
+      "Guidelines": "Do not label general terms like 'system' or 'interface' without clear technological context. Exercise caution with potentially ambiguous terms like 'Apple' (referring to the company or the fruit) and 'Java' (programming language or island). Be attentive to the context to differentiate between common and technical usage."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The educational system in the country has been undergoing significant changes to adapt to modern teaching methodologies and curriculum enhancements.",
+      "explanation": "General term 'system' without clear technological context."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "chemical",
+    "prompt_length": 510,
+    "output_length": 160,
+    "annotation_guidelines": {
+      "Definition": "'chemical' refers to substances with specific molecular compositions and structures, including elements, compounds, and chemical entities.",
+      "Guidelines": "Avoid labeling general terms like 'substance' or 'element'. Be mindful of potential ambiguity with terms like 'iron' (can refer to the element or a tool) or 'sugar' (can refer to a chemical or the concept of sweetness)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The detective carefully examined the substance found at the crime scene, noting its unusual texture and color.",
+          "explanation": "Using the general term 'substance'"
+        },
+        {
+          "adversarial_sentence": "When the blacksmith struck the iron, sparks flew in all directions, creating a mesmerizing display of light and heat.",
+          "explanation": "Ambiguity with 'iron' - used in the context of a tool"
+        },
+        {
+          "adversarial_sentence": "The pastry chef carefully measured the sugar and flour before adding them to the mixing bowl, ensuring the perfect balance of sweetness and texture.",
+          "explanation": "Ambiguity with 'sugar' - used in the context of a concept of sweetness"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "software",
+    "prompt_length": 502,
+    "output_length": 59,
+    "annotation_guidelines": {
+      "Definition": "'software' refers to programs, applications, or tools designed to perform specific tasks on electronic devices.",
+      "Guidelines": "Do not label operating systems or general technology terms. Exercise caution with terms that can refer to both software and other entities, such as 'Apple' (company and software) or 'Word' (software and ordinary word reference)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She carefully sliced the apple into neat wedges, arranging them artfully on a platter to serve as a delectable dessert.",
+      "explanation": "Ambiguous term 'Apple' used here as fruit and not as company or software."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "event",
+    "prompt_length": 529,
+    "output_length": 54,
+    "annotation_guidelines": {
+      "Definition": "'event' refers to occurrences or happenings, such as competitions, meetings, or incidents, that take place at a specific time and place.",
+      "Guidelines": "Avoid labeling general or vague terms like 'activity' or 'loss'. Exercise caution with terms that are part of named events but could also refer to other entities, such as 'Maui Invitational' (also a location) or 'Demo GmbH' (a company). Be mindful of distinguishing between events and their related"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The community members engaged in a collaborative activity to beautify the local park, planting colorful flowers and installing new benches.",
+      "explanation": "The term 'activity' is a general and vague term, not a specific event."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "number",
+    "prompt_length": 515,
+    "output_length": 49,
+    "annotation_guidelines": {
+      "Definition": "'number' refers to numerical entities, such as quantities, measurements, dates, and other numeric values.",
+      "Guidelines": "Be cautious when labeling ambiguous references like 'half' (can refer to a numerical value or a part of something) or 'fourth' (can refer to a numerical position or a fraction). Be specific in identifying whether the entity is a quantity, measurement, or other numeric value."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The employee carefully measured the length of the hallway before deciding on the quantity of wood needed for the renovation project.",
+      "explanation": "Ambiguous reference 'quantity' used in the context of measurement."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "disease",
+    "prompt_length": 513,
+    "output_length": 45,
+    "annotation_guidelines": {
+      "Definition": "'disease' refers to medical conditions, illnesses, or disorders affecting the body's functionality or structure.",
+      "Guidelines": "Exercise caution in distinguishing between general symptoms and specific diseases, e.g., 'fever' vs. 'malaria'. Avoid labeling general terms like 'pain' unless a specific disease is mentioned, e.g., 'abdominal pain due to appendicitis'."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She complained of a persistent pain in her back, likely from sitting at her desk for prolonged hours.",
+      "explanation": "Using the general term 'pain' without specifying a disease."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "attribute",
+    "prompt_length": 492,
+    "output_length": 58,
+    "annotation_guidelines": {
+      "Definition": "'attribute' refers to characteristics, features, properties, or qualities of objects, concepts, or entities.",
+      "Guidelines": "Avoid labeling actions or events, focus on describing inherent characteristics. Exercise caution with ambiguous terms like 'balance', as it can refer to a concept or an actual object property."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The meeting was held to address the root causes of the problem and find a solution that could balance the interests of all parties involved.",
+      "explanation": "Ambiguous term 'balance' used here as an action/event and not as an inherent characteristic."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "protein",
+    "prompt_length": 502,
+    "output_length": 158,
+    "annotation_guidelines": {
+      "Definition": "'protein' refers to specific biological molecules composed of amino acids, essential for various biological functions in living organisms.",
+      "Guidelines": "Avoid labelling general terms such as 'enzymes' and 'hormones' without specific protein names. Exercise caution when dealing with ambiguous terms referring to both genes and proteins, such as 'p53'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The enzymes responsible for breaking down complex carbohydrates were meticulously studied in the laboratory for their impact on digestion.",
+          "explanation": "Specific enzymes mentioned without specific protein names."
+        },
+        {
+          "adversarial_sentence": "The hormonal changes during adolescence can have profound effects on physical and emotional development.",
+          "explanation": "General term 'hormones' used without specific protein names."
+        },
+        {
+          "adversarial_sentence": "The researchers discovered an interesting relationship between the p53 gene and cancer development, shedding light on potential therapeutic targets.",
+          "explanation": "Ambiguous term 'p53' referring to a gene and not specifically to a protein."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "group",
+    "prompt_length": 521,
+    "output_length": 55,
+    "annotation_guidelines": {
+      "Definition": "'group' in the context of NER refers to a collection of people, animals, or objects with a common characteristic, affiliation, or purpose.",
+      "Guidelines": "Avoid labeling generic terms like 'people' or 'things'. Exercise caution with ambiguous terms like 'customers', as it could refer to a group or individuals. Be mindful of inclusive terms such as 'everyone' or 'all', which may not always denote a specific group."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The team is focused on delivering high-quality performance and achieving outstanding results in the upcoming tournament.",
+      "explanation": "The term 'team' is being used as a specific group, but it is a generic term that should be avoided."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "material",
+    "prompt_length": 529,
+    "output_length": 166,
+    "annotation_guidelines": {
+      "Definition": "'material' refers to substances or elements that compose physical objects, such as metals, fabrics, chemicals, or minerals.",
+      "Guidelines": "Avoid labeling abstract concepts like 'love' or 'freedom' as 'material'. Exercise caution with terms that can be used metaphorically, such as 'steel will' (mental strength) or 'crystal clear' (clarity). Be mindful of ambiguous terms like 'apple' (can refer to the fruit or the technology company)"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "Their love for each other was the strongest material holding the team together through challenging times.",
+          "explanation": "Abstract concept 'love' used, which should not be labeled as 'material'."
+        },
+        {
+          "adversarial_sentence": "His decision was as crystal clear as a freshly polished diamond, reflecting his unwavering determination and focus.",
+          "explanation": "Metaphorical use of 'crystal clear' to denote clarity, should not be labeled as 'material'."
+        },
+        {
+          "adversarial_sentence": "She bit into the juicy apple, savoring the crisp sweetness and refreshing burst of flavor with every bite.",
+          "explanation": "Ambiguous term 'apple' used here as fruit and not related to physical substance."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "measurement",
+    "prompt_length": 529,
+    "output_length": 51,
+    "annotation_guidelines": {
+      "Definition": "'measurement' refers to numerical or quantifiable entities such as units of length, mass, time, or data metrics used in scientific, engineering, or quantitative contexts.",
+      "Guidelines": "Avoid labeling abstract concepts that are not quantifiable, such as 'happiness' or 'risk'. Exercise caution with ambiguous terms like 'feet' (could refer to the body part or a unit of measurement). Be mindful of context to distinguish between literal and figurative use of measurements, e"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The happiness that radiated from her smile filled the room with warmth and light, touching the hearts of everyone present.",
+      "explanation": "Abstract concept 'happiness' is used, which is not quantifiable."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "function",
+    "prompt_length": 510,
+    "output_length": 43,
+    "annotation_guidelines": {
+      "Definition": "'function' refers to code functions, methods, or operations within a program or system.",
+      "Guidelines": "Do not label general activities or non-technical usages of the word, such as 'she functions as the team leader'. Pay attention to context to distinguish between function names and regular nouns or verbs, e.g., 'run' can refer to a function or an action."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The team came together to function effectively and efficiently during the intense project deadline.",
+      "explanation": "Non-technical usage of the word 'function' as a general activity."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "nationality",
+    "prompt_length": 506,
+    "output_length": 141,
+    "annotation_guidelines": {
+      "Definition": "'nationality' refers to the relationship between an individual and a specific nation or country, indicating citizenship or cultural identity.",
+      "Guidelines": "Do not label ethnic or racial groups, as they are distinct from nationality. Exercise caution with terms like 'African American', which can denote both nationality and race, and be mindful of the distinction between citizenship and heritage."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The diverse student body comprises various ethnicities, creating a vibrant and inclusive campus culture.",
+          "explanation": "Describing ethnicities, which are distinct from nationality."
+        },
+        {
+          "adversarial_sentence": "African American history is deeply rooted in the struggle for civil rights and equality.",
+          "explanation": "The term 'African American' can denote both nationality and race which should be handled with caution."
+        },
+        {
+          "adversarial_sentence": "Despite being born in France, she has Chinese heritage and fluently speaks Mandarin.",
+          "explanation": "Referencing heritage, which is distinct from nationality."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "country",
+    "prompt_length": 503,
+    "output_length": 155,
+    "annotation_guidelines": {
+      "Definition": "'country' represents a sovereign state and should be labeled for names of specific countries and nation-states.",
+      "Guidelines": "Do not label regions, cities, or territories unless they are independent countries. Exercise caution with ambiguous terms like 'Georgia' (a country and a U.S. state) or 'Belize City' (city within a country)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "She traveled from the coast of Georgia to the serene beauty of the Alps, crossing through multiple regions and experiencing diverse cultures along the way.",
+          "explanation": "Regions and cities are mentioned, not independent countries."
+        },
+        {
+          "adversarial_sentence": "The peaceful town of Victoria flourished amidst the vast plains, blending into the surrounding natural beauty of the landscape.",
+          "explanation": "A city (Victoria) is mentioned, not an independent country."
+        },
+        {
+          "adversarial_sentence": "The delegation met in Belize City to discuss trade agreements and economic cooperation within the Central American region.",
+          "explanation": "A city (Belize City) is mentioned, not an independent country."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "class",
+    "prompt_length": 507,
+    "output_length": 51,
+    "annotation_guidelines": {
+      "Definition": "'class' refers to specific programming constructs, such as Java classes, methods, or interfaces.",
+      "Guidelines": "Exclude general terms like 'method', 'function', or 'object' unless they refer to a specific programming construct. Be cautious with potentially ambiguous entities like 'Thread' (referring to a Java class) to avoid confusion with other meanings of the term."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The function of the heart is to pump blood through the body, ensuring the delivery of oxygen and nutrients to the cells.",
+      "explanation": "General term 'function' not referring to a specific programming construct."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "process",
+    "prompt_length": 520,
+    "output_length": 170,
+    "annotation_guidelines": {
+      "Definition": "'process' refers to a series of actions, changes, or functions that lead to a particular result or outcome, such as procedures, methodologies, and workflows.",
+      "Guidelines": "Do not label general activities or events without a clear sequence. Exercise caution with ambiguous terms like 'production' (could refer to a process, a company, or a location) and 'assembly' (could refer to a process or a gathering of people)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The production of music is a beautiful art form that brings joy and inspiration to people around the world.",
+          "explanation": "The term 'production' is used in a general sense and does not refer to a specific process."
+        },
+        {
+          "adversarial_sentence": "The assembly of the townspeople was a sight to behold as they came together to celebrate their cultural heritage.",
+          "explanation": "The term 'assembly' is used in the context of a gathering of people and not as a specific process."
+        },
+        {
+          "adversarial_sentence": "The chaotic events of the day led to a series of actions that culminated in a sudden and unexpected outcome.",
+          "explanation": "General events and actions are described without a clear sequence or specific process."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "title",
+    "prompt_length": 519,
+    "output_length": 159,
+    "annotation_guidelines": {
+      "Definition": "'title' refers to specific designations, honorifics, or formal names used to address or refer to individuals, publications, or creative works.",
+      "Guidelines": "Avoid labeling generic terms such as 'chief', 'judge', or 'part'. Exercise caution when an entity could be ambiguous, such as 'Jackson' (name vs. title) or 'Defender of All Cats' (possible publication vs. informal designation)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The CEO, who was appointed as the chief strategist, has extensive experience in business development and financial planning.",
+          "explanation": "Generic term 'chief' used here."
+        },
+        {
+          "adversarial_sentence": "Jackson is a renowned expert in the field of linguistics, having published numerous articles and books on the subject.",
+          "explanation": "Ambiguous term 'Jackson' used as a name and not a title."
+        },
+        {
+          "adversarial_sentence": "As the Defender of All Cats, she tirelessly advocates for the welfare of felines and works closely with local animal shelters to promote adoption initiatives.",
+          "explanation": "Potential publication or informal designation of 'Defender of All Cats'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "animal",
+    "prompt_length": 507,
+    "output_length": 53,
+    "annotation_guidelines": {
+      "Definition": "'animal' denotes living organisms that are not human, such as mammals, birds, reptiles, and insects.",
+      "Guidelines": "Do not label fictional creatures or mythological beings. Exercise caution when identifying ambiguous terms like 'monkey wrench' (tool with an animal name) and 'cat' (could refer to an actual animal, a person, or an acronym)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The young wizard pulled out his wand and conjured a magnificent phoenix to aid him in battle against the dark forces.",
+      "explanation": "Fictional creature 'phoenix' not to be labeled as 'animal'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "component",
+    "prompt_length": 499,
+    "output_length": 165,
+    "annotation_guidelines": {
+      "Definition": "'component' refers to individual, functional elements within a system, such as software modules, physical parts, or elements in a process.",
+      "Guidelines": "Avoid labeling general terms like 'module' or 'part' unless they are specific components within the context. Be mindful of abstract or conceptual references that may not represent tangible components."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The success of this project can be attributed to several key parts working together seamlessly.",
+          "explanation": "Using the general term 'parts' which should not be labeled as 'component'."
+        },
+        {
+          "adversarial_sentence": "The manager discussed the importance of each module in the software development process during the meeting.",
+          "explanation": "Using the general term 'module' which should not be labeled as 'component'."
+        },
+        {
+          "adversarial_sentence": "The design team brainstormed various abstract concepts to enhance the user experience, overlooking tangible components that needed attention.",
+          "explanation": "Referring to abstract concepts which do not represent tangible components."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "condition",
+    "prompt_length": 529,
+    "output_length": 54,
+    "annotation_guidelines": {
+      "Definition": "'condition' in the context of NER refers to specific physical or mental states, illnesses, disorders, symptoms, or medical phenomena experienced by an individual or a group.",
+      "Guidelines": "Do not label general or nonspecific terms such as 'feeling' or 'state'. Be cautious with ambiguous terms like 'depression' (a medical condition and a general feeling). Watch out for overlapping terms like 'inflammation' which could also be related to 'location' or"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "After the intense workout, he felt a general state of stiffness and soreness throughout his body, signaling the effectiveness of the exercise regimen.",
+      "explanation": "Non-specific terms 'feeling' and 'state' used here."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "substance",
+    "prompt_length": 505,
+    "output_length": 148,
+    "annotation_guidelines": {
+      "Definition": "'substance' refers to chemical compounds, materials, or elements that have specific physical or chemical properties.",
+      "Guidelines": "Do not label generic terms like 'solution' or 'emissions' unless a specific substance is mentioned. Exercise caution with abstract references or ambiguous terms like 'carbon footprint' (concept) or 'hot water' (physical state)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The project manager proposed a potential solution that could improve overall efficiency and reduce costs in the long run.",
+          "explanation": "Generic term 'solution' is used but no specific substance is mentioned."
+        },
+        {
+          "adversarial_sentence": "The factory made efforts to control its carbon footprint by utilizing renewable energy sources, aiming to reduce its environmental impact.",
+          "explanation": "Abstract reference 'carbon footprint' is used, which is a concept and not a specific substance."
+        },
+        {
+          "adversarial_sentence": "He preferred drinking hot water with lemon in the morning to kick-start his day.",
+          "explanation": "Ambiguous term 'hot water' is used to describe physical state and not a specific substance."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "food",
+    "prompt_length": 520,
+    "output_length": 156,
+    "annotation_guidelines": {
+      "Definition": "'food' refers to items that are edible and consumable, including ingredients and prepared dishes.",
+      "Guidelines": "Avoid labeling non-edible references like 'apple' (technology company) and 'hamburger' (slang for a stolen base in baseball). Exercise caution with ambiguous terms like 'chicken' (can refer to the animal or the food item) and 'pear' (can refer to the fruit or a shape)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The new smartphone model, named after the iconic apple, promises revolutionary features and unparalleled performance.",
+          "explanation": "Non-edible reference 'apple' (technology company) is used."
+        },
+        {
+          "adversarial_sentence": "The baseball team managed to score a hamburger in the fourth inning, securing their lead against the opponents.",
+          "explanation": "Non-edible reference 'hamburger' (slang for a stolen base in baseball) is used."
+        },
+        {
+          "adversarial_sentence": "Our neighbors keep a few chickens in their backyard for eggs and occasional company during sunny afternoons.",
+          "explanation": "Ambiguous term 'chicken' used here as animal and not as food item."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "city",
+    "prompt_length": 507,
+    "output_length": 51,
+    "annotation_guidelines": {
+      "Definition": "'city' refers to a significant human settlement characterized by a dense population, infrastructure, and local governance.",
+      "Guidelines": "Ensure cities are labeled even when accompanied by a state or country reference. Exercise caution with ambiguous references, such as 'Washington' (could refer to the city or the state) and 'Santiago' (a city and a person's name)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She was born to lead, with the sophistication of a New York socialite and the charm of a Parisian fashion icon.",
+      "explanation": "Attributes of cities used as metaphorical descriptions, not actual locations."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "activity",
+    "prompt_length": 518,
+    "output_length": 219,
+    "annotation_guidelines": {
+      "Definition": "'activity' refers to actions or processes that involve a specific behavior or task, such as blogging, washing, or sun exposure.",
+      "Guidelines": "Do not annotate general concepts like 'life' or 'movement'. Exercise caution with ambiguous references, such as 'running' (activity vs. political campaign) or 'apple' (fruit vs. technology company). Pay attention to gerunds and action verbs to identify relevant activities."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The key to a fulfilling life lies in finding contentment and peace within oneself, allowing for the freedom to pursue personal growth and happiness.",
+          "explanation": "General concept 'life' is mentioned, which should not be annotated as the named entity 'activity'."
+        },
+        {
+          "adversarial_sentence": "She developed the habit of daily running early in the morning, gradually increasing her speed and endurance over time.",
+          "explanation": "The word 'running' is used as a physical activity, but as per the guidelines, it should not be annotated as the named entity 'activity'."
+        },
+        {
+          "adversarial_sentence": "The students were amazed by the new Apple product, eagerly exploring its innovative features and seamless design.",
+          "explanation": "The word 'Apple' is used as a reference to a technology company, not to an activity, and should not be annotated as the named entity 'activity'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "type",
+    "prompt_length": 509,
+    "output_length": 54,
+    "annotation_guidelines": {
+      "Definition": "'type' refers to categories, classifications, or specific forms of entities that are distinguishable based on attributes, features, or characteristics.",
+      "Guidelines": "Do not label generic references like 'stuff' or 'things'. Exercise caution with terms that have multiple meanings, such as 'weak' which could refer to a type in mathematics or indicate a lack of strength in other contexts."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The storage room is filled with all sorts of stuff, from old books to random knick-knacks of various shapes and sizes.",
+      "explanation": "Generic reference 'stuff' should not be labeled as 'type'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "company",
+    "prompt_length": 509,
+    "output_length": 46,
+    "annotation_guidelines": {
+      "Definition": "'company' refers to business entities, organizations, and institutions that produce goods, services, or operate in a specific industry.",
+      "Guidelines": "Be wary of common nouns or generic terms. Distinguish between company names and product names (e.g., Apple Inc. vs. iPhone). Pay attention to entities that are part of larger conglomerates (e.g., subsidiaries or divisions)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She works hard to maintain a work-life balance, spending time with her family and pursuing her passion for photography during weekends and holidays.",
+      "explanation": "Avoid common nouns or generic terms."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "time",
+    "prompt_length": 505,
+    "output_length": 153,
+    "annotation_guidelines": {
+      "Definition": "'time' represents temporal entities, such as specific points in time, durations, and temporal references.",
+      "Guidelines": "Avoid labeling generic terms like 'now' or 'soon'. Exercise caution with ambiguous terms like 'summer' (can refer to the season or a specific time period). Be mindful of references that could be interpreted differently across cultures or time zones."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The children will be home from school any minute now, so we better start preparing their snacks.",
+          "explanation": "Generic term 'now' used here."
+        },
+        {
+          "adversarial_sentence": "I look forward to spending the entire summer break exploring new hiking trails and enjoying the great outdoors.",
+          "explanation": "Ambiguous term 'summer' used here as a season, not a specific time period."
+        },
+        {
+          "adversarial_sentence": "The team meeting is scheduled for 3 PM sharp, so please make sure to adjust for any potential differences in interpretation due to participants from various time zones.",
+          "explanation": "Be mindful of references interpreted differently across time zones."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "method",
+    "prompt_length": 529,
+    "output_length": 165,
+    "annotation_guidelines": {
+      "Definition": "'method' refers to specific techniques, procedures, or approaches used to accomplish a task, solve a problem, or conduct an analysis in a particular field or discipline.",
+      "Guidelines": "Avoid labeling generic terms like 'approach' or 'technique' without specific context. Distinguish between specific methods and general concepts, e.g., 'statistical methods' vs. 'statistics'. Be cautious with entities that can be interpreted as both methods and general concepts, such as 'tree"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The team decided to take a collaborative approach to address the issue and develop a more cohesive work environment.",
+          "explanation": "Generic term 'approach' used without specific context."
+        },
+        {
+          "adversarial_sentence": "It is important to understand the principles and techniques involved in quantum mechanics to appreciate the complexities of the universe.",
+          "explanation": "Generic terms 'techniques' used without specific context."
+        },
+        {
+          "adversarial_sentence": "The tree stood tall and proud, its branches reaching out to provide shade to the visitors of the park.",
+          "explanation": "Entity 'tree' can be interpreted both as a method and a general concept."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "property",
+    "prompt_length": 511,
+    "output_length": 58,
+    "annotation_guidelines": {
+      "Definition": "'property' refers to characteristic attributes or qualities of objects, materials, or substances that can be observed or measured.",
+      "Guidelines": "Do not label actions or events as 'property'. Exercise caution when distinguishing between 'property' and 'process', as well as between 'property' and 'entity' (e.g., 'strength' as a quality of a material versus 'company strength')."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The company's strength lies in its innovative approach and strategic decision-making capabilities, setting it apart from its competitors in the market.",
+      "explanation": "'Strength' in this context refers to the company's capability and not as a characteristic attribute."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "organism",
+    "prompt_length": 526,
+    "output_length": 43,
+    "annotation_guidelines": {
+      "Definition": "'organism' refers to living entities, such as animals, plants, and microorganisms, that are part of the biological world.",
+      "Guidelines": "Avoid labeling non-living entities (e.g., viruses, minerals) as 'organisms'. Exercise caution with terms that can be interpreted as both living and non-living, like 'virus' or 'rock'. Pay particular attention to ambiguous terms such as 'computer virus' or 'rock band'."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The computer virus quickly spread across the network, causing widespread disruption and chaos in its wake.",
+      "explanation": "Non-living entity 'computer virus' referenced."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "drug",
+    "prompt_length": 528,
+    "output_length": 44,
+    "annotation_guidelines": {
+      "Definition": "'drug' refers to chemical substances used to diagnose, treat, cure, or prevent diseases and medical conditions.",
+      "Guidelines": "Do not label general medical terms, vitamins, or natural remedies as 'drug'. Exercise caution with terms that may have multiple meanings, such as 'dose' (can refer to dosage or a verb), and be mindful of potential ambiguities with brand names (e.g., 'Tylenol' is both a brand and a drug ingredient)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "He regularly takes vitamin C and zinc to boost his immune system during flu season.",
+      "explanation": "Vitamins should not be labeled as 'drug'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical procedure",
+    "prompt_length": 489,
+    "output_length": 40,
+    "annotation_guidelines": {
+      "Definition": "'medical procedure' refers to any specific medical treatment, surgery, diagnostic procedure, or intervention performed on a patient.",
+      "Guidelines": "Avoid labeling general medical terms (e.g., 'medical diagnostics') or ambiguous references. Exercise caution when identifying compound terms ('cardiac surgery')."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The doctor requested further medical diagnostics to determine the cause of the patient's symptoms.",
+      "explanation": "Generic medical term 'medical diagnostics' should be avoided."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "treatment",
+    "prompt_length": 526,
+    "output_length": 57,
+    "annotation_guidelines": {
+      "Definition": "'treatment' refers to medical procedures, therapies, medications, or any intervention aimed at addressing a health condition or disease.",
+      "Guidelines": "The term 'treatment' should not be applied to general medical concepts like diseases or body parts. Exercise care with ambiguous terms such as 'total tiroidectomy' (which may also refer to a surgical procedure). Be mindful of instances where the term may be used metaphorically, such as 'legal treatment'."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The cardiovascular system plays a crucial role in maintaining overall health, ensuring blood circulation and oxygen delivery to various parts of the body.",
+      "explanation": "General medical concept 'cardiovascular system' and 'overall health', not a specific treatment."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "profession",
+    "prompt_length": 516,
+    "output_length": 167,
+    "annotation_guidelines": {
+      "Definition": "'profession' refers to occupations, roles, or titles that are typically associated with a specific skill set, expertise, or function.",
+      "Guidelines": "Avoid labeling general terms like 'worker' or 'employee' unless the context specifically mentions a profession. Exercise caution with terms that could also refer to non-professional activities, for example, 'chef' could refer to a professional cook or a character in a game."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The company is focused on fostering a culture of collaboration and innovation among its workforce, ensuring that every employee feels valued and appreciated for their contributions.",
+          "explanation": "General term 'employee' used here without specific mention of a profession."
+        },
+        {
+          "adversarial_sentence": "The restaurant hired a new chef to revamp its menu and introduce exciting culinary creations to its patrons.",
+          "explanation": "The term 'chef' is used here, but it could refer to a character in a game."
+        },
+        {
+          "adversarial_sentence": "He's a dedicated worker, always putting in the extra effort to ensure the job gets done right.",
+          "explanation": "General term 'worker' used here without specific mention of a profession."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "cell type",
+    "prompt_length": 526,
+    "output_length": 150,
+    "annotation_guidelines": {
+      "Definition": "'cell type' refers to distinct categories of cells based on their morphology, function, and genetic makeup, such as stem cells, pancreatic cells, or neurons.",
+      "Guidelines": "Do not label general cell references like 'cell', 'tissue', or 'organ'. Exercise caution with entities that have dual meanings, such as 'pancreatic cancer cell' (cell type vs. medical condition) or 'apple cells' (fruit vs. biological cells)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "I need to charge my cell before we go out tonight.",
+          "explanation": "General reference to an electronic device's cell, not a biological cell type."
+        },
+        {
+          "adversarial_sentence": "The recipe calls for squeezing the cells of a fresh lemon to extract the juice.",
+          "explanation": "Reference to the cells of a fruit, not biological cell types."
+        },
+        {
+          "adversarial_sentence": "Her blood work revealed abnormalities in the pancreatic cancer cells, prompting further testing and analysis.",
+          "explanation": "Reference to cells related to a medical condition, not specifically a cell type."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "anatomical structure",
+    "prompt_length": 510,
+    "output_length": 64,
+    "annotation_guidelines": {
+      "Definition": "'anatomical structure' refers to parts of an organism's body, such as organs, tissues, bones, and other physical components.",
+      "Guidelines": "Exercise caution with general terms like 'cysts' or 'arteries' that may or may not specifically refer to anatomical structures. Avoid labeling non-physical or abstract references like 'eNOS'."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The doctor mentioned that the patient's recent MRI scan revealed the presence of cysts in the abdominal region, possibly indicating an underlying health issue.",
+      "explanation": "General term 'cysts' that may or may not specifically refer to anatomical structures."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "job title",
+    "prompt_length": 530,
+    "output_length": 188,
+    "annotation_guidelines": {
+      "Definition": "'job title' refers to specific positions or roles within an organization or professional environment, such as 'manager', 'chief executive officer (CEO)', or 'faculty productivity'.",
+      "Guidelines": "Avoid labeling general occupations ('worker', 'employee') as 'job title' unless they are part of a specific job title (e.g., 'social worker'). Be mindful of titles that can be confused with common nouns (e.g., 'driver', which could refer to a job or"
+    },
+    "negative_sentences": {
+      "adversarial_examples": [
+        {
+          "adversarial_sentence": "The organization aims to support workers' health and safety through various programs and initiatives.",
+          "explanation": "General occupation 'workers' should not be labeled as 'job title'."
+        },
+        {
+          "adversarial_sentence": "The driver skillfully navigated through the busy streets of the city, ensuring a smooth and efficient commute for the passengers.",
+          "explanation": "The term 'driver' can be confused with a common noun and should not be labeled as 'job title'."
+        },
+        {
+          "adversarial_sentence": "She is an excellent cook and her delicious creations always impress the guests at the events she organizes.",
+          "explanation": "The term 'cook' should not be labeled as 'job title' unless it is part of a specific job title."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "data",
+    "prompt_length": 500,
+    "output_length": 175,
+    "annotation_guidelines": {
+      "Definition": "'data' represents information or facts, often in electronic form, that can be processed or manipulated.",
+      "Guidelines": "Do not label generic terms or common nouns like 'rules' or 'outcomes'. Exercise caution with ambiguous terms such as 'Amazon' (company or data storage service) or 'Apple' (company or fruit)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The rules for conducting experiments in the laboratory were strict and closely monitored to ensure accuracy and safety.",
+          "explanation": "Generic term 'rules' should not be labeled as 'data'."
+        },
+        {
+          "adversarial_sentence": "The outcomes of the study were thoroughly analyzed and presented at the international conference.",
+          "explanation": "Generic term 'outcomes' should not be labeled as 'data'."
+        },
+        {
+          "adversarial_sentence": "The Amazon was once again engulfed in flames as wildfires continued to ravage the forest, prompting global concerns about environmental preservation.",
+          "explanation": "Ambiguous term 'Amazon' used here as a geographical location and not as a company or data storage service."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "quantity",
+    "prompt_length": 494,
+    "output_length": 54,
+    "annotation_guidelines": {
+      "Definition": "'quantity' denotes numerical values or measurements of items, entities, or concepts.",
+      "Guidelines": "Avoid labeling generic references to numbers, such as 'many', 'few', or 'some'. Exercise caution with ambiguous terms like 'scores' (which could refer to 20 units or 20 points)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "Many people attended the concert, and some even camped out overnight to secure a good spot near the stage.",
+      "explanation": "Generic references 'Many' and 'some' should not be labeled as 'quantity'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "sports team",
+    "prompt_length": 530,
+    "output_length": 60,
+    "annotation_guidelines": {
+      "Definition": "'sports team' refers to professional or amateur athletic organizations, including teams from various sports such as football, baseball, basketball, and so on.",
+      "Guidelines": "Ensure that the labeled entity pertains to a specific sports team and not a general sports reference. Exercise caution with potentially ambiguous terms, such as 'Red Sox' (can refer to both the team and the fan base) or 'Broncos' (can refer to multiple sports teams, e.g., Denver Broncos or"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "Physical activity is essential for maintaining good health and overall well-being, and participating in team sports can be a fun way to stay active and socialize with others.",
+      "explanation": "Non-specific reference to team sports, not a specific 'sports team'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "biological process",
+    "prompt_length": 522,
+    "output_length": 57,
+    "annotation_guidelines": {
+      "Definition": "'biological process' refers to a series of events, activities, or changes that occur in a living organism or cell, such as metabolic pathways, signal transduction, and cellular processes.",
+      "Guidelines": "Do not label individual molecules or proteins unless they are involved in a specific biological process. Exercise caution with ambiguous terms like 'effect' (which can have various interpretations) and be precise in identifying the actual biological processes being referenced."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The effect of the new drug on cellular activity was remarkable, causing a significant change in the expression of multiple proteins within the cells.",
+      "explanation": "Use of ambiguous term 'effect' without clearly identifying the specific biological process being referenced."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "data type",
+    "prompt_length": 512,
+    "output_length": 46,
+    "annotation_guidelines": {
+      "Definition": "'data type' refers to the classification of data that specifies the type of value a variable can hold, such as integer, string, float, boolean, etc.",
+      "Guidelines": "Do not label general or non-specific terms. Exercise caution with ambiguous terms, such as 'value' or 'class', which could refer to other entities. Verify the context to correctly identify specific data types."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The value of the class is an important consideration when developing a new framework for the software system.",
+      "explanation": "The term 'class' is used in a non-data type context."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "programming language",
+    "prompt_length": 530,
+    "output_length": 184,
+    "annotation_guidelines": {
+      "Definition": "'programming language' refers to specific languages or frameworks used for computer programming, such as Python, Java, or MATLAB.",
+      "Guidelines": "Avoid labeling general terms like 'programming' or 'language'. Exercise caution with ambiguous terms like 'Java' (could refer to the programming language or the island) and 'Swift' (could refer to the programming language or a quality). When in doubt, consider the context of the use of the term to determine if it refers to the programming"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The evolution of programming has greatly impacted the technology industry, leading to innovative solutions and advancements in various fields.",
+          "explanation": "Avoid labeling general terms like 'programming' or 'language'."
+        },
+        {
+          "adversarial_sentence": "She captured the essence of Java in her artwork, depicting the serene beauty of the island through her intricate brushstrokes.",
+          "explanation": "Ambiguous term 'Java' used here as the name of an island and not as a programming language."
+        },
+        {
+          "adversarial_sentence": "His swift response to the crisis was commendable, displaying a level of decisiveness and efficiency that impressed everyone.",
+          "explanation": "Ambiguous term 'swift' used here as a quality and not as a programming language."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "occupation",
+    "prompt_length": 500,
+    "output_length": 203,
+    "annotation_guidelines": {
+      "Definition": "'occupation' refers to specific roles, jobs, or professions that individuals hold or perform.",
+      "Guidelines": "Avoid ambiguous terms like 'driver' (can refer to a car driver or software driver) and be cautious with titles that can be both an occupation and a proper noun like 'Queen' (a chess piece and a monarch)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "We used the term 'driver' to explain the operation of the new software, emphasizing its crucial role in ensuring smooth communication between the hardware and the applications.",
+          "explanation": "Ambiguous term 'driver' used here as software driver, not as a job title."
+        },
+        {
+          "adversarial_sentence": "The Queen of the chess club enthusiastically organized a tournament for the members, showcasing her strategic prowess on and off the board.",
+          "explanation": "The title 'Queen' used here as a proper noun/title, not as an occupation."
+        },
+        {
+          "adversarial_sentence": "I recently read an intriguing article about a master strategist who devised revolutionary tactics to outmaneuver opponents in the game of chess, showcasing the genius mindset of a true Queen on the board.",
+          "explanation": "The title 'Queen' used here as a metaphor for a master strategist in chess, not as an occupation."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "file",
+    "prompt_length": 520,
+    "output_length": 57,
+    "annotation_guidelines": {
+      "Definition": "'file' represents a named entity that refers to a specific digital file or document, such as code files, style files, or configuration files.",
+      "Guidelines": "Avoid labeling generic references to files, such as 'code' or 'style files'. Exercise caution with ambiguous references, such as 'project file' (could refer to various types of files) or 'file' (could be used informally to refer to any document)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The team worked collaboratively to finalize the project file, ensuring that all necessary details were meticulously recorded and organized for future reference.",
+      "explanation": "Generic reference 'project file' is used, which could refer to various types of files."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "body part",
+    "prompt_length": 518,
+    "output_length": 56,
+    "annotation_guidelines": {
+      "Definition": "'body part' represents specific anatomical components of a human or animal body.",
+      "Guidelines": "Avoid labeling general terms like 'part' or ambiguous references like 'head' (could refer to a leader) or 'arm' (could refer to a weapon). Be mindful of figurative language that mentions body parts, such as 'set your mind at ease' (mind is not a body part in this context)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The CEO played a crucial part in the company's strategic decision-making process, leading the team to new heights of success.",
+      "explanation": "Use of 'part' in a general sense, not referring to a specific body part."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical treatment",
+    "prompt_length": 514,
+    "output_length": 157,
+    "annotation_guidelines": {
+      "Definition": "'medical treatment' refers to procedures, therapies, medications, or interventions used to address health conditions or diseases.",
+      "Guidelines": "Do not label general medical terms like 'healthcare' or 'medicine'. Exercise caution with ambiguous terms such as 'therapy' (can refer to various types of treatments, including non-medical therapies) or 'process' (which may not always signify a medical procedure)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "A healthy lifestyle and regular exercise are important for maintaining overall well-being.",
+          "explanation": "Does not refer to a specific medical treatment."
+        },
+        {
+          "adversarial_sentence": "The manufacturing process of the new pharmaceutical drug is state-of-the-art and meticulously controlled to ensure high quality.",
+          "explanation": "The term 'process' is used in a non-medical context."
+        },
+        {
+          "adversarial_sentence": "She found solace in art therapy, using creative expression to manage her emotional well-being.",
+          "explanation": "The term 'therapy' is used in a non-medical context."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "language",
+    "prompt_length": 523,
+    "output_length": 51,
+    "annotation_guidelines": {
+      "Definition": "'language' refers to human languages, including natural languages, computer programming languages, sign languages, and any other form of communication specific to human or machine interaction.",
+      "Guidelines": "Avoid labeling generic terms like 'code', 'script', or 'text' as 'language'. Exercise caution with ambiguous terms like 'Java' (can refer to the island or the programming language) or 'Python' (can refer to the snake or the programming language)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The author skillfully crafted a beautiful piece of code to animate the website's homepage, showcasing an elegant blend of art and technology.",
+      "explanation": "Generic term 'code' used instead of 'language'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "chemical compound",
+    "prompt_length": 530,
+    "output_length": 57,
+    "annotation_guidelines": {
+      "Definition": "'chemical compound' refers to specific substances composed of two or more elements in fixed proportions. These compounds may be organic or inorganic, and can include molecules, ions, and salts.",
+      "Guidelines": "Avoid labeling general terms like 'salts' or ambiguous references such as 'aryl' (can refer to a group in organic chemistry) or 'basic' (which may refer to a chemical property or a solution). Be specific and ensure that the labeled entities refer to well-defined"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The basic concept of chemical compounds is central to understanding the composition and behavior of matter in the natural world.",
+      "explanation": "The term 'basic' is used here in a non-specific general context."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "gene",
+    "prompt_length": 502,
+    "output_length": 49,
+    "annotation_guidelines": {
+      "Definition": "'gene' refers to specific DNA sequences that provide the genetic code for a particular function or trait.",
+      "Guidelines": "Exercise caution with gene symbols that may be short common words (e.g., 'rat' or 'map'). Be mindful of multi-word gene names, as well as potential homographs, where the same spelling represents different genes."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The rat quickly scurried across the floor, causing a commotion among the startled scientists in the lab.",
+      "explanation": "Use of 'rat' as a common word and not gene symbol."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "state",
+    "prompt_length": 508,
+    "output_length": 153,
+    "annotation_guidelines": {
+      "Definition": "'state' refers to a defined territory within a country or nation, often with its own government and administrative boundaries.",
+      "Guidelines": "Do not label non-political divisions like 'emotional state' or 'solid state'. Exercise caution with ambiguous terms such as 'Georgia' (could refer to the state or the country) and use contextual clues to disambiguate."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The scientist explained the concept of solid state physics in great detail during the lecture.",
+          "explanation": "Non-political use of 'state' to refer to a scientific concept."
+        },
+        {
+          "adversarial_sentence": "After the breakup, Sarah found herself in a fragile emotional state, struggling to cope with the pain of the separation.",
+          "explanation": "Non-territorial use of 'state' to refer to emotional state."
+        },
+        {
+          "adversarial_sentence": "I visited Georgia last summer and fell in love with the natural beauty of the region.",
+          "explanation": "Ambiguous term 'Georgia' used without context, could refer to the state or the country."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "law",
+    "prompt_length": 529,
+    "output_length": 46,
+    "annotation_guidelines": {
+      "Definition": "'law' refers to legal documents, regulations, acts, and other formal rules or statutes that have been established by a governing body.",
+      "Guidelines": "Avoid labeling general or informal references to rules. Exercise caution with terms that also have non-legal meanings, such as 'constitution' (can refer to physical health) or 'right' (can refer to direction or entitlement). Be mindful of ambiguous terms like 'Freedom of Information Act' (may refer to the US federal law"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "It's important to always follow the basic laws of physics when conducting scientific experiments to ensure accurate and reliable results.",
+      "explanation": "General reference to rules in a non-legal context."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "action",
+    "prompt_length": 509,
+    "output_length": 147,
+    "annotation_guidelines": {
+      "Definition": "'action' refers to verbs or verbal phrases that describe a specific activity or behavior.",
+      "Guidelines": "Avoid labeling general activities that lack specific verbs (e.g., 'exercise' without a specific action like 'running'). Exercise caution with idiomatic or metaphorical expressions (e.g., 'bite' in 'Fight the Bite' may refer to mosquitoes rather than a physical action)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "She values regular exercise as part of her healthy lifestyle.",
+          "explanation": "Labeling of a general activity 'exercise' without a specific verb."
+        },
+        {
+          "adversarial_sentence": "The company is determined to tackle the issue head-on and 'fight the bite' of misinformation in their advertising campaign.",
+          "explanation": "Idiomatic expression 'fight the bite' where 'bite' does not refer to a physical action."
+        },
+        {
+          "adversarial_sentence": "The team is focused on growth strategies to maximize revenue and increase market share.",
+          "explanation": "Labeling of general activities 'growth strategies' without specific verbs."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "website",
+    "prompt_length": 529,
+    "output_length": 52,
+    "annotation_guidelines": {
+      "Definition": "'website' refers to specific online platforms or domains on the internet, such as 'facebook.com' or 'twitter.com', primarily used for communication, information dissemination, or commercial activities.",
+      "Guidelines": "Avoid labeling general terms like 'the web' or 'online'. Exercise caution with ambiguous terms such as 'apple.com' (company or website) or 'reddit' (website or community/forum). Be mindful of cases where a term could refer to a company or a website ("
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The company's online operations have expanded significantly over the past year, allowing them to reach a wider audience and boost their sales.",
+      "explanation": "Usage of the general term 'online' instead of specific website name."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "library",
+    "prompt_length": 504,
+    "output_length": 196,
+    "annotation_guidelines": {
+      "Definition": "'library' refers to software components or modules that provide specific functions or services for use in programming or development.",
+      "Guidelines": "Do not label standalone words that could refer to a broad range of topics, such as 'numpy' or 'jquery'. Exercise caution with terms that may reference file extensions or configurations, like 'MSVCRTD.lib'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The company's success can be attributed to its strong focus on innovation and quality, with a commitment to staying ahead of the curve in the competitive market.",
+          "explanation": "Standalone word 'innovation' should not be labeled as 'library'."
+        },
+        {
+          "adversarial_sentence": "The team proposed using a jquery approach to enhance the user experience on the website, aiming to achieve a more interactive and dynamic platform.",
+          "explanation": "The term 'jquery' should not be labeled as 'library'."
+        },
+        {
+          "adversarial_sentence": "The developers encountered an issue with the MSVCRTD.lib file extension due to compatibility conflicts during the integration process.",
+          "explanation": "Exercise caution with terms that may reference file extensions or configurations, like 'MSVCRTD.lib.'"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "facility",
+    "prompt_length": 508,
+    "output_length": 189,
+    "annotation_guidelines": {
+      "Definition": "'facility' refers to physical structures or places designed for specific functions, such as hospitals, post offices, and taprooms.",
+      "Guidelines": "Do not label general areas like 'city' or 'town'. Exercise caution with ambiguous terms like 'airport' (can refer to the facility or the company) and 'school' (can refer to the building or the institution)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The city experienced a surge in population growth due to the economic boom in the region.",
+          "explanation": "General area 'city' is mentioned, but not a specific physical structure or place designed for specific functions."
+        },
+        {
+          "adversarial_sentence": "After missing his flight, John decided to spend the night at the airport, hoping to catch the next available departure.",
+          "explanation": "Ambiguous term 'airport' is used here in the context of the company or the location rather than the physical structure."
+        },
+        {
+          "adversarial_sentence": "The school received a grant to improve its educational programs and facilities.",
+          "explanation": "The term 'school' is used here in reference to the institution as a whole, not a specific physical structure or place designed for specific functions."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "publication",
+    "prompt_length": 529,
+    "output_length": 46,
+    "annotation_guidelines": {
+      "Definition": "'publication' refers to sources of written or printed material, such as newspapers, magazines, journals, or books, that are officially released or made public.",
+      "Guidelines": "Exclude non-specific or ambiguous references, such as 'a paper' or 'an article,' unless the publication's name is identifiable. Be mindful of potential homographs, such as 'Post' (could refer to a newspaper or a physical post) or 'Times' (could refer to a publication or the"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She carefully folded the letter and slipped it into an envelope, ready to be sent off to its recipient.",
+      "explanation": "Non-specific reference 'a letter' instead of identifiable publication."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "tool",
+    "prompt_length": 516,
+    "output_length": 201,
+    "annotation_guidelines": {
+      "Definition": "'tool' refers to physical or digital instruments, devices, or software used to perform specific tasks, either by hand or with technical assistance.",
+      "Guidelines": "Avoid labeling abstract concepts unless directly referenced as tools. Exercise caution with potentially ambiguous terms such as 'hammer' (can refer to a tool or a dance move) or 'Windows' (can refer to a tool, an operating system, or a company)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "Her meticulous planning and organization skills were her hammer when it came to executing complex projects efficiently.",
+          "explanation": "The term 'hammer' is used here metaphorically to describe a personal attribute, not as a physical tool."
+        },
+        {
+          "adversarial_sentence": "The company's success can be attributed to its innovative use of Windows and its commitment to excellence in software development.",
+          "explanation": "The term 'Windows' is used here to reference an operating system or software, not as a physical or digital tool."
+        },
+        {
+          "adversarial_sentence": "The musician's mesmerizing performance showcased the graceful movements of a dancer, effortlessly transitioning between styles with the finesse of a hammer striking a delicate surface.",
+          "explanation": "The term 'hammer' is used here to reference a dance move, not as a physical tool."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "field of study",
+    "prompt_length": 525,
+    "output_length": 199,
+    "annotation_guidelines": {
+      "Definition": "'field of study' refers to academic or scientific disciplines, specialized areas of knowledge, or specific subject matters that are the focus of research or educational pursuits.",
+      "Guidelines": "Exercise caution when labeling general terms like 'biology' which could denote a subject or a physical location. Be mindful of multi-word terms that can be confused with everyday language, such as 'computer science' (field) vs 'computer' or 'science' (individual words)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The flowers bloomed beautifully in the field behind the house, creating a picturesque setting for the outdoor wedding ceremony.",
+          "explanation": "The word 'field' is used in the context of a physical location, not as a field of study."
+        },
+        {
+          "adversarial_sentence": "The young student enthusiastically explored the wonders of computer games and the science behind them, sparking an interest in technology and gaming design.",
+          "explanation": "The multi-word term 'computer science' is used in the context of 'computer' and 'science' as individual concepts, not as a field of study."
+        },
+        {
+          "adversarial_sentence": "Her interest in marine biology led her to explore the diversity of marine life in various coastal regions, conducting research on the ecological impacts of human activity on marine ecosystems.",
+          "explanation": "The term 'biology' is used to denote a subject, not a field of study."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "compound",
+    "prompt_length": 521,
+    "output_length": 73,
+    "annotation_guidelines": {
+      "Definition": "'compound' refers to chemical substances composed of two or more elements or substances, combined in fixed proportions.",
+      "Guidelines": "Do not label general elements or substances that do not form specific chemical compounds (e.g., 'oxygen' or 'water'). Exercise caution with ambiguous terms that can refer to compounds or non-compound entities, such as 'iron curtain' (historical concept) or 'apple pie' (culinary dish)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The chef proudly displayed his grandmother's secret apple pie recipe, showcasing the perfect combination of sweet, tangy apples with a buttery, flaky crust that captivated the taste buds of everyone who tried it.",
+      "explanation": "Ambiguous term 'apple pie' used here as culinary dish and not as chemical compound."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "document",
+    "prompt_length": 529,
+    "output_length": 167,
+    "annotation_guidelines": {
+      "Definition": "'document' refers to specific textual or written materials, such as files, permits, or studies, that contain information intended for communication, reference, or record-keeping purposes.",
+      "Guidelines": "Avoid labeling general terms like 'studies' when they lack reference to a specific textual or written record. Exercise caution when interpreting terms like 'permit' that may have multiple meanings based on context. Be clear on distinguishing 'document' from broader concepts like 'information' or 'data'"
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The teacher recommended that the students engage in more studies to improve their exam performance.",
+          "explanation": "General term 'studies' lacks reference to a specific textual or written record."
+        },
+        {
+          "adversarial_sentence": "The construction company obtained the necessary permit to proceed with the building project.",
+          "explanation": "The term 'permit' is used in the context of construction and does not refer to a specific textual or written record."
+        },
+        {
+          "adversarial_sentence": "The scientist collected data from the experiment to support her hypothesis.",
+          "explanation": "The term 'data' is a broader concept and does not specifically refer to a written record."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "organ",
+    "prompt_length": 512,
+    "output_length": 51,
+    "annotation_guidelines": {
+      "Definition": "'organ' refers to parts of the body that have a specific structure and function, such as heart, liver, brain, and kidney.",
+      "Guidelines": "Do not label non-anatomical usage, such as 'the heart of the matter' (metaphorical). Watch out for terms that are ambiguous, like 'heart' (which could refer to the body part or a shape)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She poured her heart and soul into her artwork, expressing raw emotions through vibrant colors and bold strokes on the canvas.",
+      "explanation": "Non-anatomical usage of 'heart' in a metaphorical sense."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "abbreviation",
+    "prompt_length": 515,
+    "output_length": 47,
+    "annotation_guidelines": {
+      "Definition": "'abbreviation' refers to shortened forms of words or phrases, often comprised of the initial letters of a phrase or a word.",
+      "Guidelines": "Avoid labeling common words or terms that are not standard abbreviations. Exercise caution with acronyms, especially if they can be confused with regular words (e.g., 'ACE' for both 'American Council on Education' and 'highest playing card in a deck')."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The CEO approached the stage, radiating an aura of confidence and authority that captivated the entire audience.",
+      "explanation": "Contains the common word 'CEO' but not a standard abbreviation."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "character",
+    "prompt_length": 522,
+    "output_length": 42,
+    "annotation_guidelines": {
+      "Definition": "'character' denotes individuals or entities that play a role in a narrative, such as people, fictional characters, or personified objects.",
+      "Guidelines": "Avoid labeling generic terms like 'thing' or 'it'. Be cautious with ambiguous terms that may refer to both a person and a non-person, such as 'Apple' (company and fruit). Be mindful of non-traditional characters, such as animals or anthropomorphized objects."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The thing we need to address first is the pricing strategy for the new product launch.",
+      "explanation": "Generic term 'thing' not referring to a character."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "brand",
+    "prompt_length": 524,
+    "output_length": 177,
+    "annotation_guidelines": {
+      "Definition": "'brand' refers to specific commercial products, companies, or organizations that are associated with a particular name or logo.",
+      "Guidelines": "Exclude generic terms such as 'quality' or 'performance'. Exercise caution with entities that can refer to both brands and non-branded items, like 'apple' or 'amazon'. Additionally, be cautious with ambiguous references like 'Mercury' (could refer to the car brand, the planet, or the Roman god)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The product's quality and performance greatly exceeded my expectations, outperforming all other similar items on the market.",
+          "explanation": "Excludes generic terms 'quality' and 'performance'."
+        },
+        {
+          "adversarial_sentence": "I couldn't resist the temptation to take a bite of the juicy apple, savoring its crispness and sweetness.",
+          "explanation": "Use of 'apple' here refers to the fruit, not the brand."
+        },
+        {
+          "adversarial_sentence": "I gazed up at the twinkling stars and marveled at the wonder of the universe, particularly captivated by the beauty of the planet Mercury as it shone brightly in the night sky.",
+          "explanation": "Ambiguous reference to 'Mercury' in the context of the planet, not the brand."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "device",
+    "prompt_length": 522,
+    "output_length": 148,
+    "annotation_guidelines": {
+      "Definition": "'device' refers to physical objects or instruments with specific functionality, often electronic or mechanical in nature, that are used for various purposes.",
+      "Guidelines": "Avoid labeling generic terms like 'equipment' or 'tool'. Exercise caution with ambiguous references, such as 'Windows' (operating system or physical windows) or 'Apple' (brand or fruit). Be mindful of similar entities like 'software', 'appliance', or 'product'."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The plumber arrived with his trusty equipment to fix the leaky faucet in the kitchen.",
+          "explanation": "Generic term 'equipment' used instead of 'device'."
+        },
+        {
+          "adversarial_sentence": "I couldn't believe my luck when I found a delicious, juicy apple at the bottom of my backpack.",
+          "explanation": "Ambiguous term 'Apple' used here as fruit."
+        },
+        {
+          "adversarial_sentence": "The software he developed revolutionized the way data is analyzed and processed in the industry, leading to significant improvements in efficiency and accuracy.",
+          "explanation": "Similar entity 'software' used instead of 'device'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "operating system",
+    "prompt_length": 531,
+    "output_length": 48,
+    "annotation_guidelines": {
+      "Definition": "'operating system' refers to software that manages computer hardware and provides services for computer programs. It includes systems such as Windows, macOS, iOS, Android, and Linux.",
+      "Guidelines": "Avoid mistaking software products or versions with similar names (e.g., 'Office' for Microsoft Office, 'Mojave' for macOS Mojave) as operating systems. Exercise caution with ambiguous references such as 'Windows' (which can refer to the operating system or a physical element"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The new Office update offers several enhancements and productivity features that have been well-received by users across different platforms.",
+      "explanation": "Mistaking software product 'Office' for an operating system."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "service",
+    "prompt_length": 506,
+    "output_length": 46,
+    "annotation_guidelines": {
+      "Definition": "'service' refers to offerings or facilities provided to fulfill specific needs or deliver specific products, such as clinics, makeup services, or software solutions.",
+      "Guidelines": "Avoid labeling general or ambiguous terms like 'customer service' (not a specific service type). Exercise caution with terms that can be interpreted in multiple contexts, like 'toast' (food or software feature)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The company prides itself on its exceptional customer service, always going above and beyond to meet the needs of its clients.",
+      "explanation": "General and ambiguous term 'customer service'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "technique",
+    "prompt_length": 520,
+    "output_length": 51,
+    "annotation_guidelines": {
+      "Definition": "'technique' refers to specific methods, procedures, or approaches used in a particular field or discipline to achieve a specific outcome or result.",
+      "Guidelines": "Do not label general actions or behaviors. Exercise caution with terms that could refer to both a method and a concept, such as 'triangulation' or 'mapping'. Be mindful of potential ambiguity when labeling a term as a 'technique' in a specific context."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "She elegantly danced across the stage, showcasing her impeccable technique and grace, leaving the audience mesmerized by her performance.",
+      "explanation": "Positive occurrence of 'technique' labeled correctly as a specific method."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "species",
+    "prompt_length": 506,
+    "output_length": 178,
+    "annotation_guidelines": {
+      "Definition": "'species' refers to distinct types of organisms, identified by their scientific names or common names if clearly referring to a specific species.",
+      "Guidelines": "Avoid labeling general terms like 'humans' or 'animals' without specifying a particular species. Be cautious with ambiguous terms like 'Italian' (could refer to food, people, or other non-species entities)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "Humans have always strived for excellence in their endeavors, pushing the boundaries of innovation and creativity to achieve remarkable feats.",
+          "explanation": "General term 'humans' without specifying a particular species."
+        },
+        {
+          "adversarial_sentence": "The restaurant's menu featured a delectable selection of Italian dishes, each prepared with the finest ingredients and authentic flavors.",
+          "explanation": "Ambiguous term 'Italian' used here could refer to food instead of a species."
+        },
+        {
+          "adversarial_sentence": "The expedition team encountered a group of animals while trekking through the dense jungle, observing their behavior from a safe distance.",
+          "explanation": "General term 'animals' without specifying a particular species."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "symptom",
+    "prompt_length": 524,
+    "output_length": 191,
+    "annotation_guidelines": {
+      "Definition": "'symptom' generally refers to specific manifestations or signs that indicate a medical condition or disease, such as physical or mental abnormalities experienced by an individual.",
+      "Guidelines": "Avoid labeling general, non-specific terms like 'pain' or 'fever' without context. Exercise caution with terms that might be both symptoms and medical conditions, such as 'depression' or 'fatigue'. Consider the specific context and medical knowledge when annotating potential symptoms."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The morning sky was painted in hues of orange and pink, creating a serene and peaceful atmosphere as the sun rose above the horizon.",
+          "explanation": "Non-specific and general term 'peaceful' without context."
+        },
+        {
+          "adversarial_sentence": "His exhaustion was apparent after the long and strenuous hours spent working on the project, leaving him drained both physically and mentally.",
+          "explanation": "Non-specific and general term 'exhaustion' without indicating any medical context."
+        },
+        {
+          "adversarial_sentence": "The patient's gray hair and wrinkled skin reflected the passage of time and the wisdom gained through life's experiences.",
+          "explanation": "Non-specific and general terms 'gray hair' and 'wrinkled skin' without context of being symptoms."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "task",
+    "prompt_length": 523,
+    "output_length": 172,
+    "annotation_guidelines": {
+      "Definition": "'task' refers to a specific activity, assignment, or operation that may involve a set of actions or objectives to achieve a particular goal.",
+      "Guidelines": "Do not label generic or ambiguous terms such as 'work' or 'service'. Exercise caution with terms that could denote entities other than tasks, such as 'plant' (which could refer to a physical object or an action), and ensure that the labeled entities directly represent a task or activity."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "She spent the morning at work, making important phone calls and attending various meetings to discuss upcoming projects.",
+          "explanation": "Generic term 'work' used, which should not be labeled as 'task'."
+        },
+        {
+          "adversarial_sentence": "The plant needs regular watering and sunlight to thrive in its new environment.",
+          "explanation": "Ambiguous term 'plant' is used here, which could refer to a physical object, not a task."
+        },
+        {
+          "adversarial_sentence": "He provides excellent service, always going above and beyond to meet his clients' needs.",
+          "explanation": "Generic term 'service' used, which should not be labeled as 'task'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "category",
+    "prompt_length": 523,
+    "output_length": 164,
+    "annotation_guidelines": {
+      "Definition": "'category' refers to a class or grouping of related items, entities, or concepts based on shared characteristics or properties.",
+      "Guidelines": "Avoid labeling general terms or vague references, and ensure that the entity represents a specific class or grouping rather than a singular item. Exercise caution with contextually ambiguous terms like 'family' (which can refer to biological families or taxonomic classifications) and 'class' (which can denote classroom settings or scientific classifications)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The team considered their options, exploring various potential groupings of the items to facilitate easier organization and retrieval.",
+          "explanation": "Vague reference to groupings without specifying a specific category."
+        },
+        {
+          "adversarial_sentence": "They had a lovely family dinner gathering, enjoying the delicious food and engaging in heartfelt conversations late into the night.",
+          "explanation": "Vague reference to family without specifying a specific category."
+        },
+        {
+          "adversarial_sentence": "The scientist explained the classification of the new species to the class, highlighting the unique characteristics and demonstrating the intricate relationships within the taxonomic hierarchy.",
+          "explanation": "Ambiguity in the term 'class' which may refer to classroom settings or scientific classifications."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "parameter",
+    "prompt_length": 498,
+    "output_length": 165,
+    "annotation_guidelines": {
+      "Definition": "'parameter' refers to variables or settings that are used to define a system's behavior or performance.",
+      "Guidelines": "Do not label general nouns or ambiguous references like 'values' that may not specifically relate to parameters. Exercise caution with potential overlaps between 'parameter' and other technical terms like 'variable' in programming context."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The speaker emphasized the need for clear values and ethical principles in decision-making processes within the organization.",
+          "explanation": "The term 'values' does not specifically relate to parameters."
+        },
+        {
+          "adversarial_sentence": "The technician adjusted the variable to enhance the efficiency of the experimental setup.",
+          "explanation": "The term 'variable' is used in a programming context and may overlap with the concept of 'parameter.'"
+        },
+        {
+          "adversarial_sentence": "In the context of statistical analysis, the model relies on numerous factors to generate accurate predictions.",
+          "explanation": "The term 'factors' is a general noun that may not specifically relate to parameters."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "molecule",
+    "prompt_length": 514,
+    "output_length": 177,
+    "annotation_guidelines": {
+      "Definition": "'molecule' refers to specific chemical compounds or biomolecules, such as proteins, DNA, RNA, enzymes, or other molecular entities.",
+      "Guidelines": "Avoid labeling general terms like 'protein' or 'enzyme' unless they refer to specific, named molecules. Exercise caution with acronyms and shorthand references, and consider context to determine if an entity is a named molecule or a generic term."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "Proteins are essential for muscle growth and repair in the human body.",
+          "explanation": "The word 'proteins' is a general term and does not refer to a specific molecule."
+        },
+        {
+          "adversarial_sentence": "Enzymes play a crucial role in biochemical reactions within living organisms.",
+          "explanation": "The word 'enzymes' is a general term and does not refer to a specific molecule."
+        },
+        {
+          "adversarial_sentence": "The patient's DNA was analyzed to identify any genetic predispositions to certain diseases.",
+          "explanation": "Although 'DNA' refers to a molecule, it is not specified whether it is referring to a specific, named molecule in this context."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "political party",
+    "prompt_length": 530,
+    "output_length": 55,
+    "annotation_guidelines": {
+      "Definition": "'political party' refers to organized groups of individuals with similar political aims and opinions, typically seeking to influence public policy and governance through electoral representation.",
+      "Guidelines": "Avoid labeling individuals or generic political affiliations if they do not represent a formal political party. Exercise caution when distinguishing between generic political terms and actual political party names, as in 'republicans' (generic term) and 'Republicans' (specific political party). Be mindful of the context to correctly identify and label specific"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "John is a staunch supporter of the republican ideology, advocating for smaller government and greater individual freedoms in his local community.",
+      "explanation": "Generic political affiliation 'republican ideology' should not be labeled as 'political party'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "procedure",
+    "prompt_length": 509,
+    "output_length": 48,
+    "annotation_guidelines": {
+      "Definition": "'procedure' refers to a specific medical or surgical treatment or intervention performed on a patient to address a health condition or concern.",
+      "Guidelines": "Avoid labeling general medical terms unless they specifically denote a procedure. Exercise caution with ambiguous terms like 'surgery' (which could refer to the medical field or the actual procedure) and 'treatment' (which may encompass various interventions)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The doctor carefully reviewed the patient's medical history and recommended a personalized treatment plan to address the underlying health issues.",
+      "explanation": "Use of the term 'treatment' which encompasses various interventions."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "sport",
+    "prompt_length": 513,
+    "output_length": 196,
+    "annotation_guidelines": {
+      "Definition": "'sport' refers to physical activities governed by a set of rules or customs, typically undertaken competitively.",
+      "Guidelines": "Avoid labeling generic terms like 'game' or 'activity' unless explicitly referring to a sport. Exercise caution with ambiguous terms like 'net' (could refer to a sports equipment or a computer network) or 'stripes' (could refer to referee uniforms or animal patterns)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "During the company team-building event, they engaged in various games and activities to foster teamwork and communication skills.",
+          "explanation": "Generic terms 'games' and 'activities' should not be labeled unless explicitly referring to a sport."
+        },
+        {
+          "adversarial_sentence": "The organization's new initiative aimed to strengthen their presence in the digital realm by enhancing their online platforms and expanding their network capabilities.",
+          "explanation": "The term 'net' is used here to refer to a computer network, not a sports equipment."
+        },
+        {
+          "adversarial_sentence": "The fashion show featured models strutting down the runway in stylish outfits, some adorned with striking animal patterns and vibrant stripes.",
+          "explanation": "The term 'stripes' is used here to refer to animal patterns, not referee uniforms."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "equipment",
+    "prompt_length": 506,
+    "output_length": 55,
+    "annotation_guidelines": {
+      "Definition": "'equipment' refers to physical devices, machinery, or apparatus utilized for specific purposes in various fields such as engineering, medical, or industrial applications.",
+      "Guidelines": "Avoid labeling generic objects like 'table' or 'chair'. Exercise caution with entities that can have multiple interpretations, e.g., 'blade' (could refer to a knife, saw, or turbine)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The chef skillfully used the sharp blade to chop the vegetables with precision, creating a delightful dish for the patrons.",
+      "explanation": "Specific item 'blade' referring to a knife, which falls under the 'equipment' category."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "team",
+    "prompt_length": 529,
+    "output_length": 57,
+    "annotation_guidelines": {
+      "Definition": "'team' refers to a group of individuals, typically in the context of sports, business, or any collaborative endeavor, that operate as a unit towards a common goal.",
+      "Guidelines": "Do not label individual players or non-team entities, like 'David Beckham' or 'Manchester United Stadium'. Avoid ambiguous terms like 'United' (can refer to a team name or a general concept) or 'Association' (can be part of a team name or indicate a general affiliation)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "United by their passion for environmental preservation, the group of enthusiastic volunteers mobilized to clean up the local park and plant new trees.",
+      "explanation": "Ambiguous term 'United' used here as a general concept, not a team name."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "biological entity",
+    "prompt_length": 519,
+    "output_length": 175,
+    "annotation_guidelines": {
+      "Definition": "'biological entity' pertains to living organisms, their components, and related substances, including cells, tissues, DNA, and proteins.",
+      "Guidelines": "Exercise caution when labeling ambiguous terms like 'molecular complex' or 'transcription factor', as they may straddle the line between abstract concepts and biological entities. Be mindful of entities like 'Amazon rainforest', which refer to geographical locations rather than biological components."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The researchers investigated the intricate interactions within a molecular complex, shedding light on the underlying mechanisms that govern cell behavior.",
+          "explanation": "Ambiguous term 'molecular complex' that straddles the line between abstract concept and biological entity."
+        },
+        {
+          "adversarial_sentence": "The study focused on the role of a transcription factor in regulating gene expression, revealing its impact on cellular processes.",
+          "explanation": "Ambiguous term 'transcription factor' that may straddle the line between abstract concept and biological entity."
+        },
+        {
+          "adversarial_sentence": "The expedition ventured deep into the heart of the Amazon rainforest, uncovering new species of flora and fauna previously unknown to science.",
+          "explanation": "Reference to 'Amazon rainforest' which refers to geographical location rather than biological component."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "book",
+    "prompt_length": 514,
+    "output_length": 214,
+    "annotation_guidelines": {
+      "Definition": "'book' denotes publications, literary works, or written compositions that are released or available for reading.",
+      "Guidelines": "Do not label generic terms like 'novel' or 'story'. Exercise caution with ambiguous terms like 'Harry Potter' (character name also used for book title) and 'Apple' (company name also used for a book title). Be attentive to distinguishing between titles and general references."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "She was engrossed in the captivating novel set in 18th century England, eager to uncover the protagonist's fate amidst the backdrop of societal upheaval and forbidden love.",
+          "explanation": "The term 'novel' is used as a generic term and should not be labeled as 'book'."
+        },
+        {
+          "adversarial_sentence": "Harry Potter, the young wizard, embarked on a thrilling adventure to uncover the secrets of the magical realm, facing formidable adversaries and learning valuable lessons along the way.",
+          "explanation": "The term 'Harry Potter' is used to refer to a character name and should not be labeled as 'book'."
+        },
+        {
+          "adversarial_sentence": "The tech giant Apple recently published a groundbreaking book exploring the intersection of design and technology, offering valuable insights into the company's innovative approach to product development.",
+          "explanation": "The term 'Apple' is used to refer to a company name and should not be labeled as 'book'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "region",
+    "prompt_length": 529,
+    "output_length": 41,
+    "annotation_guidelines": {
+      "Definition": "'region' refers to a specific area or territory within a larger geographical context, often characterized by its distinct cultural, political, or historical features, and it may represent administrative divisions, historical territories, or recognizable districts.",
+      "Guidelines": "Exercise caution when labeling terms like 'state' or 'county,' as they may refer to administrative entities rather than geographic regions. Consider the context and potential ambiguity, such as 'Georgia' (could refer to the state or the country) or '"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The company's latest expansion plans involve setting up several branches in key states across the country.",
+      "explanation": "Avoid labeling terms like 'state'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical test",
+    "prompt_length": 523,
+    "output_length": 55,
+    "annotation_guidelines": {
+      "Definition": "'medical test' refers to procedures or examinations conducted to evaluate a patient's health, often involving imaging (CT, MRI) or laboratory analysis (polymerase chain reaction).",
+      "Guidelines": "Do not label general medical terms or symptoms. Exercise caution with ambiguous terms like 'CT' (can refer to something other than a medical test, e.g., 'central tendency') or 'wash' (which can refer to a physical action)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The patient experienced discomfort and persistent coughing, which prompted further investigation into her condition.",
+      "explanation": "General medical term 'discomfort' and 'persistent coughing' mentioned but not referring to a medical test."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "anatomy",
+    "prompt_length": 527,
+    "output_length": 52,
+    "annotation_guidelines": {
+      "Definition": "'anatomy' refers to body structures or parts, including bones, organs, tissues, and related terms that pertain to the physical makeup of an organism.",
+      "Guidelines": "Avoid labeling general medical terms that do not specifically refer to anatomical structures (e.g., 'metabolism'). Exercise caution with terms that can be interpreted as both anatomical and non-anatomical references, such as 'collagen' (a substance and an anatomical component)."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The doctor explained that the patient's metabolism was affected by the new medication, leading to unexpected side effects.",
+      "explanation": "General medical term 'metabolism' which does not specifically refer to anatomical structures."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "module",
+    "prompt_length": 519,
+    "output_length": 129,
+    "annotation_guidelines": {
+      "Definition": "'module' refers to a self-contained unit of software that performs a specific function or offers specific features within a larger software system.",
+      "Guidelines": "Avoid labeling general or non-specific software terms, such as 'project' or 'software'. Be cautious with ambiguous terms that could refer to multiple modules or have different meanings in other contexts, e.g., 'elastic search' (could refer to the search engine or the software module)."
+    },
+    "negative_sentences": {
+      "adversarial_sentences": [
+        {
+          "adversarial_sentence": "The software development team is currently working on a new project focused on enhancing user experience through innovative design and seamless functionality.",
+          "explanation": "Non-specific software term 'project'"
+        },
+        {
+          "adversarial_sentence": "The team is utilizing elastic search to optimize the retrieval of relevant data from the database.",
+          "explanation": "Ambiguous term 'elastic search' used here as the search engine."
+        },
+        {
+          "adversarial_sentence": "Are you satisfied with the current software performance and functionality?",
+          "explanation": "Non-specific software term 'software'"
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "hardware",
+    "prompt_length": 503,
+    "output_length": 46,
+    "annotation_guidelines": {
+      "Definition": "'hardware' refers to physical components of a computing system, including but not limited to CPUs, GPUs, servers, desktops, laptops, and other tangible electronic devices.",
+      "Guidelines": "Do not label software or applications as 'hardware', and avoid labeling generic terms like 'device' or 'equipment' unless explicitly referring to a physical computing component."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The company's new mobile app utilizes cutting-edge technology to enhance user experience and streamline business operations.",
+      "explanation": "Non-physical and non-hardware related: 'mobile app'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "place",
+    "prompt_length": 507,
+    "output_length": 60,
+    "annotation_guidelines": {
+      "Definition": "'place' refers to specific physical locations, such as towns, cities, and landmarks, where activities occur or events take place.",
+      "Guidelines": "Do not label ambiguous terms like 'The Golden Gate' (bridge or location) or 'New York Times' (company or place name). Be cautious when identifying places that could also serve as company names or generic terms."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The announcement was met with overwhelming support from The Golden Gate's loyal patrons, who praised the bridge's iconic design and historical significance.",
+      "explanation": "Ambiguous term 'The Golden Gate' used here to refer to the bridge, not as a location."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "characteristic",
+    "prompt_length": 497,
+    "output_length": 50,
+    "annotation_guidelines": {
+      "Definition": "'characteristic' refers to distinctive features, attributes, or properties that define or describe an object, organism, or concept.",
+      "Guidelines": "Avoid labeling generic terms like 'feature' or 'property'. Exercise caution when distinguishing between a characteristic and a general noun, especially in cases where the context may be ambiguous."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The innovative design of the new smartphone includes a feature that allows users to seamlessly switch between different modes for optimal performance.",
+      "explanation": "Generic term 'feature' used here instead of 'characteristic'."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "plant",
+    "prompt_length": 511,
+    "output_length": 45,
+    "annotation_guidelines": {
+      "Definition": "'plant' refers to living organisms that have the ability to grow, such as trees, flowers, and herbs.",
+      "Guidelines": "Exclude references to manufacturing plants or infrastructure. Exercise caution with terms that have multiple meanings, like 'tree' (can refer to a living organism or a data structure) or 'rose' (a flower or the past tense of the verb 'to rise')."
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "The company plans to open a new manufacturing plant in the industrial area to increase production capacity and create job opportunities for the local community.",
+      "explanation": "Reference to manufacturing plant."
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "biomolecule",
+    "prompt_length": 531,
+    "output_length": 62,
+    "annotation_guidelines": {
+      "Definition": "'biomolecule' refers to molecules and compounds found in living organisms that are of biological significance, such as proteins, nucleic acids, hormones, enzymes, and metabolites.",
+      "Guidelines": "Do not label common non-biological compounds. Exercise caution with generic terms like 'enzyme' or 'protein', which can refer to biological or non-biological entities. Carefully disambiguate terms like 'plasma' (Can refer to the fluid component of blood or a"
+    },
+    "negative_sentences": {
+      "adversarial_sentence": "Johnny used a plasma cutter to precisely shape the metal sheets for his latest art installation, showcasing his talent for industrial design and craftsmanship.",
+      "explanation": "The term 'plasma' is used in the context of a cutting tool, not referring to the biological fluid."
+    },
+    "finish_reason": "stop"
+  }
+]

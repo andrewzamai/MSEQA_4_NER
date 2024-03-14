@@ -3,15 +3,16 @@
 base_model: meta-llama/Llama-2-7b-chat-hf
 prompt_template_name: reverse_INST
 # using dataset converted from MSEQA format to GenQA format (instruction, input, output) columns
-data_path: ./datasets/pileNER/5_samples_per_NE_GenQA_TrueDef/train.jsonl
-val_data_path: ./datasets/pileNER/5_samples_per_NE_GenQA_TrueDef/validation.jsonl
+data_path: ./datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_GenQA_TrueDef/train.jsonl
+val_data_path: ./datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_GenQA_TrueDef/validation.jsonl
 select_train_portion: -1
-val_set_size: 500 # ca 1/4 of validation data
-output_dir: ./trained_models/llama2_7B_5samplesPerNE_TrueDef
+val_set_size: 1000 # ca 1/4 of validation data
+output_dir: ./trained_models/llama2_7B_15_10_per_NE_3_ADVERSARIAL_TrueDef_enhanced
+early_stopping_patience: 10
 #training hyperparams
 batch_size: 32
 micro_batch_size: 1
-num_epochs: 3
+num_epochs: 10
 learning_rate: 3.0e-4
 cutoff_len: 768
 
