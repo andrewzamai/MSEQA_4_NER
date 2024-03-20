@@ -204,7 +204,7 @@ def train(
 
     # TODO: masking for enhanced training
     from MSEQA_4_NER.data_handlers.data_handler_pileNER import mask_named_entities
-    train_data = mask_named_entities(train_data, corruption_prob=0.5, masking_prob=0.8, default_mask='<unk>')
+    # train_data = mask_named_entities(train_data, corruption_prob=0.5, masking_prob=0.8, default_mask='<unk>')
 
     #if os.path.exists(data_path[:-len(".json") + '_' + base_model.split("/")[-1] + '_tokenized'):
     #train_data = load_dataset()
@@ -230,9 +230,12 @@ def train(
     elif val_data_path:
         train_data = data["train"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer, prompter, cutoff_len, train_on_inputs), num_proc=30)
         val_data = load_dataset("json", data_files=val_data_path)
+        # if -1 use all validation data
+        if val_set_size == -1:
+            val_set_size = len(val_data["train"])
         val_data = val_data["train"].select(list(range(min(val_set_size, len(val_data["train"])))))  # no more than val_set_size 5k examples
         # TODO: masking for enhanced training
-        val_data = mask_named_entities(val_data, corruption_prob=0.5, masking_prob=0.8, default_mask='<unk>')
+        # val_data = mask_named_entities(val_data, corruption_prob=0.5, masking_prob=0.8, default_mask='<unk>')
         val_data = val_data.map(lambda x: generate_and_tokenize_prompt(x, tokenizer, prompter, cutoff_len, train_on_inputs), num_proc=30)
         val_set_size = len(val_data)
     else:
@@ -318,7 +321,10 @@ if __name__ == "__main__":
 
     # print("Llama-2-7b-chat finetuning on pileNER - with guidelines - enhanced \n")
     #print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 10 samples per NE (5positive + 5negative) + ADVERSARIAL examples (3 per NER) + enhanced 0.5 0.8 \n")
-    print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 15 positive + 10 negative + ADVERSARIAL examples (3 per NER) + YES enhanced \n")
+    #print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 5 positive + 3 negative + ADVERSARIAL examples (2 train + 1 val per NER) + NO enhanced \n")
+
+    #print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 5 positive + 5 negative + POS NEG ADVERSARIAL examples (1+1 train + 1+1 val per NER) + NO enhanced \n")
+    print("Llama-2-7b-chat finetuning on pileNER - FalseDef - 5 positive + 5 negative + removed NEs from CrossNER/MIT + only top 50 NEs\n")
 
     # load HuggingFace access token with permissions to LLAMA repo
     from huggingface_hub import login

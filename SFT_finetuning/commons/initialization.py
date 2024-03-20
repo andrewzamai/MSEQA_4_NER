@@ -1,3 +1,5 @@
+__package__ = "SFT_finetuning.commons"
+
 import sys
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig, T5ForConditionalGeneration

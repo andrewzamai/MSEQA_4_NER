@@ -1,0 +1,3214 @@
+[
+  {
+    "named_entity": "field",
+    "prompt_length": 301,
+    "output_length": 133,
+    "annotation_guidelines": {
+      "Definition": "'field' in the context of NER represents specific domains, areas of study, or subject matters, such as 'Computer Science', 'Medicine', and 'Film'.",
+      "Guidelines": "Do not label general concepts like 'award' or 'form'. Exercise caution with potentially ambiguous terms, such as 'Short Film', which could refer to a film genre or a specific work of art. Similarly, 'Photography' could represent the practice, craft, or specific works and"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The 'Short Film' showcased at the festival today was a real masterpiece.",
+          "explanation": "In this context, 'Short Film' refers to a specific work of art, fitting the definition of the Named Entity.",
+          "occurrences": [
+            "Short Film"
+          ]
+        },
+        {
+          "sentence": "Her outstanding portfolio features stunning examples of 'Photography'.",
+          "explanation": "Here, 'Photography' represents a specific domain or practice, aligning with the definition of the Named Entity.",
+          "occurrences": [
+            "Photography"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "award",
+    "prompt_length": 295,
+    "output_length": 130,
+    "annotation_guidelines": {
+      "Definition": "'award' refers to a recognition or honor given to individuals, groups, or organizations in various fields, such as sports, entertainment, academia, and business.",
+      "Guidelines": "Avoid labeling non-official titles or generic terms like 'best', 'top', 'favorite'. Exercise caution with ambiguous terms like 'Oscar' (could refer to a person or the award) or 'Nobel' (could refer to the organization or the prize)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The film director won an Oscar for Best Director at the prestigious award ceremony.",
+          "explanation": "In this sentence, 'Oscar' is used in the context of a prestigious award given to the film director, aligning with the definition of 'award'."
+        },
+        {
+          "sentence": "The scientist proudly displayed her Nobel Prize for Physics in her laboratory.",
+          "explanation": "In this sentence, 'Nobel' is used to refer to the prestigious prize awarded to the scientist, fitting the definition of 'award'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "tv show",
+    "prompt_length": 297,
+    "output_length": 162,
+    "annotation_guidelines": {
+      "Definition": "'tv show' refers to televised programs or series, including reality shows, documentaries, and scripted dramas or comedies.",
+      "Guidelines": "Avoid labeling general TV channels or networks (e.g. ESPN\u2019s 30 For 30) unless they specifically refer to a show. Exercise caution with ambiguous terms like 'TI & TINY' (which could refer to individuals or shows) and 'Adventure Time' (which could also refer to movies or games)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I can't wait to watch the new episodes of TI & TINY this weekend, it's my favorite tv show!",
+          "explanation": "In this sentence, 'TI & TINY' specifically refers to a TV show, fitting the definition of the Named Entity 'tv show.'",
+          "positive_occurrences": [
+            "tv show"
+          ]
+        },
+        {
+          "sentence": "Last night, I binge-watched Adventure Time on TV for hours, it's such a captivating tv show!",
+          "explanation": "'Adventure Time' in this context refers to a televised program, aligning with the definition of the Named Entity 'tv show.'",
+          "positive_occurrences": [
+            "tv show"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "gender",
+    "prompt_length": 281,
+    "output_length": 193,
+    "annotation_guidelines": {
+      "Definition": "'gender' refers to the classification of individuals as male, female, or other identities based on societal and cultural perceptions.",
+      "Guidelines": "Avoid labeling non-gender-specific entities like 'people' or 'individuals'. Exercise caution with terms like 'man-made' (not referring to males) and 'male' in non-gender contexts (e.g., 'male connector')."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The company is working to improve gender diversity in its workforce.",
+          "explanation": "The term 'gender' is used to describe the classification of individuals based on male, female, or other identities in the context of workforce diversity.",
+          "positive_occurrences": [
+            "gender"
+          ]
+        },
+        {
+          "sentence": "The artist explores themes of gender identity in their latest exhibition.",
+          "explanation": "Here, 'gender' is used to refer to various identities beyond traditional male and female classifications, aligning with the Named Entity definition.",
+          "positive_occurrences": [
+            "gender"
+          ]
+        },
+        {
+          "sentence": "The policy aims to promote equality regardless of gender.",
+          "explanation": "In this sentence, 'gender' is used to indicate the different classifications based on societal and cultural perceptions.",
+          "positive_occurrences": [
+            "gender"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "feature",
+    "prompt_length": 295,
+    "output_length": 144,
+    "annotation_guidelines": {
+      "Definition": "'feature' refers to distinctive attributes, characteristics, or components of objects, products, or systems.",
+      "Guidelines": "Avoid labeling generic terms like 'part' or 'component'. Pay attention to context to differentiate between literal and figurative uses of words like 'heart' (literal organ vs. metaphorical essence). Be mindful of ambiguous terms like 'apple' (fruit vs. technology company) and 'chrome' (metal vs. web browser)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I love using Chrome for browsing the internet.",
+          "explanation": "In this sentence, 'Chrome' refers to the web browser developed by Google, aligning with the definition of 'feature' as a distinctive component of a system.",
+          "positive_occurrences": [
+            "Chrome"
+          ]
+        },
+        {
+          "sentence": "The Apple announcement revealed exciting new features for their upcoming products.",
+          "explanation": "Here, 'Apple' is used to denote the technology company known for its products, fitting the definition of 'feature' as distinctive attributes of objects or systems.",
+          "positive_occurrences": [
+            "Apple"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "program",
+    "prompt_length": 272,
+    "output_length": 142,
+    "annotation_guidelines": {
+      "Definition": "'program' refers to structured initiatives, schemes, or projects aimed at achieving specific objectives with planned activities and interventions.",
+      "Guidelines": "Avoid labeling generic terms like 'problem' or 'dilemma' as 'program'. Exercise caution with terms that can refer to both programs and non-program entities, such as 'initiative'."
+    },
+    "positive_sentences": {
+      "Sentences": [
+        {
+          "Sentence": "The government launched a program to provide free healthcare services to low-income families.",
+          "Explanation": "In this sentence, 'program' is used to describe a structured initiative with planned activities aimed at achieving specific objectives, which is providing free healthcare services to low-income families.",
+          "PositiveOccurrences": [
+            "program"
+          ]
+        },
+        {
+          "Sentence": "The community center initiated a program to promote literacy among children in the neighborhood.",
+          "Explanation": "'Program' in this sentence refers to a structured project aimed at achieving specific objectives - promoting literacy among children in the neighborhood.",
+          "PositiveOccurrences": [
+            "program"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "enzyme",
+    "prompt_length": 301,
+    "output_length": 234,
+    "annotation_guidelines": {
+      "Definition": "'enzyme' refers to proteins that catalyze specific biochemical reactions in living organisms, aiding in processes like digestion, metabolism, and cellular regulation.",
+      "Guidelines": "Do not label general proteins or molecules unless they specifically catalyze biochemical reactions. Exercise caution when distinguishing between generic terms and specific enzymes (e.g., 'amylase' vs. 'salivary amylase'). Be vigilant about identifying enzymes within complex compound terms where they may be part of a larger entity"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The pancreatic enzyme amylase helps break down carbohydrates in the small intestine.",
+          "explanation": "In this sentence, the term 'enzyme' is specifically referring to 'pancreatic enzyme amylase' which catalyzes the biochemical reaction of breaking down carbohydrates.",
+          "occurrences": [
+            "enzyme",
+            "amylase"
+          ]
+        },
+        {
+          "sentence": "The enzyme lactase is responsible for breaking down lactose into glucose and galactose during digestion.",
+          "explanation": "Here, the term 'enzyme' is used to describe 'lactase' that performs the catalytic activity of breaking down lactose into simpler sugars.",
+          "occurrences": [
+            "enzyme",
+            "lactase"
+          ]
+        },
+        {
+          "sentence": "The restriction enzyme EcoRI recognizes and cuts DNA at specific sequences.",
+          "explanation": "In this context, 'enzyme' refers to 'restriction enzyme EcoRI' that catalyzes the cutting of DNA at specific sites.",
+          "occurrences": [
+            "enzyme",
+            "EcoRI"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "structure",
+    "prompt_length": 267,
+    "output_length": 217,
+    "annotation_guidelines": {
+      "Definition": "'structure' refers to physical entities such as buildings, bridges, and biological molecules that have a distinct form or organization.",
+      "Guidelines": "Avoid labeling abstract or metaphorical references. Exercise caution with ambiguous terms like 'columns' (could refer to architectural structures or data tables) and ensure proper context is considered."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The ancient columns of the temple stood tall for centuries, a testament to the architectural prowess of the civilization.",
+          "explanation": "In this sentence, 'columns' clearly refers to physical architectural structures, fitting the definition of 'structure'.",
+          "positive_occurrences": [
+            "columns"
+          ]
+        },
+        {
+          "sentence": "The bioengineers studied the complex structure of the protein molecule, hoping to unlock its therapeutic potential.",
+          "explanation": "Here, 'structure' pertains to the biological molecule, specifically the protein structure, meeting the definition provided.",
+          "positive_occurrences": [
+            "structure"
+          ]
+        },
+        {
+          "sentence": "The digital artist meticulously designed every element of the virtual skyscraper, ensuring both beauty and functional structure.",
+          "explanation": "The phrase 'functional structure' highlights the physical nature of the skyscraper, aligning with the definition of 'structure'.",
+          "positive_occurrences": [
+            "skyscraper",
+            "structure"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "phenomenon",
+    "prompt_length": 286,
+    "output_length": 249,
+    "annotation_guidelines": {
+      "Definition": "'phenomenon' represents observable events, occurrences, or processes that are of interest or importance in a given context.",
+      "Guidelines": "Avoid labeling generic terms like 'process' or 'event'. Exercise caution with abstract or ambiguous concepts that may be better categorized as 'object', 'action', or 'attribute'. Be explicit about the specific nature of the observed phenomenon to accurately capture its essence."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The concept of 'justice' is a complex phenomenon that varies across different cultures and legal systems.",
+          "explanation": "In this sentence, 'justice' is described as an observable event or process that is significant in the context of cultures and legal systems, fitting the definition of 'phenomenon'.",
+          "positive_occurrences": [
+            "'justice'"
+          ]
+        },
+        {
+          "sentence": "Love, viewed as a transcendental phenomenon, has been a subject of philosophical debates for centuries.",
+          "explanation": "Here, 'love' is portrayed as an observable phenomenon that goes beyond the material realm, making it suitable for the definition of 'phenomenon'.",
+          "positive_occurrences": [
+            "'love'"
+          ]
+        },
+        {
+          "sentence": "The rise of populism in recent elections is a worrying phenomenon affecting democracies worldwide.",
+          "explanation": "In this case, 'populism' is depicted as an observed occurrence that has significant implications for democracies globally, aligning with the concept of 'phenomenon'.",
+          "positive_occurrences": [
+            "'populism'"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "industry",
+    "prompt_length": 301,
+    "output_length": 220,
+    "annotation_guidelines": {
+      "Definition": "'industry' refers to a category of businesses involved in the production or provision of goods and services in a particular field, such as technology, tourism, manufacturing, etc.",
+      "Guidelines": "Avoid labeling general terms like 'business' or 'commerce'. Exercise caution when an entity could be interpreted as a specific company rather than an industry, such as 'Apple' (company) versus 'technology' (industry). Be mindful of ambiguous terms like 'steel' (material and industry)"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The steel industry in our country has experienced a significant downturn due to increased competition.",
+          "explanation": "The term 'steel' in this sentence refers to the category of businesses involved in producing steel and related products, fitting the definition of the Named Entity 'industry'.",
+          "occurrences": [
+            "steel industry"
+          ]
+        },
+        {
+          "sentence": "Investments in the tourism industry have resulted in a boost to the local economy.",
+          "explanation": "Here, 'tourism industry' represents the businesses engaged in providing tourism-related goods and services, aligning with the concept of the Named Entity 'industry'.",
+          "occurrences": [
+            "tourism industry"
+          ]
+        },
+        {
+          "sentence": "The technology industry is constantly evolving with new innovations and advancements.",
+          "explanation": "'Technology industry' indicates the collection of businesses involved in technology development and services, which corresponds to the definition of the Named Entity 'industry'.",
+          "occurrences": [
+            "technology industry"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "license",
+    "prompt_length": 278,
+    "output_length": 154,
+    "annotation_guidelines": {
+      "Definition": "'license' refers to legal agreements or permissions granted by an authority to use, distribute, or modify specific software, content, or intellectual property.",
+      "Guidelines": "Avoid labeling general discussions about licenses without specifying a particular one. Be cautious with ambiguous references such as 'Windows' (operating system and trademark) or 'Creative Commons' (organization and licensing framework)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Microsoft issued a license to ABC Company allowing them to use their proprietary software.",
+          "explanation": "In this sentence, 'license' is related to a legal agreement granted by an authority (Microsoft) to use specific software, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "license"
+          ]
+        },
+        {
+          "sentence": "The government granted a license to XYZ Corporation enabling them to distribute their copyrighted content globally.",
+          "explanation": "Here, 'license' refers to a permission given by an authority (government) to distribute specific content, aligning with the definition of the Named Entity.",
+          "positive_occurrences": [
+            "license"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "ethnicity",
+    "prompt_length": 272,
+    "output_length": 218,
+    "annotation_guidelines": {
+      "Definition": "'ethnicity' refers to the identification with a particular social group sharing cultural traditions, ancestry, language, or nationality.",
+      "Guidelines": "Be cautious with terms that may denote nationality, language, or race. Avoid labeling generic terms like 'American' without clear context, and refrain from assuming ethnicity based solely on names or appearance."
+    },
+    "positive_sentences": {
+      "exemplary_sentences": [
+        {
+          "sentence": "The Mexican celebration showcased the rich heritage and traditions of the indigenous population.",
+          "explanation": "The term 'Mexican' is being used to refer to a particular social group sharing cultural traditions and ancestry, fitting the definition of 'ethnicity'.",
+          "ethnicity_occurrences": [
+            "Mexican"
+          ]
+        },
+        {
+          "sentence": "The Chinese New Year festivities included various cultural performances and traditional foods.",
+          "explanation": "The term 'Chinese' is utilized to denote a distinct social group sharing cultural traditions, aligning with the concept of 'ethnicity'.",
+          "ethnicity_occurrences": [
+            "Chinese"
+          ]
+        },
+        {
+          "sentence": "The Italian opera singer captivated the audience with her lyrical performance.",
+          "explanation": "The term 'Italian' is employed here in reference to a specific social group sharing cultural traditions and heritage, meeting the criteria of 'ethnicity'.",
+          "ethnicity_occurrences": [
+            "Italian"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "system",
+    "prompt_length": 281,
+    "output_length": 138,
+    "annotation_guidelines": {
+      "Definition": "'system' refers to organized and interconnected components designed to perform specific functions or tasks, often within an engineering or technological context.",
+      "Guidelines": "Avoid labeling vague or generic terms like 'process' or 'method'. Exercise caution with potentially ambiguous terms such as 'Windows' (operating system or physical windows) or 'control' (can denote a system or a general concept)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The Windows system crashed unexpectedly during the software update.",
+          "explanation": "In this sentence, 'Windows' is used in the context of an operating system, fitting the definition of the Named Entity 'system'.",
+          "positive_occurrences": [
+            "system"
+          ]
+        },
+        {
+          "sentence": "The control system maintained stable temperature levels in the research facility.",
+          "explanation": "Here, 'control' is used to refer to a system that regulates temperature, aligning with the definition of the Named Entity 'system'.",
+          "positive_occurrences": [
+            "system"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "value",
+    "prompt_length": 286,
+    "output_length": 125,
+    "annotation_guidelines": {
+      "Definition": "'value' refers to numerical, textual, or symbolic entities that hold quantitative or qualitative significance in a given context, including measurements, quantities, and identifiers.",
+      "Guidelines": "Avoid labeling common words that might be interpreted as values, such as 'one', 'zero', 'null'. Exercise caution with context-dependent words like 'high' or 'low' as they may or may not represent specific values."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The temperature in summer can reach a high of one hundred degrees Fahrenheit.",
+          "explanation": "In this sentence, 'high' is used to describe a specific value of temperature, representing a 'value' as indicated by the definition."
+        },
+        {
+          "sentence": "The sales numbers for the month reflected a low performance compared to the previous quarter.",
+          "explanation": "Here, 'low' is used to describe a specific value of performance, which falls under the category of 'value' as defined."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "age",
+    "prompt_length": 264,
+    "output_length": 138,
+    "annotation_guidelines": {
+      "Definition": "'age' refers to numerical representations of a person's age, such as specific ages or age ranges.",
+      "Guidelines": "Avoid labeling time-related or duration references like '5 minutes' or 'decades'. Exercise caution with numerical values that could represent other entities, such as quantity or measurement."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The woman decided to retire at the age of 65.",
+          "explanation": "The term 'age' is used here to indicate a specific age representing the woman's retirement decision.",
+          "positive_occurrences": [
+            "age"
+          ]
+        },
+        {
+          "sentence": "The voting age in that country is set to 18 years old.",
+          "explanation": "In this sentence, 'age' is clearly referring to a specific numerical representation, which is the minimum age for voting.",
+          "positive_occurrences": [
+            "age"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "time period",
+    "prompt_length": 270,
+    "output_length": 110,
+    "annotation_guidelines": {
+      "Definition": "'time period' refers to a specific duration or range of time, such as hours, days, months, or historical epochs.",
+      "Guidelines": "Do not label general temporal concepts like 'when it rains'. Exercise caution with ambiguous terms like 'modern age', which may refer to a historical period or a generalized era."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "In the modern age of technology, advancements in communication have been rapid.",
+          "explanation": "The term 'modern age' here refers to a specific historical epoch, fitting the definition of 'time period'."
+        },
+        {
+          "sentence": "During the industrial revolution, societal changes were profound.",
+          "explanation": "The 'industrial revolution' represents a specific historical period, aligning with the concept of 'time period'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "element",
+    "prompt_length": 301,
+    "output_length": 184,
+    "annotation_guidelines": {
+      "Definition": "'element' denotes chemical substances or compounds, including individual elements, minerals, and compounds.",
+      "Guidelines": "Do not label general or generic terms that have no specific chemical connotation. Exercise caution with terms that have multiple meanings, such as 'lead' (a metal and a verb). Be aware of ambiguous terms like 'iron' (a metal and a verb), 'mercury' (a planet, a chemical element, and a Roman god), and 'table' ("
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The iron metal was used to construct the building structures.",
+          "explanation": "In this sentence, 'iron' is used as a chemical element, fitting the annotation of the Named Entity 'element'.",
+          "positive_occurrences": [
+            "iron"
+          ]
+        },
+        {
+          "sentence": "He studied the lead compound to determine its properties.",
+          "explanation": "Here, 'lead' is used as a chemical compound, aligning with the Named Entity 'element'.",
+          "positive_occurrences": [
+            "lead"
+          ]
+        },
+        {
+          "sentence": "The mercury element is known for its liquid state at room temperature.",
+          "explanation": "In this sentence, 'mercury' is clearly referencing the chemical element rather than other ambiguous meanings.",
+          "positive_occurrences": [
+            "mercury"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "topic",
+    "prompt_length": 297,
+    "output_length": 196,
+    "annotation_guidelines": {
+      "Definition": "'topic' refers to specific subject matters, themes, or areas of interest that can be the focus of discussion, research, or coverage.",
+      "Guidelines": "Do not label general or vague concepts like 'life' or 'world'. Be mindful of ambiguous terms like 'apple' (fruit or company) and 'football' (sport or type of ball). Ensure specificity and contextual relevance when labeling 'topic'. Avoid labeling entire sentences or statements as 'topic'. "
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I enjoy watching football games on weekends with my friends.",
+          "explanation": "In this sentence, 'football' is used to refer to the sport, fitting the definition of the Named Entity 'topic'.",
+          "positive_occurrences": [
+            "football"
+          ]
+        },
+        {
+          "sentence": "The debate about climate change continues to be a hot topic in scientific circles.",
+          "explanation": "Here, 'climate change' is the specific subject matter being discussed, meeting the criteria for the Named Entity 'topic'.",
+          "positive_occurrences": [
+            "climate change"
+          ]
+        },
+        {
+          "sentence": "The new movie release has been a trending topic on social media platforms.",
+          "explanation": "In this context, 'movie release' is the focus of discussion and qualifies as a 'topic'.",
+          "positive_occurrences": [
+            "movie release"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "color",
+    "prompt_length": 301,
+    "output_length": 121,
+    "annotation_guidelines": {
+      "Definition": "'color' refers to specific hues, shades, or tints, such as 'red', 'blue', 'emerald green', 'pastel yellow', etc., that are used to describe visual appearances.",
+      "Guidelines": "Avoid labeling generic terms like 'color' or 'shade' without specifying the actual color. Exercise caution with ambiguous terms like 'black book' (could refer to a color or a physical object). Additionally, differentiate between actual colors and vague descriptors, like"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "She picked up a black book from the shelf.",
+          "explanation": "In this sentence, 'black' is used as a color to describe the book, fitting the definition of the Named Entity.",
+          "occurrences": [
+            "black"
+          ]
+        },
+        {
+          "sentence": "The purple gown she wore to the party was stunning.",
+          "explanation": "Here, 'purple' is clearly referring to a specific color, exemplifying the Named Entity.",
+          "occurrences": [
+            "purple"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "unit",
+    "prompt_length": 287,
+    "output_length": 226,
+    "annotation_guidelines": {
+      "Definition": "'unit' refers to measurements, quantities, or standard units of measurement such as seconds, meters, kilograms, etc.",
+      "Guidelines": "Do not label non-standard or vague units, such as 'some', 'a few', or 'several', as 'unit'. Be mindful of potential homographs, such as 'kg' (kilograms) versus 'Kg' (Kelvin-grams)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The marathon race lasted for 2 hours and 30 minutes.",
+          "explanation": "In this sentence, 'hours' and 'minutes' are standard units of time, which fall under the definition of 'unit'.",
+          "positive_occurrences": [
+            "2 hours",
+            "30 minutes"
+          ]
+        },
+        {
+          "sentence": "She measured that the bookcase was 2 meters tall and 1 meter wide.",
+          "explanation": "The units 'meters' and 'meter' are standard measurements of distance, therefore considered as 'unit'.",
+          "positive_occurrences": [
+            "2 meters",
+            "1 meter"
+          ]
+        },
+        {
+          "sentence": "The recipe called for 500 grams of sugar and 250 milliliters of milk.",
+          "explanation": "Here, 'grams' and 'milliliters' are common units of weight and volume respectively, hence fitting the definition of 'unit'.",
+          "positive_occurrences": [
+            "500 grams",
+            "250 milliliters"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "virus",
+    "prompt_length": 302,
+    "output_length": 217,
+    "annotation_guidelines": {
+      "Definition": "'virus' refers to microorganisms that can cause infection and disease in living organisms, typically characterized by their genetic material and protein coat.",
+      "Guidelines": "Avoid mislabeling biological terms that are not viruses, such as 'bacteria' or 'parasite'. Exercise caution with terms that have multiple meanings, such as 'corona' (referring to coronavirus or crown shape), and differentiate based on context. Ensure that the term refers to an actual"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Researchers are studying a new virus that has emerged in the population, causing widespread illness.",
+          "explanation": "In this sentence, 'virus' is used to refer to a microorganism causing infection and disease, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "virus"
+          ]
+        },
+        {
+          "sentence": "The virologist isolated the virus from the patient's blood sample for further analysis.",
+          "explanation": "Here, 'virus' is clearly described as a microorganism that can cause infection and disease, aligning with the definition provided.",
+          "positive_occurrences": [
+            "virus"
+          ]
+        },
+        {
+          "sentence": "Doctors are concerned about the new strain of virus spreading rapidly across the region.",
+          "explanation": "This sentence uses 'virus' in the context of causing infection and disease, fitting the criteria of the Named Entity.",
+          "positive_occurrences": [
+            "virus"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "religion",
+    "prompt_length": 297,
+    "output_length": 205,
+    "annotation_guidelines": {
+      "Definition": "'religion' represents belief systems and faiths followed by individuals or communities, including Christianity, Islam, Hinduism, Buddhism, Judaism, etc.",
+      "Guidelines": "Do not label cultural references not directly related to religious beliefs, such as 'German' or 'Greek' (ethnicities). Exercise caution with terms that may indicate dual religious affiliations or spiritual roles (e.g., 'Brahmin Hindu' may imply a caste and a religion)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "During Diwali, a significant Hindu festival, families come together to celebrate their religion with prayers and offerings.",
+          "explanation": "The term 'Hindu' is used in the context of religious beliefs, specifically referring to the adherents of Hinduism.",
+          "occurrences": [
+            "Hinduism"
+          ]
+        },
+        {
+          "sentence": "The Christian congregation gathered at the cathedral on Easter Sunday for the special service.",
+          "explanation": "The term 'Christian' is used to describe individuals following the religion of Christianity.",
+          "occurrences": [
+            "Christianity"
+          ]
+        },
+        {
+          "sentence": "His study of Buddhism led him to travel to different countries to learn more about this ancient religion.",
+          "explanation": "The term 'Buddhism' refers to the belief system followed by followers of Buddha's teachings.",
+          "occurrences": [
+            "Buddhism"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "sports league",
+    "prompt_length": 262,
+    "output_length": 218,
+    "annotation_guidelines": {
+      "Definition": "'sports league' represents organized athletic competitions or associations of teams competing in a specific sport.",
+      "Guidelines": "Do not label individual team names or generic sports references. Exercise caution with ambiguous terms like 'AC Milan' (football club) which could be confused with a sports league."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The Bundesliga is a popular sports league in Germany.",
+          "explanation": "Here the term 'Bundesliga' is used to represent an organized athletic competition or association of teams, fitting the definition of 'sports league'.",
+          "positive_occurrences": [
+            "Bundesliga"
+          ]
+        },
+        {
+          "sentence": "La Liga features top football clubs such as Barcelona and Real Madrid.",
+          "explanation": "In this sentence, 'La Liga' is described as an organized athletic competition involving teams like Barcelona and Real Madrid, aligning with the concept of a 'sports league'.",
+          "positive_occurrences": [
+            "La Liga"
+          ]
+        },
+        {
+          "sentence": "The Premiere League is known for its competitive matches and skilled players.",
+          "explanation": "The term 'Premiere League' is used here to refer to an organized athletic competition, meeting the criteria of a 'sports league'.",
+          "positive_occurrences": [
+            "Premiere League"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "band",
+    "prompt_length": 284,
+    "output_length": 162,
+    "annotation_guidelines": {
+      "Definition": "'band' refers to musical groups or musical acts consisting of multiple performers, typically including instrumentalists and vocalists.",
+      "Guidelines": "Do not label solo artists, such as Beyonc\u00e9 or Elvis Presley, even if they are often referred to as a 'band' colloquially. Watch out for potential name clashes with other entities, such as 'Apple' (company versus music group)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I went to watch a local band at the bar last night. The band had a guitarist, a drummer, and a lead singer.",
+          "explanation": "In this sentence, 'band' refers to a group of musical performers, including instrumentalists and vocalists, which aligns with the definition provided.",
+          "occurrences": [
+            "band"
+          ]
+        },
+        {
+          "sentence": "The high school band won first place in the regional music competition. The band members practiced tirelessly to achieve their success.",
+          "explanation": "Here, 'band' clearly indicates a musical group or musical act consisting of multiple performers, as described in the Named Entity definition.",
+          "occurrences": [
+            "band"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "vehicle",
+    "prompt_length": 287,
+    "output_length": 230,
+    "annotation_guidelines": {
+      "Definition": "'vehicle' refers to any means of transportation, including but not limited to cars, trucks, airplanes, and boats.",
+      "Guidelines": "Do not label stationary objects or non-transportation-related terms. Exercise caution with ambiguous references like 'Air Force One' (which can refer to the aircraft or the call sign). Be mindful of metaphorical uses, such as 'the campaign was a runaway train'."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The streets were filled with vehicles rushing to their destinations, creating a symphony of honking horns and revving engines.",
+          "explanation": "The term 'vehicles' is used to describe various means of transportation on the streets, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "vehicles"
+          ]
+        },
+        {
+          "sentence": "The airport runway was a sea of vehicles as planes taxied to and from the gates, preparing for takeoff.",
+          "explanation": "Here, 'vehicles' refers to the airplanes on the runway, aligning with the definition of the Named Entity.",
+          "positive_occurrences": [
+            "vehicles"
+          ]
+        },
+        {
+          "sentence": "The port was bustling with vehicles of all sizes, from small fishing boats to large cargo ships, unloading their precious cargo.",
+          "explanation": "By mentioning boats and cargo ships as 'vehicles', the term is used within the context of transportation, meeting the criteria for the Named Entity.",
+          "positive_occurrences": [
+            "vehicles"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "ingredient",
+    "prompt_length": 283,
+    "output_length": 215,
+    "annotation_guidelines": {
+      "Definition": "'ingredient' refers to specific substances used in the preparation of food or drinks, such as spices, fruits, or seasonings.",
+      "Guidelines": "Avoid labeling generic or ambiguous terms like 'flavors' or 'spices' if not specifically mentioned. Exercise caution when labeling common verbs like 'stir in' or 'add' which may not always refer to the introduction of ingredients."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The recipe calls for adding a pinch of paprika for an extra kick.",
+          "explanation": "The term 'adding' implies the introduction of a specific substance (paprika) into the dish, making it an 'ingredient'.",
+          "positive_occurrences": [
+            "paprika"
+          ]
+        },
+        {
+          "sentence": "After mixing the batter, fold in the chopped walnuts gently.",
+          "explanation": "The term 'fold in' suggests incorporating a specific substance (chopped walnuts) into the mixture as an 'ingredient'.",
+          "positive_occurrences": [
+            "chopped walnuts"
+          ]
+        },
+        {
+          "sentence": "Sprinkle some grated Parmesan on top of the pasta before serving.",
+          "explanation": "The term 'sprinkle' indicates the application of a specific substance (grated Parmesan) as an 'ingredient' to enhance the dish.",
+          "positive_occurrences": [
+            "grated Parmesan"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "media",
+    "prompt_length": 277,
+    "output_length": 215,
+    "annotation_guidelines": {
+      "Definition": "'media' refers to channels, platforms, or means of communication and information distribution, such as books, newspapers, television, and the internet.",
+      "Guidelines": "Do not label individual elements within media, like 'Busytown books' or 'The State'. Avoid labeling generic terms like 'video' unless specifically referring to a medium of communication or distribution."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The New York Times, a renowned news media, uncovered the corruption scandal.",
+          "explanation": "The term 'news media' refers to a platform for communication and information distribution which aligns with the definition of the Named Entity 'media'.",
+          "positive_occurrences": [
+            "news media"
+          ]
+        },
+        {
+          "sentence": "Netflix, a popular online media streaming service, released a new series.",
+          "explanation": "The term 'online media streaming service' falls under the definition of 'media' as it is a platform for communication and distribution of information.",
+          "positive_occurrences": [
+            "online media streaming service"
+          ]
+        },
+        {
+          "sentence": "The library offers various forms of traditional media, including newspapers and magazines.",
+          "explanation": "Here, 'traditional media' refers to printed publications, representing channels of communication and information distribution.",
+          "positive_occurrences": [
+            "traditional media",
+            "newspapers",
+            "magazines"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "factor",
+    "prompt_length": 282,
+    "output_length": 149,
+    "annotation_guidelines": {
+      "Definition": "'factor' refers to elements, characteristics, or variables that have an impact on a situation, outcome, or result, often in the context of research or analysis.",
+      "Guidelines": "Avoid labeling specific instances when referring to vague or general concepts, such as 'things' or 'stuff'. Pay attention to context to distinguish 'factor' from actions or events that might impact a situation."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The level of education is a crucial factor in determining job opportunities.",
+          "explanation": "In this sentence, 'factor' is used to refer to an element influencing job opportunities."
+        },
+        {
+          "sentence": "The economic stability of a country is influenced by various factors, such as inflation and unemployment rates.",
+          "explanation": "Here, 'factors' are mentioned as variables impacting economic stability."
+        },
+        {
+          "sentence": "Environmental degradation is a significant factor to consider in climate change discussions.",
+          "explanation": "In this context, 'factor' is used to denote a characteristic affecting climate change."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "tissue",
+    "prompt_length": 280,
+    "output_length": 151,
+    "annotation_guidelines": {
+      "Definition": "'tissue' refers to a collection of similar cells and intercellular material that perform a specific function in an organism.",
+      "Guidelines": "Be cautious not to label individual cells or non-tissue structures (e.g., blood cells or organs). Take care to differentiate between structures that could be mistaken for tissue, such as 'tumor' or 'organ'."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The tumor tissue exhibited abnormal cell growth and differentiation.",
+          "explanation": "In this sentence, 'tumor tissue' refers to a collection of cells that are not part of a healthy organ but rather constitute a specific type of tissue characterized by abnormal growth.",
+          "positive_occurrences": [
+            "tumor tissue"
+          ]
+        },
+        {
+          "sentence": "The scar tissue formed after the injury helped with wound healing.",
+          "explanation": "Here, 'scar tissue' is a collection of similar cells and material that form as a response to injury and serves a specific function related to wound healing.",
+          "positive_occurrences": [
+            "scar tissue"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "crime",
+    "prompt_length": 301,
+    "output_length": 222,
+    "annotation_guidelines": {
+      "Definition": "'crime' refers to illegal activities that violate laws, such as theft, fraud, and murder.",
+      "Guidelines": "Avoid labeling legal actions or events as crimes, such as 'filing for bankruptcy'. Be cautious when distinguishing between literal and metaphorical uses of crime-related terms, e.g., 'dragged off to the slammer' (literal) versus 'committing a white-collar crime' (metaphorical). Be attentive to ambiguous terms like 'impeached'"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Many suspects were arrested for attempting to break into a jewelry store, which was a blatant crime.",
+          "explanation": "The term 'crime' is used in the context of illegal activities that violate laws, specifically in the case of attempting to break into a jewelry store.",
+          "positive_occurrences": [
+            "crime"
+          ]
+        },
+        {
+          "sentence": "The embezzlement of funds by the company's executives was a severe crime that led to their arrest.",
+          "explanation": "Here, 'crime' refers to the illegal activity of embezzlement, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "crime"
+          ]
+        },
+        {
+          "sentence": "The scandal involving the mayor's fraudulent activities was a prime example of a high-profile crime.",
+          "explanation": "In this sentence, 'crime' is used to describe the fraudulent activities of the mayor, which aligns with the Named Entity definition.",
+          "positive_occurrences": [
+            "crime"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "village",
+    "prompt_length": 279,
+    "output_length": 244,
+    "annotation_guidelines": {
+      "Definition": "'village' refers to a small settlement in rural or remote areas, typically smaller than a town or city, with a closely-knit community and limited population.",
+      "Guidelines": "Exercise caution when distinguishing 'village' from larger settlements like towns or smaller geographic features like hamlets. Avoid labeling non-specific references to rural areas or communities without specific village names."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The village of Greenfield nestled among the rolling hills, its population barely reaching a hundred.",
+          "explanation": "This sentence clearly describes a small settlement in a rural area with a closely-knit community and limited population, fitting the definition of the Named Entity 'village'.",
+          "positive_occurrences": [
+            "village of Greenfield"
+          ]
+        },
+        {
+          "sentence": "In the village of Willow Creek, everyone knows each other, making it a tightly-knit community.",
+          "explanation": "This sentence exemplifies a small settlement with a closely-knit community, which is characteristic of a village as defined.",
+          "positive_occurrences": [
+            "village of Willow Creek"
+          ]
+        },
+        {
+          "sentence": "Rural life in the village of Sunflower Valley is peaceful and idyllic, far from the hustle and bustle of the city.",
+          "explanation": "The usage of 'village of Sunflower Valley' highlights a small settlement in a rural area, emphasizing its calm and serene nature.",
+          "positive_occurrences": [
+            "village of Sunflower Valley"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "year",
+    "prompt_length": 301,
+    "output_length": 213,
+    "annotation_guidelines": {
+      "Definition": "'year' refers to a specific point in time denoted by the calendar year.",
+      "Guidelines": "Do not label relative or imprecise temporal references like 'last year' or 'in the future'. Exercise caution when distinguishing between year used as temporal reference and years used in a non-temporal context, e.g., 'He spent his college years in California'. Be mindful of potential ambiguities such as '1984' (could refer to a year or a generic number"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "In 2000, the company witnessed a sharp decline in sales.",
+          "explanation": "The term '2000' is used as a specific point in time denoted by the calendar year, fitting the definition of 'year'.",
+          "positive_occurrences": [
+            "2000"
+          ]
+        },
+        {
+          "sentence": "The historical event took place in 1969, marking a significant turning point.",
+          "explanation": "The term '1969' is used as a specific point in time denoted by the calendar year, fitting the definition of 'year'.",
+          "positive_occurrences": [
+            "1969"
+          ]
+        },
+        {
+          "sentence": "The contract is set to expire in 2023.",
+          "explanation": "The term '2023' is used as a specific point in time denoted by the calendar year, fitting the definition of 'year'.",
+          "positive_occurrences": [
+            "2023"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "demographic",
+    "prompt_length": 277,
+    "output_length": 220,
+    "annotation_guidelines": {
+      "Definition": "'demographic' refers to characteristics of a population, including but not limited to age, gender, race, and ethnicity.",
+      "Guidelines": "Avoid labeling individuals. Be mindful of context, as some terms like 'Black' may refer to a race or color. Exercise caution with terms that may refer to both individuals and demographics like 'elderly'."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The latest census data reveals shifts in the demographic makeup of the town, with more young families moving in.",
+          "explanation": "In this sentence, 'demographic' is used to refer to the characteristics of the population in terms of age and family composition.",
+          "positive_occurrences": [
+            "demographic"
+          ]
+        },
+        {
+          "sentence": "A study conducted on the demographic distribution of healthcare services highlighted disparities in access based on ethnicity.",
+          "explanation": "Here, 'demographic' is used to describe the distribution of healthcare services based on ethnicity, fitting the definition of characteristics of a population.",
+          "positive_occurrences": [
+            "demographic"
+          ]
+        },
+        {
+          "sentence": "Policies tailored to the demographic needs of the community are more likely to be successful and impactful.",
+          "explanation": "This sentence uses 'demographic' in the context of addressing the specific characteristics of a population to develop effective policies.",
+          "positive_occurrences": [
+            "demographic"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical equipment",
+    "prompt_length": 302,
+    "output_length": 238,
+    "annotation_guidelines": {
+      "Definition": "'medical equipment' refers to tools, instruments, devices, or apparatus used in healthcare settings for diagnosis, treatment, monitoring, or prevention of medical conditions.",
+      "Guidelines": "Avoid labeling general medical terms that are not specific to equipment, e.g., 'pain' or 'liquid'. Exercise caution with ambiguous terms such as 'catheter', which can also refer to a part of the body anatomy. Be mindful of context to distinguish between medical equipment and medical procedures or actions."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The doctor inserted a catheter into the patient's bladder to drain urine, utilizing the advanced medical equipment.",
+          "explanation": "In this sentence, 'catheter' is used in the context of a medical device or equipment for draining urine, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "medical equipment"
+          ]
+        },
+        {
+          "sentence": "The nurse carefully cleaned the endoscope, a crucial piece of medical equipment used for internal examinations.",
+          "explanation": "Here, 'endoscope' is referred to as a tool or device used in medical settings for internal examinations, aligning with the Named Entity definition.",
+          "positive_occurrences": [
+            "medical equipment"
+          ]
+        },
+        {
+          "sentence": "The clinic invested in state-of-the-art defibrillators to ensure rapid response to cardiac emergencies.",
+          "explanation": "In this scenario, 'defibrillators' are mentioned as essential devices in healthcare for responding to cardiac emergencies, falling under the category of medical equipment.",
+          "positive_occurrences": [
+            "medical equipment"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "namespace",
+    "prompt_length": 282,
+    "output_length": 198,
+    "annotation_guidelines": {
+      "Definition": "'namespace' is a programming concept that defines a scope for a set of identifiers (e.g., classes, functions, variables) in code to avoid naming conflicts and organize code.",
+      "Guidelines": "Do not label general terms or common words that are not specifically related to programming namespaces. Exercise caution with ambiguous terms, especially in technical documentation where namespace names might match common words or phrases."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "In the programming article, the 'namespace' of the global variables was clearly defined to prevent conflicts.",
+          "explanation": "This sentence shows the usage of 'namespace' in a programming context to define a specific scope for identifiers.",
+          "positive_occurrences": [
+            "namespace"
+          ]
+        },
+        {
+          "sentence": "Each module had its own 'namespace' to encapsulate the functions and avoid naming clashes.",
+          "explanation": "Here, 'namespace' is used in the context of programming to create separate scopes for functions.",
+          "positive_occurrences": [
+            "namespace"
+          ]
+        },
+        {
+          "sentence": "The 'namespace' of the classes in the program ensured that class names were unique and organized.",
+          "explanation": "This sentence illustrates the role of 'namespace' in programming to maintain unique identifiers for classes.",
+          "positive_occurrences": [
+            "namespace"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "skill",
+    "prompt_length": 267,
+    "output_length": 217,
+    "annotation_guidelines": {
+      "Definition": "'skill' represents an ability or expertise in performing a specific task or activity.",
+      "Guidelines": "Avoid labeling generic activities or objects. Exercise caution with expressions that signify traits, such as 'nice shot' (complimentary remark) or 'hit it out of the park' (metaphorical expression)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "She demonstrated exceptional skill in playing the piano, captivating the audience with her performance.",
+          "explanation": "In this sentence, 'skill' is used to describe someone's expertise in playing the piano, showing proficiency in a specific activity.",
+          "occurrences": [
+            "skill"
+          ]
+        },
+        {
+          "sentence": "His skill in coding and problem-solving was evident as he quickly debugged the complex software.",
+          "explanation": "Here, 'skill' denotes the person's ability and expertise in coding and problem-solving, reflecting a specific task they excel at.",
+          "occurrences": [
+            "skill"
+          ]
+        },
+        {
+          "sentence": "The surgeon's delicate hand movements showcased her precision and skill in performing intricate surgeries.",
+          "explanation": "This sentence highlights the surgeon's expertise and ability, emphasizing her proficiency in performing specific tasks related to surgery.",
+          "occurrences": [
+            "skill"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "anatomical entity",
+    "prompt_length": 303,
+    "output_length": 220,
+    "annotation_guidelines": {
+      "Definition": "'anatomical entity' refers to physical structures or components of the body, such as organs, tissues, cells, or anatomical features.",
+      "Guidelines": "Do not label abstract or conceptual references. Exercise careful judgment with ambiguous terms like 'heart of the matter' (idiomatic expression) or 'brain' in a philosophical context. Additionally, avoid labeling non-specific terms like 'tissue' or 'organ' without context that clearly identifies the specific anatomical entity."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The heart of the matter lay in the intricate design of the human heart.",
+          "explanation": "In this sentence, 'heart of the matter' is used to refer to the physical structure of the heart, aligning with the definition of 'anatomical entity'.",
+          "positive_occurrences": [
+            "human heart"
+          ]
+        },
+        {
+          "sentence": "The brain behind the operation is the central nervous system.",
+          "explanation": "Here, 'brain behind the operation' embodies the central nervous system, which is an anatomical entity according to the guidelines.",
+          "positive_occurrences": [
+            "central nervous system"
+          ]
+        },
+        {
+          "sentence": "The nerve of that person is unparalleled, stemming from an elaborate network of neural connections.",
+          "explanation": "The term 'nerve' in this context signifies the nervous system, which falls under the category of anatomical entities.",
+          "positive_occurrences": [
+            "nervous system",
+            "neural connections"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "model",
+    "prompt_length": 273,
+    "output_length": 134,
+    "annotation_guidelines": {
+      "Definition": "'model' refers to a representation or simulation of a system, concept, or object, often used in the context of computer science, mathematics, and engineering.",
+      "Guidelines": "Exercise caution with generic terms like 'object' or 'entity' that can have broader meanings. Avoid labeling abstract concepts or theoretical frameworks unless explicitly representing a model."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The design team created a complex mathematical model to simulate traffic patterns in the city.",
+          "explanation": "The term 'model' is used to refer to a simulation of a system (traffic patterns) in the field of mathematics and engineering.",
+          "occurrences": [
+            "model"
+          ]
+        },
+        {
+          "sentence": "The researchers used a computer model to predict the behavior of a new software algorithm.",
+          "explanation": "Here, 'model' is employed as a representation or simulation in the context of computer science.",
+          "occurrences": [
+            "model"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "position",
+    "prompt_length": 272,
+    "output_length": 152,
+    "annotation_guidelines": {
+      "Definition": "'position' refers to specific job titles, roles, or functions within an organization or context.",
+      "Guidelines": "Avoid labeling general terms that do not specify a particular job or function. Be cautious with ambiguous terms like 'CEO' (can refer to multiple levels of leadership) or 'guy' (informal and non-specific)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The company appointed a new CEO to lead the organization's expansion efforts.",
+          "explanation": "In this sentence, 'CEO' is used to refer to a specific job title within the organization, fitting the definition of 'position'.",
+          "positive_occurrences": [
+            "CEO",
+            "organization"
+          ]
+        },
+        {
+          "sentence": "The guy responsible for sales strategy at the firm impressed everyone with his innovative ideas.",
+          "explanation": "Here, 'guy' is used informally to refer to a specific position related to sales strategy within the firm.",
+          "positive_occurrences": [
+            "guy",
+            "sales strategy",
+            "firm"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical concept",
+    "prompt_length": 273,
+    "output_length": 161,
+    "annotation_guidelines": {
+      "Definition": "'medical concept' refers to terms related to medical conditions, procedures, treatments, anatomical structures, or healthcare concepts.",
+      "Guidelines": "Do not label general healthcare terms like 'hospital' or 'doctor'. Be cautious with ambiguous terms like 'heart' (organ and emotional state) or 'cold' (illness and temperature)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "He underwent open-heart surgery to repair a damaged valve.",
+          "explanation": "In this sentence, 'heart' is used in the context of an anatomical structure related to a medical procedure, fitting the definition of 'medical concept'.",
+          "occurrences": [
+            "open-heart surgery",
+            "damaged valve"
+          ]
+        },
+        {
+          "sentence": "After being diagnosed with a cold, she was prescribed medication to reduce fever and alleviate symptoms.",
+          "explanation": "In this sentence, 'cold' is used to refer to a medical condition, meeting the criteria of 'medical concept'.",
+          "occurrences": [
+            "cold",
+            "medication",
+            "fever",
+            "symptoms"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "song",
+    "prompt_length": 285,
+    "output_length": 174,
+    "annotation_guidelines": {
+      "Definition": "'song' refers to a musical composition with lyrics and melody that can be performed or recorded.",
+      "Guidelines": "Do not label general music-related terms like 'album' or 'lyrics'. Exercise caution with ambiguous cases like 'Billie Jean' (which can refer to a person or a song) or 'Guns N' Roses' (which can refer to a band or a song)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I love listening to 'Billie Jean' by Michael Jackson whenever I need a mood boost.",
+          "explanation": "Here, 'Billie Jean' is used to refer to a specific song composed by Michael Jackson, aligning with the definition of the 'song' named entity.",
+          "positive_occurrences": [
+            "'Billie Jean'"
+          ]
+        },
+        {
+          "sentence": "The crowd went wild when the band played 'Guns N' Roses' at the concert last night.",
+          "explanation": "'Guns N' Roses' is used in this context to denote a specific song performed by the band, thus meeting the criteria of the 'song' named entity.",
+          "positive_occurrences": [
+            "'Guns N' Roses'"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "video game",
+    "prompt_length": 302,
+    "output_length": 233,
+    "annotation_guidelines": {
+      "Definition": "'video game' refers to specific games, including titles, series, or franchises in digital or interactive form, intended for entertainment purposes.",
+      "Guidelines": "Avoid labeling generic terms like 'game' or broad categories like 'entertainment'. Exercise caution with titles that may also refer to non-gaming content, such as 'Winx Club' or 'Assassin's Creed' (a historical term and a game title). Be mindful of contexts where game names may be used metaphorically"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I spent hours playing 'The Legend of Zelda' last night, and I just can't get enough of this video game.",
+          "explanation": "The term 'video game' in this sentence refers to the specific game 'The Legend of Zelda', fitting the definition of the Named Entity.",
+          "occurrences": [
+            "The Legend of Zelda"
+          ]
+        },
+        {
+          "sentence": "My friends and I are huge fans of the 'Final Fantasy' series; we have played every video game in the franchise.",
+          "explanation": "Here, 'video game' is used to describe the games within the 'Final Fantasy' series, aligning with the Named Entity definition.",
+          "occurrences": [
+            "Final Fantasy"
+          ]
+        },
+        {
+          "sentence": "As a gamer, I enjoy exploring different worlds and completing quests in each video game I play.",
+          "explanation": "The term 'video game' is used generically here to encompass any game that the speaker plays, still within the context of gaming.",
+          "occurrences": []
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "test",
+    "prompt_length": 290,
+    "output_length": 209,
+    "annotation_guidelines": {
+      "Definition": "'test' refers to medical procedures, examinations, or diagnostics that are used to assess a patient's health condition or monitor disease progression.",
+      "Guidelines": "Avoid labeling general medical terms that do not specifically refer to a diagnostic test. Exercise caution with terms that can have multiple meanings, such as 'dotatate' (can be a test or a treatment) and 'histologically' (a method, not a test)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The doctor ordered a 'sputum test' to check for signs of respiratory infection.",
+          "explanation": "In this sentence, 'sputum test' clearly refers to a diagnostic procedure used to assess the patient's health condition.",
+          "named_entities": [
+            "sputum test"
+          ]
+        },
+        {
+          "sentence": "After the 'colonoscopy test', the results indicated the presence of polyps.",
+          "explanation": "Here, 'colonoscopy test' is a specific medical procedure used for examination and monitoring of diseases.",
+          "named_entities": [
+            "colonoscopy test"
+          ]
+        },
+        {
+          "sentence": "The 'MRA test' provided detailed imaging of the blood vessels in the brain.",
+          "explanation": "'MRA test' is a diagnostic tool to assess the patient's health condition, as it generates imaging for medical evaluation.",
+          "named_entities": [
+            "MRA test"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "data structure",
+    "prompt_length": 297,
+    "output_length": 159,
+    "annotation_guidelines": {
+      "Definition": "'data structure' refers to the organization and arrangement of data elements in a computer system or program, often used for efficient data manipulation and storage.",
+      "Guidelines": "Do not label individual data elements unless they are part of a larger data organization concept, such as arrays, linked lists, or hash tables. Be cautious with ambiguous terms like 'categories' (can refer to data structure or a general concept) or 'blocklists' (ambiguous without context)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The film database was structured into various categories based on genre, release year, and director.",
+          "explanation": "The term 'categories' is used here to describe the organization and arrangement of data elements in the film database, aligning with the definition of 'data structure'.",
+          "positive_occurrences": [
+            "data structure"
+          ]
+        },
+        {
+          "sentence": "The shopping app implemented a new data structure to efficiently store user preferences in linked lists for quick retrieval and updating.",
+          "explanation": "The term 'linked lists' is a specific data organization concept and falls under the umbrella of the definition of 'data structure'.",
+          "positive_occurrences": [
+            "data structure"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "album",
+    "prompt_length": 281,
+    "output_length": 224,
+    "annotation_guidelines": {
+      "Definition": "'album' in the context of NER refers to a collection of musical or artistic works released as a single unit.",
+      "Guidelines": "Exclude generic references to albums in unrelated contexts - e.g., 'photo album'. Beware of ambiguity in cases where 'album' is used in a non-musical sense, such as 'family album' or 'stamp album'."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The band's latest album is a masterpiece that showcases their musical evolution over the years.",
+          "explanation": "In this sentence, 'album' refers to a collection of musical works released by the band, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "album"
+          ]
+        },
+        {
+          "sentence": "The curator carefully organized the art exhibition as if each painting was part of a collaborative album.",
+          "explanation": "Here, 'album' is used metaphorically to describe a collection of artistic works, aligning with the context of a collection of works released as a single unit.",
+          "positive_occurrences": [
+            "album"
+          ]
+        },
+        {
+          "sentence": "The new poetry anthology is a lyrical album that captures the essence of various emotions and experiences.",
+          "explanation": "In this context, 'album' is extended beyond music to encompass a collection of poems that are presented together, similar to a musical album.",
+          "positive_occurrences": [
+            "album"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "string",
+    "prompt_length": 292,
+    "output_length": 135,
+    "annotation_guidelines": {
+      "Definition": "'string' in the context of NER refers to a sequence of characters or text, usually enclosed within quotation marks or denoted as a distinct unit within a sentence.",
+      "Guidelines": "Exclude generic words unless they carry specific meaning in the given context (e.g., 'foo' in software development). Exercise caution with ambiguous terms like 'QGIS 2.99' which may refer to a software version rather than a string."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The string 'Hello, World!' is commonly used in programming tutorials to demonstrate printing on the screen.",
+          "explanation": "In this sentence, the term 'string' is used to refer to a sequence of characters enclosed within quotation marks, fitting the definition of the Named Entity."
+        },
+        {
+          "sentence": "She sent me a love letter with a beautiful string of words that touched my heart.",
+          "explanation": "Here, the term 'string' is used to describe a sequence of words forming a meaningful unit, similar to a string in programming."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "part",
+    "prompt_length": 278,
+    "output_length": 150,
+    "annotation_guidelines": {
+      "Definition": "'part' refers to components, elements, or constituents of a larger whole, including physical, mechanical, or abstract entities.",
+      "Guidelines": "Do not label actions or processes. Exercise caution with ambiguous terms like 'joint' (can refer to both a component and an action) or 'stock units' (potentially a collection of parts or a distinct part)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The joint of the machine consists of several interconnected parts that work together smoothly.",
+          "explanation": "In this sentence, 'joint' is used to describe the connection point of different components which aligns with the definition of the Named Entity 'part'.",
+          "occurrences": [
+            "parts"
+          ]
+        },
+        {
+          "sentence": "The assembly line produces stock units of the product, each composed of various interchangeable parts.",
+          "explanation": "Here, 'stock units' are considered collections of components or constituents, thus falling under the definition of the Named Entity 'part'.",
+          "occurrences": [
+            "stock units",
+            "parts"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical term",
+    "prompt_length": 302,
+    "output_length": 146,
+    "annotation_guidelines": {
+      "Definition": "'medical term' pertains to words or phrases related to the field of medicine, encompassing anatomical parts, procedures, medical conditions, and terms specifically associated with healthcare and clinical contexts.",
+      "Guidelines": "Avoid labeling general terms not exclusive to medicine (e.g., 'complications' could be in a non-medical context). Exercise caution with potentially ambiguous terms like 'follow-up' (can refer to non-medical contexts) and 'quality of life' (not always"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The patient underwent a follow-up appointment to monitor the progress of their treatment.",
+          "explanation": "In this context, 'follow-up' is used in a medical sense to refer to a subsequent appointment related to the patient's treatment.",
+          "occurrences": [
+            "follow-up"
+          ]
+        },
+        {
+          "sentence": "The study aimed to assess the quality of life of cancer survivors post-treatment.",
+          "explanation": "Here, 'quality of life' is specifically evaluated in the context of healthcare, focusing on the well-being and overall health status of cancer survivors.",
+          "occurrences": [
+            "quality of life"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "package",
+    "prompt_length": 273,
+    "output_length": 223,
+    "annotation_guidelines": {
+      "Definition": "'package' refers to a specific software package, library, or module that can be installed and utilized in a software development context.",
+      "Guidelines": "Do not label generic terms like 'software' or 'library'. Exercise caution with ambiguous terms like 'Java' (programming language and platform), and 'Amazon' (company and software package)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I developed a new web application using a popular 'Python' package for handling data visualization.",
+          "explanation": "In this sentence, 'Python' is used as the name of a programming language, which fits the 'package' definition as a software package or library.",
+          "positive_occurrences": [
+            "package"
+          ]
+        },
+        {
+          "sentence": "The team decided to integrate a powerful 'TensorFlow' package for machine learning tasks.",
+          "explanation": "Here, 'TensorFlow' is referred to as a machine learning library, aligning with the 'package' definition of a software package or module.",
+          "positive_occurrences": [
+            "package"
+          ]
+        },
+        {
+          "sentence": "She implemented a real-time chat feature by incorporating the 'Socket.IO' package into the application.",
+          "explanation": "In this context, 'Socket.IO' is utilized as a module for real-time communication, which fits the 'package' definition.",
+          "positive_occurrences": [
+            "package"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "command",
+    "prompt_length": 301,
+    "output_length": 124,
+    "annotation_guidelines": {
+      "Definition": "'command' refers to specific instructions or directives issued to a computer system or device for carrying out a task or function, typically linked to programming or system operations.",
+      "Guidelines": "Do not label common words or actions that are not specific programming or system commands, such as 'go', 'stop', or 'find'. Exercise caution when labeling ambiguous terms that could refer to both commands and regular language, like 'man' or 'sed'. Be mindful of context and technical nuances when"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The 'man' command in Unix is used to display manual pages for different commands and programs.",
+          "explanation": "'man' is used in the context of a specific instruction in Unix, fitting the definition of 'command'."
+        },
+        {
+          "sentence": "When working with text files in Linux, the 'sed' command is essential for stream editing tasks.",
+          "explanation": "'sed' is a specific instruction for text file editing in Linux, aligning with the concept of 'command'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "building",
+    "prompt_length": 282,
+    "output_length": 129,
+    "annotation_guidelines": {
+      "Definition": "'building' refers to physical structures that are constructed, such as houses, towers, hotels, and offices, that are designed for human occupancy or use.",
+      "Guidelines": "Avoid labeling natural formations like mountains or caves unless specifically used as a building. Exercise caution with ambiguous terms like 'White House' (building name and governmental reference) or 'Amazon' (company and river name)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The White House is a historic building situated in Washington, D.C.",
+          "explanation": "Here 'White House' is used as a building name, fitting the Named Entity definition.",
+          "occurrences": [
+            "White House"
+          ]
+        },
+        {
+          "sentence": "Amazon announced the construction of a new office building in downtown Seattle.",
+          "explanation": "'Amazon' is referenced as a company involved in building construction, aligning with the Named Entity definition.",
+          "occurrences": [
+            "Amazon",
+            "office building",
+            "Seattle"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "currency",
+    "prompt_length": 280,
+    "output_length": 202,
+    "annotation_guidelines": {
+      "Definition": "'currency' refers to the standardized units of money used in different countries or regions.",
+      "Guidelines": "Do not label generic terms like 'money' or 'finance'. Exercise caution with ambiguous terms like 'dollar' (refers to both the U.S. currency and other currencies). Be attentive to currency symbols such as '$', '\u20ac', and '\u00a5'."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "She exchanged her dollars for euros at the airport.",
+          "explanation": "In this sentence, 'dollars' and 'euros' are both referring to different standardized units of money used in specific regions (U.S. and Europe).",
+          "occurrences": [
+            "dollars",
+            "euros"
+          ]
+        },
+        {
+          "sentence": "The store accepted payment in yen or dollars.",
+          "explanation": "Here, 'yen' and 'dollars' are used to indicate specific currencies accepted for payment.",
+          "occurrences": [
+            "yen",
+            "dollars"
+          ]
+        },
+        {
+          "sentence": "He invested in both pounds and pesos in the foreign exchange market.",
+          "explanation": "The terms 'pounds' and 'pesos' represent distinct units of money from different countries in this context.",
+          "occurrences": [
+            "pounds",
+            "pesos"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "noun",
+    "prompt_length": 260,
+    "output_length": 138,
+    "annotation_guidelines": {
+      "Definition": "'noun' refers to a word that represents a person, place, thing, or idea.",
+      "Guidelines": "Do not label generic or ambiguous terms that do not clearly represent a specific person, place, thing, or idea. Exercise caution with abstract or metaphorical references."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The happiness of a noun illuminates the room with radiant joy.",
+          "explanation": "In this sentence, 'happiness' is a noun representing an abstract concept or idea, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "noun"
+          ]
+        },
+        {
+          "sentence": "The mountain stood tall as a silent, stoic noun in the landscape.",
+          "explanation": "Here, 'mountain' is a noun representing a physical object or thing, aligning with the guidelines for the Named Entity.",
+          "positive_occurrences": [
+            "noun"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical device",
+    "prompt_length": 297,
+    "output_length": 224,
+    "annotation_guidelines": {
+      "Definition": "'medical device' includes instruments or apparatus used for the diagnosis, treatment, or prevention of disease or injury.",
+      "Guidelines": "Avoid labeling general medical terms like drugs or pharmaceuticals. Exercise caution with terms that have dual usage, such as 'bandage' (can refer to both a medical device and a general object). Be mindful of distinguishing between medical devices and body parts or procedures (e.g., distinguishing 'stent' from 'artery')."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The surgeon used a stent to open up the blocked artery in the patient's heart.",
+          "explanation": "In this sentence, 'stent' is used as a medical device to treat the patient's condition.",
+          "positive_occurrences": [
+            "stent",
+            "artery"
+          ]
+        },
+        {
+          "sentence": "The doctor implanted a pacemaker in the patient's chest to regulate their heart rhythm.",
+          "explanation": "Here, 'pacemaker' is being referred to as a medical device used for a specific medical purpose.",
+          "positive_occurrences": [
+            "pacemaker",
+            "chest",
+            "heart rhythm"
+          ]
+        },
+        {
+          "sentence": "The nurse applied a continuous glucose monitor to help the diabetic patient manage their blood sugar levels.",
+          "explanation": "In this context, 'continuous glucose monitor' is a medical device aiding in monitoring the patient's health condition.",
+          "positive_occurrences": [
+            "continuous glucose monitor",
+            "diabetic patient",
+            "blood sugar levels"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "trait",
+    "prompt_length": 277,
+    "output_length": 144,
+    "annotation_guidelines": {
+      "Definition": "'trait' refers to distinctive qualities, attributes, or characteristics of organisms or objects that are identifiable and measurable.",
+      "Guidelines": "Avoid labeling general adjectives or descriptors not associated with specific attributes of interest. Exercise caution with ambiguous terms like 'strong' (could refer to physical strength or other traits) or 'fast' (could mean quick or unrestrained)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "She displayed a strong determination to finish the race, running with unwavering focus and perseverance.",
+          "explanation": "In this context, 'strong' refers to the quality of determination and perseverance, fitting the definition of 'trait'.",
+          "occurrences": [
+            "determination",
+            "perseverance"
+          ]
+        },
+        {
+          "sentence": "His sharp wit and quick thinking always kept him ahead in intellectual discussions.",
+          "explanation": "Here, 'quick' pertains to the attribute of fast thinking, aligning with the concept of 'trait'.",
+          "occurrences": [
+            "quick thinking"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "age group",
+    "prompt_length": 271,
+    "output_length": 258,
+    "annotation_guidelines": {
+      "Definition": "'age group' refers to a range of ages that share common characteristics or experiences, such as children, adolescents, or infants.",
+      "Guidelines": "Do not label individual ages. Be cautious with ambiguous terms like 'teenagers' (can encompass different age ranges) and be mindful of context when determining the appropriate age group."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The new movie is targeted towards teenagers, with themes and humor that resonate with this age group.",
+          "explanation": "The term 'teenagers' is used to refer to a specific range of ages (13-19) that share common characteristics and experiences, making it a part of the 'age group' Named Entity.",
+          "positive_occurrences": [
+            "age group"
+          ]
+        },
+        {
+          "sentence": "The toy store carries a wide selection of educational toys suitable for toddlers, catering to the needs of this age group.",
+          "explanation": "Here, 'toddlers' is used to describe a specific age range typically between 1 to 3 years old, falling under the 'age group' Named Entity.",
+          "positive_occurrences": [
+            "age group"
+          ]
+        },
+        {
+          "sentence": "The dance class is tailored for young children, providing activities that are engaging and age-appropriate for this group.",
+          "explanation": "In this sentence, 'young children' is a term used to encompass children within a certain age range, categorizing them under the 'age group' Named Entity.",
+          "positive_occurrences": [
+            "age group"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "county",
+    "prompt_length": 269,
+    "output_length": 207,
+    "annotation_guidelines": {
+      "Definition": "'county' refers to administrative regions within a specific country, typically with their own local government and boundaries.",
+      "Guidelines": "Avoid labeling general or ambiguous references like 'orange county' (non-administrative references). Exercise caution with locations that may have similar names, e.g., 'Washington County' in different states."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The county council is responsible for managing public services such as waste collection and libraries.",
+          "explanation": "The term 'county' is used to refer to an administrative region with a local government and boundaries, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "county"
+          ]
+        },
+        {
+          "sentence": "Residents of the county must vote for their local representatives in the upcoming election.",
+          "explanation": "In this context, 'county' indicates an administrative region with its own local government, aligning with the Named Entity definition.",
+          "positive_occurrences": [
+            "county"
+          ]
+        },
+        {
+          "sentence": "The county sheriff's department handles law enforcement within the boundaries of the region.",
+          "explanation": "Here, 'county' is related to the jurisdiction and governance of a specific administrative region, meeting the criteria of the Named Entity.",
+          "positive_occurrences": [
+            "county"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "invention",
+    "prompt_length": 302,
+    "output_length": 241,
+    "annotation_guidelines": {
+      "Definition": "'invention' in the context of NER refers to a novel device, process, or concept that has been created or developed.",
+      "Guidelines": "Entities labeled as 'invention' should be specific inventions and not general concepts. Exercise caution with generic terms like 'innovation' that may not represent a concrete invention. Additionally, be mindful of instances where the term 'invention' is used as a generic placeholder and does not refer to a specific patented or novel concept."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The invention of the light bulb by Thomas Edison revolutionized the way we illuminate our homes.",
+          "explanation": "The term 'invention' is used to refer to the specific creation of the light bulb by Thomas Edison, fitting the definition of a novel device or concept.",
+          "positive_occurrences": [
+            "invention"
+          ]
+        },
+        {
+          "sentence": "Marie Curie's discovery of radioactivity was a groundbreaking invention in the field of science.",
+          "explanation": "Here, 'invention' is used to describe the novel concept of radioactivity discovered by Marie Curie, meeting the criteria of a significant creation or development.",
+          "positive_occurrences": [
+            "invention"
+          ]
+        },
+        {
+          "sentence": "The invention of the World Wide Web by Tim Berners-Lee transformed the way we access information and connect globally.",
+          "explanation": "In this sentence, 'invention' relates to the creation of the World Wide Web by Tim Berners-Lee, representing a specific and impactful technological development.",
+          "positive_occurrences": [
+            "invention"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "column",
+    "prompt_length": 276,
+    "output_length": 174,
+    "annotation_guidelines": {
+      "Definition": "'column' in the context of NER refers to named data columns or fields within a database, spreadsheet, or table.",
+      "Guidelines": "Avoid labeling generic terms like 'field' or 'variable' unless they specifically refer to a named column. Exercise caution with potentially ambiguous terms like 'status', which could refer to various data fields in different contexts."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The 'status' column in the database tracks the progress of each customer's order.",
+          "explanation": "'status' is used specifically in the context of named data columns within a database.",
+          "occurrences": [
+            "status column"
+          ]
+        },
+        {
+          "sentence": "The 'priority' column in the spreadsheet indicates the urgency level of each task.",
+          "explanation": "'priority' is referred to as a data column in a spreadsheet.",
+          "occurrences": [
+            "priority column"
+          ]
+        },
+        {
+          "sentence": "The 'type' column in the table categorizes different products based on their features.",
+          "explanation": "'type' column is used as a data field within a table.",
+          "occurrences": [
+            "type column"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "url",
+    "prompt_length": 273,
+    "output_length": 149,
+    "annotation_guidelines": {
+      "Definition": "'url' refers to Uniform Resource Locators, which are addresses used to access resources on the internet, such as web pages, images, and files.",
+      "Guidelines": "Do not label non-URL references such as 'visit our website', and be cautious with truncations and punctuation within URLs, which could lead to misinterpretation."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I found a great recipe on https://www.foodnetwork.com for banana bread.",
+          "explanation": "The URL 'https://www.foodnetwork.com' is used to access a specific recipe on the Food Network website.",
+          "positive_occurrences": [
+            "https://www.foodnetwork.com"
+          ]
+        },
+        {
+          "sentence": "To learn more about machine learning, check out the tutorials at https://www.tensorflow.org.",
+          "explanation": "The URL 'https://www.tensorflow.org' provides access to tutorials related to machine learning on the TensorFlow website.",
+          "positive_occurrences": [
+            "https://www.tensorflow.org"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "outcome",
+    "prompt_length": 301,
+    "output_length": 212,
+    "annotation_guidelines": {
+      "Definition": "'outcome' refers to the result or consequence of a particular event, action, or condition, often in a specific context such as medical, scientific, or social scenarios.",
+      "Guidelines": "Do not label general terms like 'result' or 'consequence' unless they are used in a specific context. Be cautious with terms that have multiple meanings, such as 'death' (can refer to a medical outcome or a general concept). Be attentive to nuances in language to identify true"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The patient's recovery was an unexpected outcome of the treatment.",
+          "explanation": "In this sentence, 'outcome' is used to refer to the result or consequence of the treatment, which aligns with the definition of the Named Entity.",
+          "positive_occurrences": [
+            "outcome"
+          ]
+        },
+        {
+          "sentence": "The successful completion of the project was a positive outcome of the team's hard work.",
+          "explanation": "Here, 'outcome' is used to describe the result or consequence of the team's hard work, illustrating the Named Entity's definition.",
+          "positive_occurrences": [
+            "outcome"
+          ]
+        },
+        {
+          "sentence": "The outcome of the experiment indicated a high likelihood of success for the new drug.",
+          "explanation": "This sentence uses 'outcome' to convey the result or consequence of the experiment, which is consistent with the Named Entity's definition.",
+          "positive_occurrences": [
+            "outcome"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "family",
+    "prompt_length": 301,
+    "output_length": 159,
+    "annotation_guidelines": {
+      "Definition": "'family' in the context of NER refers to a group of related individuals connected by blood or legal ties, or a taxonomic category in biology.",
+      "Guidelines": "Avoid labeling generic terms like 'friends' or 'colleagues' as 'family'. Exercise caution with ambiguous terms like 'Jackson' (could be a family name or a location), and 'genus' or 'species' in biological contexts to accurately distinguish 'family' as a taxonomic unit."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The Jackson family gathered for a reunion at their ancestral home.",
+          "explanation": "In this sentence, 'Jackson family' refers to a group of related individuals connected by blood, fitting the definition of the Named Entity 'family'.",
+          "occurrences": [
+            "Jackson family"
+          ]
+        },
+        {
+          "sentence": "The study of evolution includes the classification of species into their respective families.",
+          "explanation": "Here, 'species' and 'families' are used in a biological context, clearly distinguishing 'family' as a taxonomic unit, consistent with the Named Entity definition.",
+          "occurrences": [
+            "families"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "html tag",
+    "prompt_length": 289,
+    "output_length": 207,
+    "annotation_guidelines": {
+      "Definition": "'html tag' refers to specific HTML elements used to define the structure and content of a webpage, such as <div>, <p>, or <a>.",
+      "Guidelines": "Do not label generic terms like 'text' or 'attribute'. Exercise caution with similar terms like 'media' (could also refer to non-HTML contexts) and 'option' (could be interpreted as general choices beyond HTML)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The <p> tag is commonly used to create paragraphs in HTML documents.",
+          "explanation": "In this sentence, the use of '<p>' clearly refers to an html tag for creating paragraphs.",
+          "positive_occurrences": [
+            "<p>"
+          ]
+        },
+        {
+          "sentence": "They wrapped the main content of the website in a <div> tag for styling purposes.",
+          "explanation": "The '<div>' tag is used here to define a division or section within an HTML document, indicating its structural significance.",
+          "positive_occurrences": [
+            "<div>"
+          ]
+        },
+        {
+          "sentence": "I inserted multiple <a> tags to create hyperlinks directing users to different pages.",
+          "explanation": "The usage of '<a>' here indicates the creation of hyperlinks, which is a common function of this html tag.",
+          "positive_occurrences": [
+            "<a>"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "database",
+    "prompt_length": 289,
+    "output_length": 222,
+    "annotation_guidelines": {
+      "Definition": "'database' refers to a structured collection of data stored and organized for easy retrieval, management, and updating.",
+      "Guidelines": "Do not label general terms like 'system' or 'views'. Exercise caution with entities that are multi-faceted, like 'Medline', which also refers to a database but is primarily known as a medical literature database. Ensure the context emphasizes the specific entity's role as a database."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The university library implemented a new database to store and retrieve academic articles.",
+          "explanation": "In this sentence, 'database' is used to refer to a structured collection of data stored and organized for easy retrieval, aligning with the definition provided.",
+          "occurrences": [
+            "database"
+          ]
+        },
+        {
+          "sentence": "The company decided to migrate all their client information to a centralized database for better data management.",
+          "explanation": "Here, 'database' is mentioned as a tool for storing and organizing data, emphasizing its role in data management, which is consistent with the definition.",
+          "occurrences": [
+            "database"
+          ]
+        },
+        {
+          "sentence": "The research team relied on a comprehensive database of genetic sequences for their study on inherited diseases.",
+          "explanation": "In this sentence, 'database' denotes a structured collection of genetic sequences, demonstrating its function as a repository for specific types of data as outlined in the definition.",
+          "occurrences": [
+            "database"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "business",
+    "prompt_length": 275,
+    "output_length": 183,
+    "annotation_guidelines": {
+      "Definition": "'business' refers to enterprises, companies, organizations, or commercial establishments involved in economic activities.",
+      "Guidelines": "Avoid labeling vague general terms like 'service' or 'industry'. Exercise caution with ambiguous references such as 'Apple' (can refer to the company or the fruit) or 'Shell' (can refer to the company or the object)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Shell announced its new sustainable energy initiatives during the conference.",
+          "explanation": "In this sentence, 'Shell' refers to the company involved in economic activities related to sustainable energy initiatives.",
+          "positive_occurrences": [
+            "Shell"
+          ]
+        },
+        {
+          "sentence": "Apple's quarterly earnings report exceeded analysts' expectations.",
+          "explanation": "Here, 'Apple' is clearly used in the context of a company's financial performance, aligning it with the Named Entity 'business'.",
+          "positive_occurrences": [
+            "Apple"
+          ]
+        },
+        {
+          "sentence": "We discussed future collaborations with Google for our marketing campaign.",
+          "explanation": "The mention of 'Google' in this sentence implies engaging with the company for business-related collaborations.",
+          "positive_occurrences": [
+            "Google"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "study",
+    "prompt_length": 273,
+    "output_length": 188,
+    "annotation_guidelines": {
+      "Definition": "'study' refers to research investigations or examinations conducted to gain knowledge or understanding of a specific subject or phenomenon.",
+      "Guidelines": "Exclude generic terms like 'analysis' or 'observation' unless specific to a research study. Avoid labeling general terms like 'trial', 'experiment', or 'review' unless they are specifically related to research activities."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The study on climate change impacts was published in a prestigious scientific journal last month.",
+          "explanation": "In this sentence, 'study' refers to a research investigation on the specific subject of climate change impacts.",
+          "positive_occurrences": [
+            "study"
+          ]
+        },
+        {
+          "sentence": "The study of genetic mutations in cancer patients led to groundbreaking discoveries in personalized medicine.",
+          "explanation": "Here, 'study' denotes a research examination focused on understanding genetic mutations in cancer patients.",
+          "positive_occurrences": [
+            "study"
+          ]
+        },
+        {
+          "sentence": "Her study on the behavior of marine mammals provided valuable insights for marine conservation efforts.",
+          "explanation": "This sentence illustrates a research investigation into the behavior of marine mammals, contributing to marine conservation efforts.",
+          "positive_occurrences": [
+            "study"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "author",
+    "prompt_length": 260,
+    "output_length": 222,
+    "annotation_guidelines": {
+      "Definition": "'author' identifies individuals who have created and published written works, including books, articles, and other literary compositions.",
+      "Guidelines": "Do not label fictional characters as authors, and be cautious with ambiguous cases such as 'George Orwell' (person with a common first name)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Jane Austen, an accomplished author, is known for her famous novel 'Pride and Prejudice.'",
+          "explanation": "In this sentence, 'Jane Austen' is referred to as an author because she created and published written works like 'Pride and Prejudice.'",
+          "positive_occurrences": [
+            "Jane Austen"
+          ]
+        },
+        {
+          "sentence": "Stephen King, a prolific author, has written numerous best-selling horror novels.",
+          "explanation": "Here, 'Stephen King' is labeled as an author due to his publication of written works, specifically horror novels.",
+          "positive_occurrences": [
+            "Stephen King"
+          ]
+        },
+        {
+          "sentence": "Maya Angelou, an influential author and poet, is celebrated for her autobiographical literature.",
+          "explanation": "Maya Angelou is recognized as an author in this context because she has created and published autobiographical works.",
+          "positive_occurrences": [
+            "Maya Angelou"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "information",
+    "prompt_length": 276,
+    "output_length": 126,
+    "annotation_guidelines": {
+      "Definition": "'information' refers to specific data, facts, or details that can be extracted or referenced within a context.",
+      "Guidelines": "Avoid labeling general concepts such as 'knowledge' or 'facts'. Be cautious with ambiguous terms like 'data' (can refer to information or computer files) and 'personal data' (could overlap with 'personal identifying information')."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The data collected from various sources indicated a strong correlation between the two variables.",
+          "explanation": "In this sentence, 'data' is used to refer to specific information or details extracted from different sources.",
+          "positive_occurrences": [
+            "data"
+          ]
+        },
+        {
+          "sentence": "The company strictly protects personal data and ensures its confidentiality.",
+          "explanation": "Here, 'personal data' is synonymous with personal information, emphasizing the confidential handling of personal details.",
+          "positive_occurrences": [
+            "personal data"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "cell line",
+    "prompt_length": 265,
+    "output_length": 172,
+    "annotation_guidelines": {
+      "Definition": "'cell line' refers to a cultured cell population derived from a specific tissue or organism, used for scientific study or experimentation.",
+      "Guidelines": "Avoid labeling primary cells or tissues. Exercise caution with ambiguous terms like 'T-24' (could refer to the cell line or a different entity)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Scientists conducted experiments on the T-24 cell line to study its response to a new drug.",
+          "explanation": "In this sentence, 'T-24' is used as a specific cell line derived from a tissue or organism, fitting the definition of the named entity 'cell line'.",
+          "positive_occurrences": [
+            "T-24 cell line"
+          ]
+        },
+        {
+          "sentence": "The researchers compared the growth rates of two different cell lines: T-24 and HeLa.",
+          "explanation": "Here, 'T-24' and 'HeLa' are both mentioned as cell lines, meeting the criteria of the named entity 'cell line'.",
+          "positive_occurrences": [
+            "T-24",
+            "HeLa"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "genus",
+    "prompt_length": 285,
+    "output_length": 154,
+    "annotation_guidelines": {
+      "Definition": "'genus' pertains to the taxonomic classification of living organisms and refers to a group of species that are closely related based on shared characteristics.",
+      "Guidelines": "Ensure the entity refers specifically to a taxonomic classification. Avoid labeling ambiguous terms like 'Ford' (company) or 'rose' (flower). Be cautious with potential overlaps between 'genus' and 'species' entities."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The Ford genus comprises several car species known for their exceptional design and performance.",
+          "explanation": "In this sentence, 'Ford' is used as a taxonomic classification within the context of car species, aligning with the definition of 'genus'.",
+          "positive_occurrences": [
+            "genus"
+          ]
+        },
+        {
+          "sentence": "The Rose genus includes various flower species characterized by their vibrant colors and unique aromas.",
+          "explanation": "Here, 'Rose' is referred to as a taxonomic classification within the context of flower species, fitting the criteria of 'genus'.",
+          "positive_occurrences": [
+            "genus"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "letter",
+    "prompt_length": 279,
+    "output_length": 210,
+    "annotation_guidelines": {
+      "Definition": "'letter' refers to individual characters of the alphabet or other symbol systems, such as 'A', 'B', 'C', etc.",
+      "Guidelines": "Do not label groups of letters or alphanumeric sequences, such as 'ABC' or 'A1'. Exercise caution with homographs, like 'C' (letter) versus 'sea' (body of water)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "She wrote a letter to her grandmother, expressing her love and gratitude.",
+          "explanation": "In this sentence, 'letter' is used to refer to a written message on paper, fitting the definition of an individual character of the alphabet or symbol system.",
+          "positive_occurrences": [
+            "letter"
+          ]
+        },
+        {
+          "sentence": "He received a beautifully handwritten letter from his pen pal in Australia.",
+          "explanation": "Here, 'letter' denotes a written communication sent by mail, meeting the criteria of individual characters of the alphabet or symbol system.",
+          "positive_occurrences": [
+            "letter"
+          ]
+        },
+        {
+          "sentence": "The child eagerly recognized the letter 'A' in the alphabet chart displayed on the classroom wall.",
+          "explanation": "In this context, 'letter' specifically refers to the individual character 'A', which aligns with the given definition.",
+          "positive_occurrences": [
+            "letter"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "patent",
+    "prompt_length": 295,
+    "output_length": 221,
+    "annotation_guidelines": {
+      "Definition": "'patent' refers to a legally protected exclusive right granted for an invention, typically issued by a government authority, and comprising a specific document identifying the invention and its details.",
+      "Guidelines": "Do not label generic references to 'patent' without a specific identification number. Exercise caution and context awareness when terms like 'patent' are used in a non-legal sense, such as 'patent leather' or 'patent pending.'"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The company finally received the patent for their groundbreaking new technology after years of development.",
+          "explanation": "In this context, 'patent' is referring to a legally protected exclusive right granted for an invention (the groundbreaking new technology), fulfilling the definition of the Named Entity.",
+          "positive_occurrences": [
+            "patent"
+          ]
+        },
+        {
+          "sentence": "The inventor filed for a patent to protect the unique design of the new electronic device.",
+          "explanation": "Here, 'patent' is being used to denote the legally protected exclusive right granted for the unique design of the new electronic device.",
+          "positive_occurrences": [
+            "patent"
+          ]
+        },
+        {
+          "sentence": "The research team's efforts paid off when they were awarded the patent for their innovative medical device.",
+          "explanation": "The term 'patent' in this sentence refers to the legally protected exclusive right granted for the innovative medical device.",
+          "positive_occurrences": [
+            "patent"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "application",
+    "prompt_length": 278,
+    "output_length": 188,
+    "annotation_guidelines": {
+      "Definition": "'application' refers to software programs, systems, or solutions designed for specific tasks or functions.",
+      "Guidelines": "Do not label generic terms like 'system' or 'use case'. Exercise caution with terms that could also refer to physical substances, such as 'water' or 'compressed air', and consider the context to determine if they truly refer to software applications."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The new application developed by the tech company revolutionized the way businesses manage their finances.",
+          "explanation": "In this context, 'application' refers to software programs designed for specific tasks.",
+          "positive_occurrences": [
+            "application"
+          ]
+        },
+        {
+          "sentence": "The researchers are testing a new application designed to analyze large datasets quickly and accurately.",
+          "explanation": "Here, 'application' is used to describe a software solution tailored for a specific function or task.",
+          "positive_occurrences": [
+            "application"
+          ]
+        },
+        {
+          "sentence": "The startup released an innovative application that helps users track their daily exercise routines and progress.",
+          "explanation": "In this sentence, 'application' is clearly referring to a software program created for a specific purpose.",
+          "positive_occurrences": [
+            "application"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "physical quantity",
+    "prompt_length": 298,
+    "output_length": 229,
+    "annotation_guidelines": {
+      "Definition": "'physical quantity' refers to measurable properties of physical systems, such as mass, temperature, energy, and electric charge.",
+      "Guidelines": "Avoid labeling generic terms like 'things', 'stuff', or 'items'. Exercise caution with ambiguous terms like 'force' (could refer to a physical quantity or an action). Be aware of scientific jargon and its potential for multi-meaning terms like 'energy' (can refer to a physical quantity or a concept)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The force required to move the heavy object was immense, requiring a significant physical quantity to be applied.",
+          "explanation": "In this sentence, 'force' is used to describe a physical quantity, specifically the amount of force needed to move the object.",
+          "positive_occurrences": [
+            "physical quantity"
+          ]
+        },
+        {
+          "sentence": "The light bulb consumed a large amount of electrical energy due to its high wattage, indicating a substantial physical quantity of power usage.",
+          "explanation": "Here, 'energy' is referenced as a physical quantity, representing the electricity consumed by the light bulb.",
+          "positive_occurrences": [
+            "physical quantity"
+          ]
+        },
+        {
+          "sentence": "To increase the temperature of the liquid rapidly, a substantial physical quantity of heat had to be applied to the system.",
+          "explanation": "In this context, 'heat' is portrayed as a physical quantity, signifying the amount of heat transferred to the liquid.",
+          "positive_occurrences": [
+            "physical quantity"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "item",
+    "prompt_length": 282,
+    "output_length": 170,
+    "annotation_guidelines": {
+      "Definition": "'item' refers to tangible or intangible things, such as objects, products, or abstract concepts that can be physically owned or experienced.",
+      "Guidelines": "Avoid labeling generic terms like 'thing' or 'stuff'. Exercise caution when identifying abstract concepts, as well as with ambiguous terms that can have multiple interpretations, such as 'players' (could refer to individuals or team items)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The coach carefully selected skilled players for the team.",
+          "explanation": "In this sentence, 'players' refer to individuals who could be considered as items within the context of a team, fulfilling the definition of 'item'."
+        },
+        {
+          "sentence": "The museum exhibited historical artifacts from various civilizations.",
+          "explanation": "In this sentence, 'artifacts' are tangible items that can be physically owned or experienced, thus falling under the definition of 'item'."
+        },
+        {
+          "sentence": "The company's lineup of cars included innovative models with advanced features.",
+          "explanation": "In this sentence, 'models' represent tangible objects that can be owned, meeting the criteria of 'item'."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "duration",
+    "prompt_length": 283,
+    "output_length": 127,
+    "annotation_guidelines": {
+      "Definition": "'duration' refers to a span of time or the length of time between two events or occurrences.",
+      "Guidelines": "Avoid labeling general time references such as 'morning' or 'noon'. Exercise caution with ambiguous terms like 'a century' (can refer to 100 years or in older context, 100 baseball runs). Be mindful when distinguishing between specific durations and vague time references."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "They travelled back in time a century to witness historical events firsthand.",
+          "explanation": "In this sentence, the term 'a century' refers to a specific span of 100 years, fitting the definition of the Named Entity 'duration'."
+        },
+        {
+          "sentence": "He waited for what seemed like a century in the never-ending queue.",
+          "explanation": "Here, 'a century' is used as a vague time reference, which showcases the need to distinguish between specific durations and general time expressions."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "programming concept",
+    "prompt_length": 284,
+    "output_length": 193,
+    "annotation_guidelines": {
+      "Definition": "'programming concept' refers to a term or concept related to computer programming, such as functions, variables, classes, and data types.",
+      "Guidelines": "Do not label general technology or generic software terms (e.g., 'software', 'technology'). Exercise caution when labeling terms that can be used in non-technical contexts (e.g., 'function' in a non-programming context)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "In object-oriented programming, a class is a blueprint for creating objects with similar properties and behaviors.",
+          "explanation": "The term 'class' is a programming concept when used in object-oriented programming to define a blueprint.",
+          "positive_occurrences": [
+            "class"
+          ]
+        },
+        {
+          "sentence": "Developers use functions to execute specific tasks or computations within a program.",
+          "explanation": "The term 'functions' is a programming concept when used to describe specific tasks or computations in a program.",
+          "positive_occurrences": [
+            "functions"
+          ]
+        },
+        {
+          "sentence": "Variables store data that can be manipulated and used in various ways throughout the program.",
+          "explanation": "The term 'variables' refers to programming concepts when used to describe data storage and manipulation in a program.",
+          "positive_occurrences": [
+            "Variables"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "constant",
+    "prompt_length": 288,
+    "output_length": 225,
+    "annotation_guidelines": {
+      "Definition": "'constant' refers to fixed values or identifiers, often used in programming or scientific contexts to represent unchanging quantities or properties.",
+      "Guidelines": "Do not label variables or dynamic values that can change during runtime. Be mindful of cases where a term might represent a variable in one context and a constant in another context, such as 'K5' (can be a constant in one equation but a variable in another)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The speed of light in a vacuum is a fundamental 'constant' in physics.",
+          "explanation": "In this sentence, 'constant' refers to a fixed value or identifier representing a property of the speed of light in physics.",
+          "occurrences": [
+            "constant"
+          ]
+        },
+        {
+          "sentence": "In programming, a common 'constant' used is PI to represent the mathematical value of approximately 3.14159.",
+          "explanation": "Here, 'constant' is used to denote a fixed value, PI, which remains unchanged during the execution of the program.",
+          "occurrences": [
+            "constant"
+          ]
+        },
+        {
+          "sentence": "The 'constant' value of Avogadro's number is used in chemistry to represent the number of constituent particles in one mole of a substance.",
+          "explanation": "This sentence illustrates the utilization of 'constant' to denote a fixed value (Avogadro's number) in the field of chemistry.",
+          "occurrences": [
+            "constant"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "cryptocurrency",
+    "prompt_length": 292,
+    "output_length": 158,
+    "annotation_guidelines": {
+      "Definition": "'cryptocurrency' refers to digital or virtual currencies that use cryptography for security and operate independently of a central authority, such as Bitcoin, Ethereum, XRP, etc.",
+      "Guidelines": "Avoid labeling financial terms that are not specifically cryptocurrencies, such as 'U.S. dollars' or 'stocks'. Exercise caution with similar terms, such as 'blockchain' or 'crypto' which can refer to broader concepts beyond specific cryptocurrencies."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I invested in Bitcoin and Ethereum, two popular cryptocurrencies, to diversify my portfolio.",
+          "explanation": "In this sentence, 'Bitcoin' and 'Ethereum' are used as specific examples of cryptocurrencies, fitting the definition of the Named Entity.",
+          "occurrences": [
+            "Bitcoin",
+            "Ethereum"
+          ]
+        },
+        {
+          "sentence": "Many people are exploring the potential applications of XRP in cross-border payments, highlighting its efficiency and low transaction costs.",
+          "explanation": "Here, 'XRP' is mentioned in the context of its potential use in cross-border payments, showcasing it as a specific cryptocurrency.",
+          "occurrences": [
+            "XRP"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "tag",
+    "prompt_length": 281,
+    "output_length": 249,
+    "annotation_guidelines": {
+      "Definition": "'tag' in the context of NER refers to specific labels used to categorize or organize content, often in online forums or social media platforms.",
+      "Guidelines": "Avoid labeling generic terms like 'remote' that have multiple meanings. Pay attention to context to distinguish tag-related terms from regular words. Be cautious with ambiguous terms like 'ENTER' which may have non-tag meanings."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I created a new post and added the tag 'REVIEW' to help users find it easily.",
+          "explanation": "In this sentence, the term 'REVIEW' is used as a specific label to categorize content, fitting the definition of the Named Entity 'tag'.",
+          "tag_occurrences": [
+            "REVIEW"
+          ]
+        },
+        {
+          "sentence": "The article was getting a lot of attention after I included the tag 'BREAKING' in the title.",
+          "explanation": "Here, 'BREAKING' is used as a label to categorize content as urgent or important, aligning with the concept of the Named Entity 'tag'.",
+          "tag_occurrences": [
+            "BREAKING"
+          ]
+        },
+        {
+          "sentence": "When sharing my artwork online, I always make sure to include the tag 'ARTISTHOUR' for visibility.",
+          "explanation": "The term 'ARTISTHOUR' is employed as a specific label to categorize content related to the artist community, fitting the 'tag' Named Entity definition.",
+          "tag_occurrences": [
+            "ARTISTHOUR"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "protocol",
+    "prompt_length": 291,
+    "output_length": 217,
+    "annotation_guidelines": {
+      "Definition": "'protocol' refers to a set of rules for exchanging data between devices or systems in a network, such as HTTP, SNMP, SPI-3, etc.",
+      "Guidelines": "Be wary of labeling general technologies or standards, such as 'software', 'standard', or 'technology', as 'protocol'. Also, be cautious with entities that can serve multiple roles, like 'Java' (programming language, island, and coffee)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The developer followed the HTTP protocol to ensure secure data transmission between the client and server.",
+          "explanation": "The term 'HTTP' is used to refer to the Hypertext Transfer Protocol, which aligns with the definition of the Named Entity 'protocol'.",
+          "positive_occurrences": [
+            "HTTP"
+          ]
+        },
+        {
+          "sentence": "The network administrator configured the SNMP protocol to monitor the network devices efficiently.",
+          "explanation": "The term 'SNMP' is utilized here as Simple Network Management Protocol, which falls under the category of the Named Entity 'protocol'.",
+          "positive_occurrences": [
+            "SNMP"
+          ]
+        },
+        {
+          "sentence": "The team implemented the SPI-3 protocol for synchronization between the hardware components.",
+          "explanation": "In this context, 'SPI-3' denotes the Serial Port Interface-3 protocol, which corresponds to the Named Entity 'protocol'.",
+          "positive_occurrences": [
+            "SPI-3"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medication",
+    "prompt_length": 294,
+    "output_length": 126,
+    "annotation_guidelines": {
+      "Definition": "'medication' refers to substances used to treat, alleviate, or prevent diseases or symptoms in medical contexts.",
+      "Guidelines": "Exercise caution with ambiguous terms like 'orange,' which could refer to the fruit or a medication color. Treat brand names, such as 'Advil' and 'Tylenol,' as medications. Avoid labeling general medical equipment or procedures, such as 'surgery' or 'stethoscope,' as medications."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I took a yellow medication to relieve my headache.",
+          "explanation": "In this sentence, 'medication' is correctly used to refer to a substance taken to alleviate a symptom, which aligns with the definition of the Named Entity."
+        },
+        {
+          "sentence": "After consulting with my doctor, I started a new medication to manage my hypertension.",
+          "explanation": "Here, 'medication' is used in the context of treating a medical condition, which is in line with the Named Entity definition."
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "educational institution",
+    "prompt_length": 270,
+    "output_length": 122,
+    "annotation_guidelines": {
+      "Definition": "'educational institution' refers to establishments dedicated to providing education and training, such as universities, colleges, and schools.",
+      "Guidelines": "Avoid labeling general educational terms like 'education' or 'training'. Exercise caution with ambiguous references, such as 'Oxford' (can refer to the university or the city)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Harvard is a renowned educational institution known for its excellent programs.",
+          "explanation": "In this sentence, 'Harvard' clearly refers to the university, which is an educational institution.",
+          "positive_occurrences": [
+            "Harvard"
+          ]
+        },
+        {
+          "sentence": "She is considering applying to Stanford, another prestigious educational institution.",
+          "explanation": "Here, 'Stanford' is used to denote a well-known educational institution.",
+          "positive_occurrences": [
+            "Stanford"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "version",
+    "prompt_length": 294,
+    "output_length": 129,
+    "annotation_guidelines": {
+      "Definition": "'version' refers to a specific release or iteration of software, product, or system, identified by a distinct set of numbers or identifiers.",
+      "Guidelines": "Avoid labeling generic terms like 'latest' or 'new'. Exercise caution with ambiguous references, such as 'Windows 10' (product version vs. location) or 'iOS 13' (platform version vs. entity). Be specific and focus on distinct identifiers or names for versions."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Windows 10 version introduced a new interface design with the latest update.",
+          "explanation": "This sentence correctly refers to 'Windows 10' as a software version, not the location.",
+          "occurrences": [
+            "Windows 10 version"
+          ]
+        },
+        {
+          "sentence": "iOS 13 version brings significant improvements to the system's performance.",
+          "explanation": "In this sentence, 'iOS 13' is clearly identified as a platform version, not an entity.",
+          "occurrences": [
+            "iOS 13 version"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "resource",
+    "prompt_length": 285,
+    "output_length": 203,
+    "annotation_guidelines": {
+      "Definition": "'resource' refers to materials, substances, or assets that have utility and value, ranging from natural minerals to digital information.",
+      "Guidelines": "Exercise caution with abstract concepts like 'time' or 'love' that may be considered resources in a metaphorical sense. Also, be mindful of potential overlaps with named entities related to industries or commodities, such as 'oil' or 'silver deposits'."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The company invested heavily in developing renewable energy resources to reduce its carbon footprint.",
+          "explanation": "The term 'resources' here refers to materials or assets (renewable energy sources) that have value and utility.",
+          "positive_occurrences": [
+            "renewable energy resources"
+          ]
+        },
+        {
+          "sentence": "The government allocated more budget towards improving educational resources for underprivileged communities.",
+          "explanation": "In this context, 'educational resources' are materials or assets (books, technology, teachers) that have utility and value.",
+          "positive_occurrences": [
+            "educational resources"
+          ]
+        },
+        {
+          "sentence": "The startup company developed innovative software resources to enhance productivity in the workplace.",
+          "explanation": "Here, 'software resources' denote digital assets or materials created to provide utility and value in increasing productivity.",
+          "positive_occurrences": [
+            "software resources"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "film",
+    "prompt_length": 244,
+    "output_length": 183,
+    "annotation_guidelines": {
+      "Definition": "'film' refers to a motion picture or movie production.",
+      "Guidelines": "Exclude references to film-related topics, such as movie titles or film festivals, unless they specifically denote the physical media."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The film directed by Steven Spielberg won multiple Oscars at the Academy Awards.",
+          "explanation": "In this sentence, 'film' is used to refer to a motion picture production directed by Steven Spielberg.",
+          "positive_occurrences": [
+            "film"
+          ]
+        },
+        {
+          "sentence": "The film was shot on location in various scenic areas around the world.",
+          "explanation": "Here, 'film' denotes the process of shooting a motion picture at different locations.",
+          "positive_occurrences": [
+            "film"
+          ]
+        },
+        {
+          "sentence": "The film distribution company secured the rights to screen the movie in multiple countries.",
+          "explanation": "This sentence highlights the involvement of a film distribution company in the global screening of a motion picture.",
+          "positive_occurrences": [
+            "film"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "policy",
+    "prompt_length": 301,
+    "output_length": 147,
+    "annotation_guidelines": {
+      "Definition": "'policy' refers to formal or informal sets of principles, rules, or guidelines implemented by government, organizations, or individuals to address specific issues or achieve particular goals, often related to social, economic, or political matters.",
+      "Guidelines": "Exclude general discussions of principles or rules that are not explicitly linked to specific policies. Exercise caution with terms that can have multiple interpretations, such as 'control' (e.g., rent control can be a policy, but it can also refer to"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The government's new environmental policy aims to reduce carbon emissions by 50% by 2030.",
+          "explanation": "In this sentence, 'policy' refers to a formal set of guidelines implemented by the government to address a specific issue related to the environment.",
+          "occurrences": [
+            "policy"
+          ]
+        },
+        {
+          "sentence": "The organization's strict policy on data privacy ensures that users' personal information is securely protected.",
+          "explanation": "Here, 'policy' represents the formal rules or guidelines established by an organization to achieve a specific goal of ensuring data privacy.",
+          "occurrences": [
+            "policy"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "quality",
+    "prompt_length": 282,
+    "output_length": 213,
+    "annotation_guidelines": {
+      "Definition": "'quality' refers to attributes, characteristics, or features of entities that can be evaluated or assessed, such as effectiveness, size, or performance.",
+      "Guidelines": "Do not label general adjectives unless they specifically refer to a measurable or assessable attribute. Exercise caution with subjective terms like 'beautiful' or 'ugly', as they can be context-dependent and not universally quantifiable."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The new smartphone has exceptional camera quality, capturing vivid and sharp images.",
+          "explanation": "In this sentence, the term 'quality' is used to describe the attribute of the camera in the smartphone, specifically referring to its ability to capture vivid and sharp images.",
+          "positive_occurrences": [
+            "quality"
+          ]
+        },
+        {
+          "sentence": "The large painting was carefully crafted to ensure high quality artistry.",
+          "explanation": "Here, 'quality' is associated with the artistry of the painting, indicating the level of skill and craftsmanship involved in creating it.",
+          "positive_occurrences": [
+            "quality"
+          ]
+        },
+        {
+          "sentence": "The powerful engine of the car contributes to the overall performance quality on the race track.",
+          "explanation": "This sentence highlights the 'quality' of performance associated with the engine of the car, specifically in the context of its racing abilities.",
+          "positive_occurrences": [
+            "quality"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "particle",
+    "prompt_length": 301,
+    "output_length": 138,
+    "annotation_guidelines": {
+      "Definition": "'particle' refers to the smallest units of matter with physical properties, such as electrons, protons, and photons, that are studied in the context of physics and chemistry.",
+      "Guidelines": "Avoid labeling generic terms like 'matter', 'substance', or 'element' unless specifically referring to a specific particle. Exercise caution when dealing with ambiguous terms like 'photons' (can also refer to light particles) or 'electron microscope' (referring to a device, not"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The photon's energy level was measured with high precision using advanced equipment.",
+          "explanation": "In this sentence, 'photon' is used to refer to the smallest unit of energy that demonstrates the concept of a particle.",
+          "positive_occurrences": [
+            "photon"
+          ]
+        },
+        {
+          "sentence": "The electrons within the atom were moving rapidly, exhibiting the behavior of charged particles.",
+          "explanation": "Here, 'electron' is used to describe the individual unit within the atom and highlights its properties as a particle.",
+          "positive_occurrences": [
+            "electron"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "directory",
+    "prompt_length": 268,
+    "output_length": 146,
+    "annotation_guidelines": {
+      "Definition": "'directory' refers to a system for organizing and storing computer files, or a listing of names, addresses, or other information.",
+      "Guidelines": "Do not label general or abstract references. Exercise caution with ambiguous terms such as 'top' (could refer to a physical location or be part of a file path)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I need to organize all my project files in the top directory to easily access them.",
+          "explanation": "In this sentence, 'top directory' refers to the system for organizing and storing computer files, fitting the definition of the 'directory' Named Entity.",
+          "positive_occurrences": [
+            "directory"
+          ]
+        },
+        {
+          "sentence": "The new software allows users to create a shared directory for collaborative work on documents.",
+          "explanation": "Here, 'shared directory' is a listing of names or information, aligning with the 'directory' Named Entity definition.",
+          "positive_occurrences": [
+            "directory"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "subject",
+    "prompt_length": 299,
+    "output_length": 218,
+    "annotation_guidelines": {
+      "Definition": "'subject' refers to specific academic or professional disciplines, topics, or areas of study.",
+      "Guidelines": "Ensure the entity is a distinct field of knowledge, discipline, or subject matter. Avoid labeling generic or unspecified terms, such as 'things', 'stuff', or colloquial expressions like 'thingamajig'. Be cautious with potential overlap with 'person' or 'organization' entities, especially in the context of academic disciplines closely associated with individuals or institutions."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The study of psychology is a fascinating subject that delves into the human mind and behavior.",
+          "explanation": "The term 'subject' is used to refer to the academic discipline of psychology, which is a distinct field of study.",
+          "occurrences": [
+            "psychology"
+          ]
+        },
+        {
+          "sentence": "One can explore various subjects within the field of biology, ranging from genetics to ecology.",
+          "explanation": "Here, 'subjects' specifically relate to different areas of study within the academic discipline of biology.",
+          "occurrences": [
+            "biology",
+            "genetics",
+            "ecology"
+          ]
+        },
+        {
+          "sentence": "In physics, the topic of quantum mechanics is a complex subject that pushes the boundaries of our understanding of the universe.",
+          "explanation": "The term 'subject' is used to highlight quantum mechanics as a specific area of study within the broader field of physics.",
+          "occurrences": [
+            "physics",
+            "quantum mechanics"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "project",
+    "prompt_length": 301,
+    "output_length": 189,
+    "annotation_guidelines": {
+      "Definition": "'project' typically represents a specific undertaking or initiative, often with a defined scope and objectives, usually within a specific organization or context.",
+      "Guidelines": "Be careful not to label generic or non-specific terms as 'project,' such as 'plan,' 'idea,' or 'experiment.' Additionally, consider the context of the term to avoid mislabeling non-project entities as 'project.' For example, in the sentence 'The experiment was a success,' 'experiment' should not be"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The company launched a new project to develop a cutting-edge product.",
+          "explanation": "In this sentence, 'project' is used to describe a specific undertaking with defined scope and objectives within an organization.",
+          "positive_occurrences": [
+            "project"
+          ]
+        },
+        {
+          "sentence": "The research team completed a successful project that led to significant scientific discoveries.",
+          "explanation": "In this sentence, 'project' refers to a specific initiative with a clear objective and scope within the context of research.",
+          "positive_occurrences": [
+            "project"
+          ]
+        },
+        {
+          "sentence": "The school implemented a project to improve student performance in mathematics.",
+          "explanation": "Here, 'project' signifies a focused endeavor with specific goals and scope carried out within an educational institution.",
+          "positive_occurrences": [
+            "project"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "work of art",
+    "prompt_length": 297,
+    "output_length": 212,
+    "annotation_guidelines": {
+      "Definition": "'work of art' refers to a creative and expressive creation, including but not limited to paintings, sculptures, films, music albums, and literary works.",
+      "Guidelines": "Avoid labeling names of generic or non-creative entities. Exercise caution with ambiguous terms like 'The Wall' (can refer to a physical wall or a music album), and ensure context clarity to distinguish 'work of art' from similar entities like 'organization' or 'product'. "
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I just finished watching 'The Wall' last night, the movie was a profound work of art.",
+          "explanation": "'The Wall' in this context refers to a film, which falls under the definition of 'work of art'.",
+          "positive_occurrences": [
+            "The Wall"
+          ]
+        },
+        {
+          "sentence": "Last week, I visited an art gallery and saw a magnificent sculpture titled 'Freedom'.",
+          "explanation": "The sculpture 'Freedom' is a creative and expressive creation, fitting the 'work of art' definition.",
+          "positive_occurrences": [
+            "Freedom"
+          ]
+        },
+        {
+          "sentence": "On my playlist, I have a music album titled 'Echoes' which is a mesmerizing work of art.",
+          "explanation": "The music album 'Echoes' is a form of creative expression, qualifying as a 'work of art'.",
+          "positive_occurrences": [
+            "Echoes"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "town",
+    "prompt_length": 301,
+    "output_length": 227,
+    "annotation_guidelines": {
+      "Definition": "'town' refers to an urban area that is larger than a village and smaller than a city, characterized by a dense human settlement with various amenities and infrastructure.",
+      "Guidelines": "Avoid labeling ambiguous references, such as 'New York' (often referred to as a city). Exercise caution with certain entities that could be towns or neighborhoods, like 'Brooklyn'. Be attentive to terms that might have multiple meanings, such as 'Springfield' or 'Victoria'. Be mindful of the"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The town of Springfield is known for its historic architecture and vibrant community.",
+          "explanation": "In this sentence, 'Springfield' is used to refer to an urban area with a dense human settlement and various amenities, fitting the definition of a town.",
+          "occurrences": [
+            "Springfield"
+          ]
+        },
+        {
+          "sentence": "Victoria is a charming town nestled among the hills, offering a wide array of cultural attractions.",
+          "explanation": "'Victoria' in this sentence is depicting an urban area with a dense human settlement and amenities, aligning with the characteristics of a town.",
+          "occurrences": [
+            "Victoria"
+          ]
+        },
+        {
+          "sentence": "Brooklyn, a quaint town within New York City, has a rich history and diverse population.",
+          "explanation": "Even though Brooklyn is also referred to as a neighborhood, in this context, it is used to describe an urban area with dense human settlement and amenities, thus classified as a town.",
+          "occurrences": [
+            "Brooklyn"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "table",
+    "prompt_length": 284,
+    "output_length": 210,
+    "annotation_guidelines": {
+      "Definition": "'table' in the context of NER refers to a structured collection of data, typically within a database or spreadsheet, representing a set of related entities with defined attributes and relationships.",
+      "Guidelines": "Do not label furniture or objects as 'table', and be careful when the term 'table' is used in a general or metaphorical sense, as in 'let's table that discussion'."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The database administrator created a new table to store customer information.",
+          "explanation": "In this sentence, 'table' refers to a structured collection of data within a database, fitting the defined attributes and relationships.",
+          "occurrences": [
+            "table"
+          ]
+        },
+        {
+          "sentence": "The excel sheet contained a price table with updated values for all products.",
+          "explanation": "Here, 'table' represents a structured collection of data in the form of a spreadsheet, maintaining relationships and attributes.",
+          "occurrences": [
+            "table"
+          ]
+        },
+        {
+          "sentence": "The relational database model consists of multiple tables linked by primary and foreign keys.",
+          "explanation": "This sentence illustrates the usage of 'table' as a structured collection of related entities within a database, each with defined attributes and relationships.",
+          "occurrences": [
+            "table"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "research",
+    "prompt_length": 276,
+    "output_length": 178,
+    "annotation_guidelines": {
+      "Definition": "'research' refers to systematic investigation or study aimed at discovering new knowledge, understanding phenomena, or solving problems.",
+      "Guidelines": "Avoid labeling general knowledge or information. Exercise caution with entities that have multiple meanings, such as 'Apple' (company, fruit, or record label) or 'Time' (magazine, concept, or unit of measurement)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The research conducted by Apple on consumer behavior was groundbreaking.",
+          "explanation": "In this sentence, 'research' refers to the systematic investigation or study done by the company 'Apple'.",
+          "positive_occurrences": [
+            "research"
+          ]
+        },
+        {
+          "sentence": "She dedicated her career to medical research that led to innovative treatments.",
+          "explanation": "Here, 'research' is about the systematic investigation aimed at discovering new knowledge in the medical field.",
+          "positive_occurrences": [
+            "research"
+          ]
+        },
+        {
+          "sentence": "The team's research into renewable energy sources impressed the environmental community.",
+          "explanation": "This sentence illustrates 'research' as a systematic study focused on finding sustainable energy solutions.",
+          "positive_occurrences": [
+            "research"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "hormone",
+    "prompt_length": 295,
+    "output_length": 194,
+    "annotation_guidelines": {
+      "Definition": "'hormone' refers to a signaling molecule produced by glands in multicellular organisms, which has a specific regulatory effect on cells or organs.",
+      "Guidelines": "Exclude general terms like 'protein' or 'chemical'. Exercise caution with terms that may refer to both hormones and non-hormonal entities, such as 'insulin' (a hormone and a protein) or 'glucagon' (a hormone and a medication name)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The doctor prescribed insulin to regulate the patient's blood sugar levels.",
+          "explanation": "In this sentence, 'insulin' is used as a hormone, a signaling molecule produced by glands to regulate blood sugar levels.",
+          "occurrences": [
+            "insulin"
+          ]
+        },
+        {
+          "sentence": "The athlete's performance improved after receiving growth hormone treatment.",
+          "explanation": "Here, 'growth hormone' is clearly referenced as a signaling molecule that had a regulatory effect on the athlete's performance.",
+          "occurrences": [
+            "growth hormone"
+          ]
+        },
+        {
+          "sentence": "The endocrinologist recommended thyroid hormone replacement therapy for the patient.",
+          "explanation": "In this context, 'thyroid hormone' is specifically mentioned as a signaling molecule produced by glands to treat a deficiency.",
+          "occurrences": [
+            "thyroid hormone"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "legal",
+    "prompt_length": 283,
+    "output_length": 223,
+    "annotation_guidelines": {
+      "Definition": "'legal' refers to entities, documents, or concepts related to the law, such as bonds, patents, court cases, and legal proceedings.",
+      "Guidelines": "Avoid labeling generic terms like 'lawyer' or 'court' unless they specifically refer to a legal context. Be cautious with homonyms like 'bond' (financial vs. legal) and ensure the context determines the labeling. "
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The legal bond between the two parties was solidified with a signed agreement.",
+          "explanation": "In this sentence, 'legal bond' refers to a legally binding agreement, fitting the definition of the Named Entity 'legal'.",
+          "occurrences": [
+            "legal",
+            "bond"
+          ]
+        },
+        {
+          "sentence": "The court case involved complex legal arguments about intellectual property rights.",
+          "explanation": "In this sentence, 'court case' and 'legal arguments' clearly refer to legal proceedings and concepts, falling under the Named Entity 'legal'.",
+          "occurrences": [
+            "court",
+            "case",
+            "legal",
+            "arguments"
+          ]
+        },
+        {
+          "sentence": "The patent filed by the company required extensive legal review before being granted.",
+          "explanation": "Here, 'patent' and 'legal review' are directly related to concepts within the law, illustrating the Named Entity 'legal'.",
+          "occurrences": [
+            "patent",
+            "legal",
+            "review"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "genre",
+    "prompt_length": 301,
+    "output_length": 219,
+    "annotation_guidelines": {
+      "Definition": "'genre' refers to a category of artistic composition, characterized by similarities in form, style, or subject matter, such as music, film, literature, or art.",
+      "Guidelines": "Avoid labeling general terms such as 'music' or 'art' as 'genre'. Exercise caution in instances where the entity may refer to a person, place, or thing, like 'The Beatles' (a band name) or 'Los Angeles' (a location). Additionally, be mindful"
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The new movie belongs to the horror genre and received critical acclaim for its terrifying storyline and eerie atmosphere.",
+          "explanation": "The term 'genre' is used in the context of categorizing a type of artistic composition, in this case, horror films.",
+          "positive_occurrences": [
+            "genre"
+          ]
+        },
+        {
+          "sentence": "The novel is deeply rooted in the science fiction genre, exploring futuristic technology and alternative realities.",
+          "explanation": "Here, 'genre' is employed to classify a specific category of literature, which is science fiction.",
+          "positive_occurrences": [
+            "genre"
+          ]
+        },
+        {
+          "sentence": "The exhibition showcases a variety of paintings, each representing a different genre from classical landscapes to abstract art.",
+          "explanation": "In this sentence, 'genre' is referring to the category of art styles present in the paintings showcased.",
+          "positive_occurrences": [
+            "genre"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "problem",
+    "prompt_length": 290,
+    "output_length": 221,
+    "annotation_guidelines": {
+      "Definition": "'problem' refers to issues, challenges, or difficulties that arise in a particular context, such as technical, societal, or organizational challenges.",
+      "Guidelines": "Avoid labeling general terms like 'issue' or 'challenge' unless they are specific to a context. Exercise caution when differentiating between general terms and specific problems, such as the distinction between 'shortage' (specific problem) and 'news' (general term)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The team faced a shortage of skilled workers, causing delays in the project timeline.",
+          "explanation": "The term 'shortage' fits the definition of 'problem' as it refers to a specific challenge affecting the team.",
+          "positive_occurrences": [
+            "shortage"
+          ]
+        },
+        {
+          "sentence": "The company experienced technical issues with its new software update, leading to customer complaints.",
+          "explanation": "The term 'technical issues' represents a problem related to the functionality of the software, aligning with the definition of 'problem'.",
+          "positive_occurrences": [
+            "technical issues"
+          ]
+        },
+        {
+          "sentence": "The community faced environmental challenges due to increased pollution levels in the area.",
+          "explanation": "The term 'environmental challenges' highlights specific difficulties related to the environment, falling under the 'problem' category.",
+          "positive_occurrences": [
+            "environmental challenges"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  }
+]

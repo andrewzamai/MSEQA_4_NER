@@ -154,6 +154,49 @@ def get_dataset_statistics():
     }
 
 
+def get_statistics_for_QA_dataset(dataset_QA, input_column_name, instruction_column_name, output_column_name):
+    """ get statistics for MSEQA/GenQA Dataset fold (e.g. train) """
+    context_lengths = []
+    n_total_samples = 0
+    n_negative_samples = 0
+    for sample in dataset_QA:
+        # counting number words approximately
+        context = sample[input_column_name]
+        context_length = len(context.split())
+        context_lengths.append(context_length)
+
+        # counting number negative samples
+        output = sample[output_column_name]
+        answers_text = None
+        # MSEQA case {'answer_start': [], 'text': []}
+        if isinstance(output, dict):
+            if 'text' in output:
+                answers_text = output['text']
+            else:
+                raise Exception("Unexpected keys, expected 'text'")
+        # GenQA case is a dumped JSON list
+        elif isinstance(output, str):
+            answers_text = json.loads(output)
+
+        n_total_samples += 1
+        if not answers_text:
+            n_negative_samples += 1
+
+    # list of unique NEs
+    tagName_list = {}
+    for sample in dataset_QA:
+        tagName_list[sample['tagName']] = 1
+
+    return {
+        'contexts_average_number_words': math.ceil(np.average(context_lengths)),
+        'contexts_min_number_words': np.min(context_lengths),
+        'contexts_max_number_words': np.max(context_lengths),
+        'fullPileNER_tagName_list': [len(list(tagName_list.keys())), list(tagName_list.keys())],
+        'number_total_QA_samples': n_total_samples,
+        'number_negative_QA_samples': [n_negative_samples, f"{round(n_negative_samples/n_total_samples*100, 2)}%"]
+    }
+
+
 def build_dataset_MSEQA_format():
     # downloading raw dataset from huggingface repo
     # (has only "train" partition)
@@ -1167,13 +1210,28 @@ def build_dataset_MSEQA_format_with_n_samples_per_NE_plus_negatives(n_samples_pe
     return DatasetDict({split: Dataset.from_list(values) for split, values in n_samples_per_NE_MSEQA_dataset.items()})
 
 
-def build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE, n_neg_samples_per_NE):
+def build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE, n_neg_samples_per_NE, removeTestDatasetsNEs=False, keep_only_top_tagNames=-1):
+    """
+    build MSEQA dataset (default is FalseDef) with N positive samples per NE and N negative samples per NE
+    train fold with N + N samples per NE
+    validation fold with ceil(N/4) + ceil(N/4) samples per NE
+    test fold is copied unchanged
+    """
     dataset_MSEQA_format = build_dataset_MSEQA_format()
     dataset_MSEQA_format = remove_bad_ne_types(dataset_MSEQA_format)
+
+    if removeTestDatasetsNEs:
+        dataset_MSEQA_format = remove_MIT_CrossNER_NEs_from_train(dataset_MSEQA_format)
+
+    if keep_only_top_tagNames > -1:
+        dataset_MSEQA_format = keep_only_top_N_tagNames(dataset_MSEQA_format, keep_only_top_tagNames)
+
     n_samples_per_NE_MSEQA_dataset = {split: [] for split in dataset_MSEQA_format.keys()}
-    n_samples_per_NE_MSEQA_dataset['test'] = dataset_MSEQA_format['test']
+    n_samples_per_NE_MSEQA_dataset['test'] = dataset_MSEQA_format['test']  # copy test fold unchanged
     for split in dataset_MSEQA_format.keys():
+        # draw few samples only for train and validation
         if split != 'test':
+            # count how many pos/neg samples we have per NE
             ne_list = {}
             for sample in dataset_MSEQA_format[split]:
                 ne_type = sample['tagName']
@@ -1184,6 +1242,10 @@ def build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_N
                 else:
                     ne_list[ne_type]['yes_answer'] += 1
 
+            # if validation use 1/4 samples per NE
+            if split == 'validation':
+                n_pos_samples_per_NE = math.ceil(n_pos_samples_per_NE/4.0)
+                n_neg_samples_per_NE = math.ceil(n_neg_samples_per_NE/4.0)
             ne_list = {ne: {'yes_answer': n_pos_samples_per_NE if values['yes_answer'] > n_pos_samples_per_NE else values['yes_answer'], 'no_answer': n_neg_samples_per_NE if values['no_answer'] > n_neg_samples_per_NE else values['no_answer']} for ne, values in ne_list.items()}
 
             for sample in dataset_MSEQA_format[split]:
@@ -1199,9 +1261,9 @@ def build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_N
     return DatasetDict({split: Dataset.from_list(values) for split, values in n_samples_per_NE_MSEQA_dataset.items()})
 
 
-def add_adversarial_negative_examples(dataset_MSEQA_format_FalseDef, path_to_adversarial_examples_json):
-    """ adding negative adversarial examples only to TRAIN fold """
-    with open(path_to_adversarial_examples_json, 'r') as f:
+def add_adversarial_negative_examples(dataset_MSEQA_format_FalseDef, path_to_adversarial_negative_examples_json):
+    """ adding negative adversarial examples: 1 to train, 1 to validation"""
+    with open(path_to_adversarial_negative_examples_json, 'r') as f:
         adversarial_examples_per_NE = json.load(f)
     # toadd_MSEQA_samples = []
     ne_progressiveID = 0
@@ -1210,7 +1272,7 @@ def add_adversarial_negative_examples(dataset_MSEQA_format_FalseDef, path_to_adv
         ne_progressiveID += 1
         if isinstance(negative_sentences, list):
             question_progressiveID = 0
-            for sentence_explanation in negative_sentences:
+            for i, sentence_explanation in enumerate(negative_sentences):
                 # not always consistent key "sentence", we extract first value in each dict
                 # sentence = sentence_explanation['sentence']
                 sentence = list(sentence_explanation.values())[0]
@@ -1222,29 +1284,127 @@ def add_adversarial_negative_examples(dataset_MSEQA_format_FalseDef, path_to_adv
                     "question": f"What describes {named_entity.upper()} in the text?",
                     "answers": {'answer_start': [], 'text': []}
                 }
-                dataset_MSEQA_format_FalseDef['train'] = dataset_MSEQA_format_FalseDef['train'].add_item(sample_MSEQA)
+                # if 3 negative sentences per NE, add 2 to train and 1 to validation
+                if i == 0:
+                    dataset_MSEQA_format_FalseDef['train'] = dataset_MSEQA_format_FalseDef['train'].add_item(sample_MSEQA)
+                elif i == 1:
+                    dataset_MSEQA_format_FalseDef['validation'] = dataset_MSEQA_format_FalseDef['validation'].add_item(sample_MSEQA)
         else:
             raise ValueError
 
     dataset_MSEQA_format_FalseDef['train'] = dataset_MSEQA_format_FalseDef['train'].shuffle()
+    dataset_MSEQA_format_FalseDef['validation'] = dataset_MSEQA_format_FalseDef['validation'].shuffle()
 
     return dataset_MSEQA_format_FalseDef
 
 
+def add_adversarial_positive_examples(dataset_GenQA_format_TrueDef, path_to_adversarial_positive_examples_json):
+    """
+    adding POSITIVE adversarial examples: 1 to train, 1 to validation for each NE
+    for now working only on GenQA format (for MSEQA requires to compute characters starting positions)
+    TrueDef since the adv examples are constructed specifically for these definitions
+    """
+    with open(path_to_adversarial_positive_examples_json, 'r') as f:
+        adv_positive_examples_per_NE = json.load(f)
+
+    # retrieving instructions per NE from the dataset
+    instructions_per_NE = {}
+    for sample in dataset_GenQA_format_TrueDef['train']:
+        if sample['tagName'] not in instructions_per_NE:
+            instructions_per_NE[sample['tagName']] = sample['instruction']
+
+    ne_progressiveID = 0
+    for named_entity, values in adv_positive_examples_per_NE.items():
+        positive_adv_sentences = values['positive_adv_sentences']
+        ne_progressiveID += 1
+        if isinstance(positive_adv_sentences, list):
+            question_progressiveID = 0
+            for i, sentence_occurrences in enumerate(positive_adv_sentences):
+                sentence = sentence_occurrences['sentence']
+                question_progressiveID += 1
+                sample_MSEQA = {
+                    "doc_question_pairID": str(ne_progressiveID) + ":" + str(question_progressiveID) + ":adversarial_positive",
+                    "input": sentence,
+                    "tagName": named_entity,
+                    "instruction": instructions_per_NE[named_entity],
+                    "output": json.dumps(sentence_occurrences['positive occurrences'])
+                }
+                # if at least 2 positive sentences per NE, add 1 to train and 1 to validation
+                if i == 0:
+                    dataset_GenQA_format_TrueDef['train'] = dataset_GenQA_format_TrueDef['train'].add_item(sample_MSEQA)
+                elif len(positive_adv_sentences) >= 2 and i == 1:
+                    dataset_GenQA_format_TrueDef['validation'] = dataset_GenQA_format_TrueDef['validation'].add_item(sample_MSEQA)
+        else:
+            raise ValueError
+
+    dataset_GenQA_format_TrueDef['train'] = dataset_GenQA_format_TrueDef['train'].shuffle()
+    dataset_GenQA_format_TrueDef['validation'] = dataset_GenQA_format_TrueDef['validation'].shuffle()
+
+    return dataset_GenQA_format_TrueDef
+
+
+def remove_MIT_CrossNER_NEs_from_train(datasetDict_QA):
+    """
+    removing from train fold all NEs that are in MIT and CrossNER to have True Zero-shot setting in test
+    person, location, country, organization, title, protein and all NEs with same NE but different definition are not removed
+    """
+    tagName_to_remove_list = ["actor", "character", "genre", "song", "year",  # MOVIE, title left
+                              "dish", "restaurant",  # RESTAURANT
+                              "algorithm", "field", "metric", "product", "programming language", "task", "university",  # AI
+                              "award", "book", "event", "genre", "magazine",  # LITERATURE
+                              "album", "award", "band", "artist", "instrument", "music genre", "genre", "song",  # MUSIC
+                              "event", "political party",   # POLITICS
+                              "journal", "object", "chemical compound", "chemical", "element", "enzyme", "event",  # SCIENCE
+                              "company", "legal"]  # BUSTER
+    tagName_to_remove_list = list(set(tagName_to_remove_list))
+
+    datasetDict_QA['train'] = datasetDict_QA['train'].filter(lambda sample: sample['tagName'] not in tagName_to_remove_list)
+
+    return datasetDict_QA
+
+
+def keep_only_top_N_tagNames(datasetDict_QA, top_N_tagNames):
+    number_samples_per_ne_type = {}
+    for sample in datasetDict_QA['train']:
+        ne_type = sample['tagName']
+        if ne_type in number_samples_per_ne_type:
+            number_samples_per_ne_type[ne_type] += 1
+        else:
+            number_samples_per_ne_type[ne_type] = 1
+    sorted_tagNames_list = [x[0] for x in sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True)]
+    print(sorted_tagNames_list)
+    valid_tagNames_list = sorted_tagNames_list[:top_N_tagNames]
+
+    datasetDict_QA['train'] = datasetDict_QA['train'].filter(lambda sample: sample['tagName'] in valid_tagNames_list)
+    datasetDict_QA['validation'] = datasetDict_QA['validation'].filter(lambda sample: sample['tagName'] in valid_tagNames_list)
+
+    return datasetDict_QA
+
+
 if __name__ == "__main__":
 
-    # pileNER_statistics = get_dataset_statistics()
-    # print(pileNER_statistics)
+    DATASET_NAME = '5pos_5neg_perNE_TrueZeroShot_top50NEs'
 
     # N samples per NE (N positive + N negatives)
-    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE=15, n_neg_samples_per_NE=10)
-    #dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE_plus_negatives(n_samples_per_NE=5)
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE=5, n_neg_samples_per_NE=5, removeTestDatasetsNEs=True, keep_only_top_tagNames=50)
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef.save_to_disk(f"../../../datasets/pileNER/{DATASET_NAME}_MSEQA_FalseDef")
     # dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = DatasetDict.load_from_disk('../../../datasets/pileNER/5_samples_per_NE_MSEQA_FalseDef_plus_negatives')
     print(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
 
-    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = add_adversarial_negative_examples(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, './questions/pileNER/ALL_pileNER_adv_examples.json')
-    print(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
+    print("\nMSEQA FalseDef train stats:")
+    train_MSEQA_FalseDef_statistics = get_statistics_for_QA_dataset(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef['train'], input_column_name='document_context', instruction_column_name='question', output_column_name='answers')
+    for stat_name, stat_values in train_MSEQA_FalseDef_statistics.items():
+        print(stat_name, stat_values)
+    print("\nMSEQA FalseDef validation stats:")
+    validation_MSEQA_FalseDef_statistics = get_statistics_for_QA_dataset(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef['validation'], input_column_name='document_context', instruction_column_name='question', output_column_name='answers')
+    for stat_name, stat_values in validation_MSEQA_FalseDef_statistics.items():
+        print(stat_name, stat_values)
 
+    # TO ADD NEGATIVE ADVERSARIAL EXAMPLES
+    #dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = add_adversarial_negative_examples(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, './questions/pileNER/ALL_pileNER_adv_examples.json')
+    #print(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
+
+    print("\nMSEQA FalseDef train tagName list:")
     ne_list = {}
     for sample in dataset_MSEQA_format_with_n_samples_per_NE_FalseDef['train']:
         ne_type = sample['tagName']
@@ -1254,6 +1414,7 @@ if __name__ == "__main__":
             ne_list[ne_type] = 1
     print(sorted(ne_list.items(), key=lambda x: x[1], reverse=True))
 
+    print("\nN samples on same document context:")
     doc_list = {}
     for sample in dataset_MSEQA_format_with_n_samples_per_NE_FalseDef['train']:
         docID = sample['doc_question_pairID'].split(":")[0]
@@ -1263,13 +1424,38 @@ if __name__ == "__main__":
             doc_list[docID] = 1
     print(sorted(doc_list.items(), key=lambda x: x[1], reverse=True))
 
-    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef.save_to_disk("../../../datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_MSEQA_FalseDef")
-    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, with_definition=False, path_to_save_to="../../../datasets/pileNER/15_pos_samples_per_NE_3_ADVERSARIAL_GenQA_FalseDef")
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_FalseDef, with_definition=False, path_to_save_to=f"../../../datasets/pileNER/{DATASET_NAME}_GenQA_FalseDef")
 
     dataset_MSEQA_format_with_n_samples_per_NE_TrueDef = build_dataset_MSEQA_format_with_guidelines("./questions/pileNER/all_423_NE_definitions.json", dataset_MSEQA_format_with_n_samples_per_NE_FalseDef)
     print(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef)
-    dataset_MSEQA_format_with_n_samples_per_NE_TrueDef.save_to_disk("../../../datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_MSEQA_TrueDef")
-    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef, with_definition=True, path_to_save_to="../../../datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_GenQA_TrueDef")
+    dataset_MSEQA_format_with_n_samples_per_NE_TrueDef.save_to_disk(f"../../../datasets/pileNER/{DATASET_NAME}_MSEQA_TrueDef")
+
+    convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef, with_definition=True, path_to_save_to=f"../../../datasets/pileNER/{DATASET_NAME}_GenQA_TrueDef")
+
+    """
+    # TO add ADVERSARIAL POSITIVE EXAMPLES
+    
+    dataset_GenQA_format_with_n_samples_per_NE_TrueDef_train = Dataset.from_json("../../../datasets/pileNER/5pos_5neg_per_NE_1NegAdv_GenQA_TrueDef/train.jsonl")
+    print(dataset_GenQA_format_with_n_samples_per_NE_TrueDef_train)
+    dataset_GenQA_format_with_n_samples_per_NE_TrueDef_validation = Dataset.from_json("../../../datasets/pileNER/5pos_5neg_per_NE_1NegAdv_GenQA_TrueDef/validation.jsonl")
+    print(dataset_GenQA_format_with_n_samples_per_NE_TrueDef_validation)
+    dataset_GenQA_format_with_n_samples_per_NE_TrueDef_test = Dataset.from_json("../../../datasets/pileNER/5pos_5neg_per_NE_1NegAdv_GenQA_TrueDef/test.jsonl")
+    print(dataset_GenQA_format_with_n_samples_per_NE_TrueDef_test)
+
+    datasetDict_GenQA_format_with_n_samples_per_NE_TrueDef = DatasetDict({
+        "train": dataset_GenQA_format_with_n_samples_per_NE_TrueDef_train,
+        "validation": dataset_GenQA_format_with_n_samples_per_NE_TrueDef_validation,
+        "test": dataset_GenQA_format_with_n_samples_per_NE_TrueDef_test
+    })
+
+    print(datasetDict_GenQA_format_with_n_samples_per_NE_TrueDef)
+
+    datasetDict_GenQA_format_with_n_samples_per_NE_TrueDef_PLUS_adv_pos = add_adversarial_positive_examples(datasetDict_GenQA_format_with_n_samples_per_NE_TrueDef, "./questions/pileNER/ALL_pileNER_positive_adversarial_examples.json")
+    print(datasetDict_GenQA_format_with_n_samples_per_NE_TrueDef_PLUS_adv_pos)
+    path_to_save_to = "../../../datasets/pileNER/5pos_5neg_1posADV_1negADV_GenQA_TrueDef"
+    for split_name, dataset in datasetDict_GenQA_format_with_n_samples_per_NE_TrueDef_PLUS_adv_pos.items():
+        dataset.to_json(os.path.join(path_to_save_to, split_name + '.jsonl'))
+    """
 
     """
     pileNER_statistics = get_dataset_statistics()

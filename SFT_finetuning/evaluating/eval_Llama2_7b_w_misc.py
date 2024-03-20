@@ -5,12 +5,8 @@ Evaluating pileNER-finetuned Llama-2-7b for zero-shot NER on CrossNER/MIT datase
 
 - Using vLLM library for faster inference
 
-UniNER's authors provide the crossNER/MIT test datasets already converted to QA format
-./datasets/eval_data_UniNER/CrossNER_ai.json
+- Using crossNER datasets converted first to MSEQA and then to QA
 
-We use convert_official_uniNER_eval_dataset_for_GenQA for:
- - replacing question with definition if with_definition=True
- - format to input expected by SFT_finetuning preprocess and tokenizer function
 """
 
 __package__ = "SFT_finetuning.evaluating"
@@ -30,7 +26,7 @@ import os
 import uniNER_official_eval_script
 
 # my libraries
-from MSEQA_4_NER.data_handlers import data_handler_pileNER, data_handler_BUSTER
+from MSEQA_4_NER.data_handlers import data_handler_pileNER, data_handler_BUSTER, data_handler_MIT, data_handler_cross_NER
 
 from ..commons.initialization import get_HF_access_token
 from ..commons.preprocessing import truncate_input
@@ -38,12 +34,8 @@ from ..commons.prompter import Prompter
 
 
 def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, data_handler, with_definition):
-    """
-    universal-ner github provides the crossNER and MIT NER-datasets already in a conversation-QA format (eval_dataset_uniNER folder);
-    here we convert the dataset to our usual features and replace "question" with the NE definition if with_definition=True
-    """
-    print("Loading train/validation/test Datasets in MS-EQA format...")
-    print(" ...converting uniNER Datasets in GenQA format for inference")
+    print("\nLoading and converting test Dataset from BIO to MS-EQA format...")
+    print(" ...converting Dataset in GenQA format\n")
     sys.stdout.flush()
 
     if datasets_cluster_name == 'pileNER':
@@ -55,55 +47,52 @@ def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, d
             path_to_pileNER_test_GenQA_format = './datasets/pileNER/GenQA_format_FalseDef/test.jsonl'
             return load_dataset("json", data_files=path_to_pileNER_test_GenQA_format)['train']
 
-    if datasets_cluster_name == 'BUSTER':
+    elif datasets_cluster_name == 'BUSTER':
         if not os.path.exists(f"./datasets/BUSTER/GenQA_format_{with_definition}Def"):
             if with_definition:
                 path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_guidelines/BUSTER"
             else:
                 path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_no_def/BUSTER"
             dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_BUSTER_MSEQA)
+            # converts to GenQA and save as jsonl files
             data_handler.convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition, f"./datasets/BUSTER/GenQA_format_{with_definition}Def")
         return load_dataset("json", data_files=f"./datasets/BUSTER/GenQA_format_{with_definition}Def/test.jsonl")['train']  # since saved as single Dataset
 
-    if datasets_cluster_name == 'crossNER':
-        path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/CrossNER_{subdataset_name}.json"
     else:
-        path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/mit-{subdataset_name}.json"
-    path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
+        path_to_NER_datasets_BIO_format = f"./datasets/{datasets_cluster_name}/BIO_format"
+        path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
+        path_to_subdataset_questions_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/what_describes_questions"
 
-    # load definitions also if with_def False to map NEs to their canonical names
-    path_to_subdataset_guidelines = os.path.join(path_to_guidelines_folder, subdataset_name + '_NE_definitions.json')
-    return data_handler.convert_official_uniNER_eval_dataset_for_GenQA(subdataset_name, path_to_eval_dataset_uniNER, with_definition, path_to_subdataset_guidelines)
+        if with_definition:
+            path_to_subdataset_guidelines = os.path.join(path_to_guidelines_folder, subdataset_name + '_NE_definitions.json')
+            dataset_MSEQA_format = data_handler.build_dataset_MSEQA_format_with_guidelines(path_to_NER_datasets_BIO_format, subdataset_name, path_to_subdataset_guidelines)
+        else:
+            path_to_subdataset_questions = os.path.join(path_to_subdataset_questions_folder, subdataset_name + '.txt')
+            dataset_BIO_format = data_handler.build_dataset_from_txt(os.path.join(path_to_NER_datasets_BIO_format, subdataset_name))
+            dataset_MSEQA_format = data_handler.build_dataset_MSEQA_format(dataset_BIO_format, path_to_subdataset_questions)
+
+        return data_handler.convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition, path_to_save_to=None, only_test=True)['test']
 
 
 if __name__ == '__main__':
 
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-    print("CrossNER/MIT ZERO-SHOT NER EVALUATIONS with UniNER official eval script:\n")
+    print("CrossNER/MIT/BUSTER ZERO-SHOT NER EVALUATIONS with UniNER official eval script W/ MISCELLANEOUS NEs:\n")
 
     to_eval_on = [
-        # converting from uniNER eval datasets using function inside data_handler_pileNER
-        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
-        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant']},
+        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_cross_NER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
+        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_MIT, 'subdataset_names': ['movie', 'restaurant']},
         {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER']},
-        {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
+        # {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = True
     print(f"\nWith definition: {WITH_DEFINITION}")
 
-    #model_path_or_name = "andrewzamai/Llama2-7B-TrueDef"
-    #model_path_or_name = "./merged_models/llama2_7B_5samplesPerNE_TrueDef_NOenhanced_plus_negatives"
-
-    model_path_or_name = "./merged_models/llama2_7B_5pos_5neg_perNE_TrueZeroShot_top50NEs_FalseDef"
-    #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
-    #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
-    #model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"
-    #model_path_or_name = "./merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp"
+    model_path_or_name = "./merged_models/llama2_7B_5pos_5neg_perNE_TrueZeroShot_top50NEs_TrueDef"
     print(f"LLM model: {model_path_or_name}")
 
-    # TODO: load from configs parameters
     max_new_tokens = 256
     print(f"max_new_tokens {max_new_tokens}")
 
@@ -112,20 +101,6 @@ if __name__ == '__main__':
     tokenizer = vllm_model.get_tokenizer()
 
     sampling_params = SamplingParams(temperature=0, max_tokens=max_new_tokens, stop=['</s>'])
-
-    """
-    # beam search generation
-    sampling_params = SamplingParams(
-        n=1,  # number of output sequences to return for the given prompt,
-        best_of=4,  # from these `best_of` sequences, the top `n` are returned, treated as the beam width when `use_beam_search` is True
-        use_beam_search=True,
-        early_stopping='never',  # stopping condition for beam search
-        temperature=0,
-        top_p=1,
-        top_k=-1
-    )
-    """
-
     print(sampling_params)
 
     prompter = Prompter('reverse_INST', template_path='./src/SFT_finetuning/templates', eos_text='')
@@ -141,17 +116,17 @@ if __name__ == '__main__':
                 cutoff_len = 1528
             print(f"cutoff_len: {cutoff_len}")
 
-            dataset_MSEQA_format = load_or_build_dataset_GenQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION)
+            dataset_GenQA_format = load_or_build_dataset_GenQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION)
 
             indices_per_tagName = {}
-            for i, sample in enumerate(dataset_MSEQA_format):
+            for i, sample in enumerate(dataset_GenQA_format):
                 tagName = sample['tagName']
                 if tagName not in indices_per_tagName:
                     indices_per_tagName[tagName] = []
                 indices_per_tagName[tagName].append(i)
 
             # retrieving gold answers (saved in ouput during dataset conversion from uniNER eval datatasets)
-            all_gold_answers = dataset_MSEQA_format['output']
+            all_gold_answers = dataset_GenQA_format['output']
 
             # masking tagName
             """
@@ -162,11 +137,12 @@ if __name__ == '__main__':
                 sample['instruction'] = pattern.sub('<unk>', sample['instruction'])
                 instructions.append(sample['instruction'])
             """
-            instructions = dataset_MSEQA_format['instruction']
+            instructions = dataset_GenQA_format['instruction']
 
             print(instructions[0])
+            sys.stdout.flush()
 
-            inputs = dataset_MSEQA_format['input']
+            inputs = dataset_GenQA_format['input']
 
             batch_instruction_input_pairs = [
                 (instruction,
@@ -213,7 +189,7 @@ if __name__ == '__main__':
                 print("------------------------------------------------------- ")
 
             preds_to_save = []
-            for i, sample in enumerate(dataset_MSEQA_format):
+            for i, sample in enumerate(dataset_GenQA_format):
                 preds_to_save.append({
                     'doc_question_pairID': sample['doc_question_pairID'],
                     'tagName': sample['tagName'],

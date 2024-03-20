@@ -1,0 +1,311 @@
+[
+  {
+    "named_entity": "person",
+    "prompt_length": 272,
+    "output_length": 164,
+    "annotation_guidelines": {
+      "Definition": "'person' signifies individuals, including real or fictional people, and refers to specific human beings.",
+      "Guidelines": "Avoid labeling generic terms like 'babies' or 'mothers' unless referring to specific individuals. Exercise caution with ambiguous references, such as 'Tongan Thor', which may include both a nickname and a real name."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "John Smith, known as the 'Tongan Thor', broke the world record in weightlifting.",
+          "explanation": "In this sentence, the term 'Tongan Thor' is used as a nickname for a specific individual (John Smith), thus falling under the definition of the Named Entity 'person'.",
+          "positive_occurrences": [
+            "John Smith"
+          ]
+        },
+        {
+          "sentence": "Alice Williams, a renowned storyteller, enchanted the audience with her tales.",
+          "explanation": "Here, 'Alice Williams' is used to refer to a specific individual (renowned storyteller), fitting the guidelines for labeling 'person' as a Named Entity.",
+          "positive_occurrences": [
+            "Alice Williams"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "organization",
+    "prompt_length": 293,
+    "output_length": 145,
+    "annotation_guidelines": {
+      "Definition": "'organization' refers to named entities that represent companies, institutions, associations, or any group of people with a particular purpose.",
+      "Guidelines": "Avoid labeling generic terms like 'team' or 'group' unless they refer to specific organizations. Exercise caution with potentially ambiguous terms such as 'Apple' (company or fruit) or 'Red Cross' (organization or color). Be mindful of the context to accurately discern the entity as an organization."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "Apple announced a new product release during their annual tech event.",
+          "explanation": "In this sentence, 'Apple' clearly refers to the company as an organization due to the context of announcing a product release during a tech event.",
+          "organization_occurrences": [
+            "Apple"
+          ]
+        },
+        {
+          "sentence": "The Red Cross volunteers worked tirelessly to provide aid to the hurricane victims.",
+          "explanation": "Here, 'Red Cross' is used in the context of volunteers providing aid to hurricane victims, indicating that it refers to the organization rather than the color.",
+          "organization_occurrences": [
+            "Red Cross"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "location",
+    "prompt_length": 267,
+    "output_length": 144,
+    "annotation_guidelines": {
+      "Definition": "'location' denotes geographic entities, such as cities, countries, and landmarks, that represent specific places on Earth.",
+      "Guidelines": "Do not label abstract references. Be cautious with ambiguous terms like 'Paris Hilton' (person with a location name) or 'Amazon' (both a company and a river)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I visited Paris Hilton in the beautiful city of Paris last summer.",
+          "explanation": "In this sentence, 'Paris' is used as a geographic entity denoting a specific city, aligning with the definition of the Named Entity 'location'.",
+          "positive_occurrences": [
+            "Paris"
+          ]
+        },
+        {
+          "sentence": "The Amazon river flows through dense forests in South America.",
+          "explanation": "Here, 'Amazon' is referred to as a landmark (river) on Earth, which falls under the definition of the Named Entity 'location'.",
+          "positive_occurrences": [
+            "Amazon",
+            "South America"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "concept",
+    "prompt_length": 285,
+    "output_length": 218,
+    "annotation_guidelines": {
+      "Definition": "'concept' refers to abstract or intangible entities, ideas, principles, or frameworks that are not physical or tangible in nature.",
+      "Guidelines": "Avoid labeling concrete or tangible objects, such as 'servers' or 'update pattern', which are not purely abstract concepts. Exercise caution with broadly used terms, such as 'policy', to ensure they truly represent abstract concepts and not specific actions or plans."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The new research paper introduces a groundbreaking 'theory' that challenges existing beliefs in the scientific community.",
+          "explanation": "In this sentence, 'theory' is used to refer to an abstract concept in the field of science.",
+          "positive_occurrences": [
+            "theory"
+          ]
+        },
+        {
+          "sentence": "The poet's work often delves into abstract 'philosophies' about the nature of reality and existence.",
+          "explanation": "Here, 'philosophies' pertains to philosophical ideas and concepts, which are intangible in nature.",
+          "positive_occurrences": [
+            "philosophies"
+          ]
+        },
+        {
+          "sentence": "The 'ethics' of artificial intelligence raise important questions about the morality of autonomous machines.",
+          "explanation": "The term 'ethics' in this context refers to abstract moral principles rather than concrete objects.",
+          "positive_occurrences": [
+            "ethics"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "product",
+    "prompt_length": 300,
+    "output_length": 197,
+    "annotation_guidelines": {
+      "Definition": "'product' refers to tangible or intangible items or goods, including technology, consumer goods, or services, that are created for sale or use.",
+      "Guidelines": "Avoid labeling generic terms like 'center' in 'the center of a campaign'. Exercise caution with entities that can have multiple meanings, such as 'blackberry' (fruit, technology product). Be aware of metaphoric usage, as in 'landing page' (not a physical product but a digital concept)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The new iPhone model will revolutionize the smartphone market.",
+          "explanation": "In this sentence, 'iPhone' is used to refer to a technology product, fitting the definition of the 'product' Named Entity.",
+          "positive_occurrences": [
+            "iPhone"
+          ]
+        },
+        {
+          "sentence": "The marketing team launched a campaign for the latest gaming console.",
+          "explanation": "Here, 'gaming console' represents a tangible product, which aligns with the definition of 'product' Named Entity.",
+          "positive_occurrences": [
+            "gaming console"
+          ]
+        },
+        {
+          "sentence": "The software company provided a data analytics service for the client.",
+          "explanation": "In this context, 'data analytics service' is an intangible product, falling under the 'product' Named Entity.",
+          "positive_occurrences": [
+            "data analytics service"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "variable",
+    "prompt_length": 295,
+    "output_length": 225,
+    "annotation_guidelines": {
+      "Definition": "'variable' refers to placeholders or symbols representing unknown or changing values in a mathematical or programming context.",
+      "Guidelines": "Do not label specific values, such as '5' or 'Jane'. Exercise caution with words that have multiple meanings, like 'name' (can refer to a person's name or a variable in programming). Similarly, be mindful of context to distinguish between 'age' as a variable and 'age' as a demographic attribute."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "In the algebraic equation, x is a variable representing an unknown value.",
+          "explanation": "The word 'variable' is used in the context of placeholders or symbols representing unknown values in mathematics, fitting the definition of the Named Entity.",
+          "positive_occurrences": [
+            "variable"
+          ]
+        },
+        {
+          "sentence": "The software program uses 'input' as a variable to adjust the output based on user settings.",
+          "explanation": "Here, 'input' is being used as a placeholder for changing values within the program, which aligns with the definition of the Named Entity.",
+          "positive_occurrences": [
+            "variable"
+          ]
+        },
+        {
+          "sentence": "When developing the statistical model, we had to assign 'x' as a variable to denote the independent factor.",
+          "explanation": "The term 'variable' is employed to represent an unknown or changing value within the context of statistical modeling, in line with the Named Entity definition.",
+          "positive_occurrences": [
+            "variable"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "date",
+    "prompt_length": 283,
+    "output_length": 149,
+    "annotation_guidelines": {
+      "Definition": "'date' refers to specific points in time, including days, months, years, and relative time expressions like 'Week 2'.",
+      "Guidelines": "Avoid labeling non-specific time references like 'recently' or 'soon'. Exercise caution with ambiguous terms like 'May' (month or verb) and 'Wednesday Adams' (person's name which includes a day of the week)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "May 1st is a public holiday.",
+          "explanation": "In this sentence, 'May 1st' is a specific point in time (a date) and fits the definition of the 'date' Named Entity.",
+          "positive_occurrences": [
+            "May 1st"
+          ]
+        },
+        {
+          "sentence": "She will be away until Week 2 of August.",
+          "explanation": "In this sentence, 'Week 2 of August' is a relative time expression that specifies a point in time, qualifying as a 'date' Named Entity.",
+          "positive_occurrences": [
+            "Week 2 of August"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "medical condition",
+    "prompt_length": 291,
+    "output_length": 148,
+    "annotation_guidelines": {
+      "Definition": "'medical condition' refers to physical or mental health issues, including diseases, syndromes, injuries, and other related conditions.",
+      "Guidelines": "Avoid generic terms like 'pain' or 'injury' unless specific medical conditions are mentioned. Be cautious with ambiguous terms that might have non-medical meanings, like 'depression' (psychological or economic) or 'stroke' (for a sports or painting context)."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "She's been struggling with depression for years and finally sought professional help.",
+          "explanation": "In this sentence, 'depression' is used in the context of a mental health condition, which aligns with the definition of 'medical condition'.",
+          "positive_occurrences": [
+            "depression"
+          ]
+        },
+        {
+          "sentence": "He had a severe stroke that left him partially paralyzed on one side.",
+          "explanation": "Here, 'stroke' is referencing a medical condition involving a sudden interruption of blood flow to the brain, fitting the criteria for 'medical condition'.",
+          "positive_occurrences": [
+            "stroke"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "object",
+    "prompt_length": 278,
+    "output_length": 206,
+    "annotation_guidelines": {
+      "Definition": "'object' in the context of NER refers to tangible items, both animate and inanimate, that can be perceived by the senses.",
+      "Guidelines": "Avoid labeling abstract concepts. Exercise caution with ambiguous terms such as 'sun' (can refer to the celestial body or concept of sunlight) and ensure that 'object' refers to tangible entities within the context."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "The sun's heat warmed the object resting on the grass.",
+          "explanation": "In this sentence, 'object' refers to a tangible item that can be perceived, aligning with the definition of the Named Entity.",
+          "occurrences": [
+            "object"
+          ]
+        },
+        {
+          "sentence": "As the teacher handed out the assignments, each student received an object to work on.",
+          "explanation": "In this context, 'object' represents a physical item that the students will work on, meeting the criteria of the Named Entity definition.",
+          "occurrences": [
+            "object"
+          ]
+        },
+        {
+          "sentence": "The artist carefully placed each object in the gallery, ensuring a visually cohesive display.",
+          "explanation": "Here, 'object' signifies tangible pieces of art being positioned in the gallery, fitting the tangible and perceivable nature of the Named Entity.",
+          "occurrences": [
+            "object"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "named_entity": "technology",
+    "prompt_length": 294,
+    "output_length": 140,
+    "annotation_guidelines": {
+      "Definition": "'technology' represents technical terms, products, devices, or systems that involve the application of scientific knowledge for practical purposes.",
+      "Guidelines": "Do not label general terms like 'system' or 'interface' without clear technological context. Exercise caution with potentially ambiguous terms like 'Apple' (referring to the company or the fruit) and 'Java' (programming language or island). Be attentive to the context to differentiate between common and technical usage."
+    },
+    "positive_sentences": {
+      "sentences": [
+        {
+          "sentence": "I am learning how to code in Java, a programming language widely used for web development.",
+          "explanation": "In this sentence, 'Java' refers to a programming language, fitting the definition of the Named Entity 'technology.'",
+          "occurrences": [
+            "Java"
+          ]
+        },
+        {
+          "sentence": "The new Apple iPhone release includes cutting-edge technology such as facial recognition.",
+          "explanation": "Here, 'Apple' is used to refer to the company known for its technological innovations, aligning with the Named Entity 'technology.'",
+          "occurrences": [
+            "Apple"
+          ]
+        }
+      ]
+    },
+    "finish_reason": "stop"
+  }
+]

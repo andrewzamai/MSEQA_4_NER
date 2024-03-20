@@ -7,6 +7,7 @@ Contains 1 general domain NER dataset CoNLL2003, and 5 domain specific datasets:
 Each domain specific dataset has its own defined set of NE categories.
 """
 
+__package__ = "MSEQA_4_NER.data_handlers"
 
 # importing packages
 import json
@@ -367,6 +368,57 @@ def build_dataset_MSEQA_format_with_guidelines(path_to_crosNER_datasets, subdata
     # new_dataset_dict["dataset_name"] = dataset_dict["dataset_name"]
 
     return new_dataset_dict
+
+
+def convert_MSEQA_dataset_to_GenQA_format(datasetDict_MSEQA_format, with_definition=True, path_to_save_to=None, only_test=True):
+    # converting each split and saving each one as jsonl file e.g. 'train.jsonl'
+    split_names = ['test'] if only_test else list(datasetDict_MSEQA_format.keys())
+    datasetDict_GenQA_format = {split_name: [] for split_name in split_names}
+    for split_name in split_names:
+        for MSEQA_sample in datasetDict_MSEQA_format[split_name]:
+            genQA_sample = {
+                "doc_question_pairID": MSEQA_sample['doc_question_pairID'],
+                "tagName": MSEQA_sample['tagName'],
+                # new column names as finetune_sft.py requires
+                "input": MSEQA_sample['document_context'],
+                "instruction": "",
+                "output": ""
+            }
+            if with_definition:
+                # rephrasing a bit definition
+                instruction = MSEQA_sample['question']
+                instruction = instruction.replace("from an input TEXT", "from the text chunk you have read")
+                instruction = instruction.replace("Your task is to extract", "Extract")
+                instruction = instruction.replace("\nTEXT: ", "\nReturn a JSON list.")
+                genQA_sample['instruction'] = instruction
+            else:
+                # question What describes X in the text?
+                genQA_sample['instruction'] = MSEQA_sample['question']
+
+            # ONLY if Training or validation
+            if split_name != 'test':
+                # sorting the text answers by ascending starting positions to give the LLM a pattern: extract the occurences in the order they appear in the passage of text
+                # this is because although the evaluation metrics are order independent the NTP loss penalizes order
+                # we also delete duplicate occurrences thus obtaining a SET of gold_answers
+                gold_answers_with_char_starts = MSEQA_sample['answers']
+                # sort text answers by ascending start positions
+                sorted_start_answers = sorted(zip(gold_answers_with_char_starts['answer_start'], gold_answers_with_char_starts['text']), key=lambda x: x[0])
+                # retrieve only text answers
+                sorted_answers_text_only = [item[1] for item in sorted_start_answers]
+                # deleting any duplicate while preserving order (order within document context)
+                sorted_textonly_gold_answers_wo_duplicates = list(OrderedDict.fromkeys(sorted_answers_text_only).keys())
+                genQA_sample["output"] = json.dumps(sorted_textonly_gold_answers_wo_duplicates)  # stringifying list
+            else:
+                genQA_sample["output"] = json.dumps(MSEQA_sample['answers']['text'])  # stringifying list
+
+            datasetDict_GenQA_format[split_name].append(genQA_sample)
+
+        datasetDict_GenQA_format[split_name] = Dataset.from_list(datasetDict_GenQA_format[split_name])
+
+        if path_to_save_to:
+            datasetDict_GenQA_format[split_name].to_json(os.path.join(path_to_save_to, split_name + '.jsonl'))
+
+    return DatasetDict(datasetDict_GenQA_format)
 
 
 if __name__ == '__main__':

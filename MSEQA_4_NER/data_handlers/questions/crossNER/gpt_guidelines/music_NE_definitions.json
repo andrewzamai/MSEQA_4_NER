@@ -278,8 +278,8 @@
     "finish_reason": "stop"
   },
   {
-	"named_entity": "person",
-  "real_name": "professionals proper name",
+    "named_entity": "person",
+    "real_name": "person",
 	"sentences_as_example": [
 	  {
 	    "sentence": "Ken believes its further evidence that B.A. should be our second home.",
@@ -303,7 +303,7 @@
 	],
 	"prompt_length": 395,
 	"output_length": 72,
-	"gpt_answer": "{\"Definition\": \"'professionals proper name' refers to proper names of non-artist individuals such as managers, journalists, music technicians or music agents.\", \"Guidelines\": \"In this context, refrain from labeling proper names of singers, composers, songwriters and DJs. Label proper names of non-artists only and do not label titles such as 'manager', 'technician'.\"}",
+	"gpt_answer": "{\"Definition\": \"'person' refers to proper names of non-artist individuals such as managers, journalists, music technicians or music agents.\", \"Guidelines\": \"In this context, refrain from labeling proper names of singers, composers, songwriters and DJs. Label proper names of non-artists only and do not label generic titles such as 'manager', 'technician'.\"}",
 	"finish_reason": "stop"
   },
   {

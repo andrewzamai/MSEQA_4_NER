@@ -1,13 +1,13 @@
-# finetuning Llama-2-7b chat version on PileNER with N=5 samples per NE
+# finetuning Llama-2-7b chat version on PileNER with N samples per NE
 
 base_model: meta-llama/Llama-2-7b-chat-hf
 prompt_template_name: reverse_INST
 # using dataset converted from MSEQA format to GenQA format (instruction, input, output) columns
-data_path: ./datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_GenQA_TrueDef/train.jsonl
-val_data_path: ./datasets/pileNER/15_10_per_NE_3_ADVERSARIAL_GenQA_TrueDef/validation.jsonl
+data_path: ./datasets/pileNER/5pos_5neg_perNE_TrueZeroShot_top50NEs_GenQA_FalseDef/train.jsonl
+val_data_path: ./datasets/pileNER/5pos_5neg_perNE_TrueZeroShot_top50NEs_GenQA_FalseDef/validation.jsonl
 select_train_portion: -1
-val_set_size: 1000 # ca 1/4 of validation data
-output_dir: ./trained_models/llama2_7B_15_10_per_NE_3_ADVERSARIAL_TrueDef_enhanced
+val_set_size: -1  # if -1 use all validation data
+output_dir: ./trained_models/llama2_7B_5pos_5neg_perNE_TrueZeroShot_top50NEs_FalseDef
 early_stopping_patience: 10
 #training hyperparams
 batch_size: 32

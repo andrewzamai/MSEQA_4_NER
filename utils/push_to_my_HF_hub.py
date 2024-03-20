@@ -8,8 +8,8 @@ if __name__ == '__main__':
     # load HuggingFace access token from .env file (git ignored)
     AZ_HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-    path_to_model_to_upload = './merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp'
-    new_repo_name = 'andrewzamai/llama2_4_NER_TrueDef_enhanced'
+    path_to_model_to_upload = './merged_models/llama2_7B_5samplesPerNE_TrueDef_NOenhanced_plus_negatives'
+    new_repo_name = 'andrewzamai/llama2_7B_5pos_5neg_perNE_TrueDef'
 
     url_new_repo_name = create_repo(
         repo_id=new_repo_name,

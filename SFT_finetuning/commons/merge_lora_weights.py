@@ -1,10 +1,14 @@
 """ merge fine-tuned LORA adapter weights with base model """
+
+__package__ = "SFT_finetuning.commons"
+
 import os.path
 import time
 import shutil
 
 # my libraries
-from initialization import init_model
+from huggingface_hub import login
+from .initialization import get_HF_access_token, init_model
 
 
 def merge_main(
@@ -44,10 +48,13 @@ def merge_main(
 
 if __name__ == "__main__":
 
+    HF_ACCESS_TOKEN = get_HF_access_token('./.env')
+    login(token=HF_ACCESS_TOKEN)
+
     base_model = "meta-llama/Llama-2-7b-chat-hf"
     # as it is the code requires namespace/model_name format only, no more subfolders
-    path_to_lora = "./trained_models/llama2_7B_15_10_per_NE_3_ADVERSARIAL_TrueDef_enhanced"
-    save_model_at = "./merged_models/llama2_7B_15_10_per_NE_3_ADVERSARIAL_TrueDef_enhanced"
+    path_to_lora = "./trained_models/llama2_7B_5pos_5neg_perNE_TrueZeroShot_top50NEs_FalseDef"
+    save_model_at = "./merged_models/llama2_7B_5pos_5neg_perNE_TrueZeroShot_top50NEs_FalseDef"
 
     # fire.Fire(merge_main)
     merge_main(base_model, path_to_lora, save_model_at)

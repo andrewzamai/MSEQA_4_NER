@@ -53,7 +53,7 @@
     ],
     "prompt_length": 600,
     "output_length": 100,
-    "gpt_answer": "{\n  \"Definition\": \"'legal consulting company' refers to a business entity providing legal services and advice on matters such as government regulation, litigation, anti-trust, structured finance, and tax, among others.\",\n  \"Guidelines\": \"Exercise caution when labeling entities that might also refer to individuals or groups of people, such as 'Morgan Securities' (could refer to a company or a person). Take care to distinguish between names that may appear to be company names but are in fact personal names.\"}",
+    "gpt_answer": "{\"Definition\": \"'legal consulting company' refers to a business entity providing legal services and advice on matters such as government regulation, litigation, anti-trust, structured finance, and tax, among others.\",\n  \"Guidelines\": \"Exercise caution when labeling entities that might also refer to individuals or groups of people, such as 'Morgan Securities' (could refer to a company or a person). Take care to distinguish between names that may appear to be company names but are in fact personal names.\"}",
     "finish_reason": "length"
   },
   {
@@ -81,7 +81,7 @@
     ],
     "prompt_length": 521,
     "output_length": 85,
-    "gpt_answer": "{\n  \"Definition\": \"'annual revenues' refers to the past or present total income earned by a company or entity within a specific fiscal year.\",\n  \"Guidelines\": \"Do not annotate generic terms such as 'revenue', but the numerical amounts of revenue, for example '120 million'. Do not annotate half-yearly revenues and future revenue forecasts.\"}",
+    "gpt_answer": "{\"Definition\": \"'annual revenues' refers to the past or present total income earned by a company or entity within a specific fiscal year.\",\"Guidelines\": \"Do not annotate generic terms such as 'revenue', but the numerical amounts of revenue, for example '120 million'. Do not annotate half-yearly revenues and future revenue forecasts.\"}",
     "finish_reason": "stop"
   },
   {
@@ -109,7 +109,7 @@
     ],
     "prompt_length": 505,
     "output_length": 88,
-    "gpt_answer": "{\n  \"Definition\": \"'acquired company' refers to a company that is beeing acquired by another company through a business transaction, such as a merger or acquisition.\",\n  \"Guidelines\": \"Ensure that the labeled entity is indeed a company and not a product. The company's role as 'being acquired' must be understandable from the sentence in which it appears. Do not label company names which role in the transaction is not clear.\"}",
+    "gpt_answer": "{\"Definition\": \"'acquired company' refers to a company that is beeing acquired by another company through a business transaction, such as a merger or acquisition.\",\"Guidelines\": \"Ensure that the labeled entity is indeed a company and not a product. The company's role as 'being acquired' must be understandable from the sentence in which it appears. Do not label company names which role in the transaction is not clear.\"}",
     "finish_reason": "stop"
   },
   {
