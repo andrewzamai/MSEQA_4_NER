@@ -1,3 +1,4 @@
 .DS_Store
 MSEQA_4_NER/experiments/.env
 /uniNER-official-repo/
+/GNER/

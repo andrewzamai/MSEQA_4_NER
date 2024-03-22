@@ -1,5 +1,5 @@
 """
-Evaluating pileNER-finetuned Llama-2-7b for zero-shot NER on CrossNER/MIT datasets
+Evaluating pileNER-finetuned Llama-2-7B for zero-shot NER on CrossNER/MIT/BUSTER datasets
 
 - Using provided uniNER official evaluation script
 
@@ -17,6 +17,7 @@ __package__ = "SFT_finetuning.evaluating"
 
 import re
 
+import numpy as np
 # use vllm_pip_container.sif
 # noinspection PyUnresolvedReferences
 from vllm import LLM, SamplingParams
@@ -42,8 +43,8 @@ def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, d
     universal-ner github provides the crossNER and MIT NER-datasets already in a conversation-QA format (eval_dataset_uniNER folder);
     here we convert the dataset to our usual features and replace "question" with the NE definition if with_definition=True
     """
-    print("Loading train/validation/test Datasets in MS-EQA format...")
-    print(" ...converting uniNER Datasets in GenQA format for inference")
+    print("\nLoading train/validation/test Datasets in QA format...")
+    print(" ...converting uniNER Datasets in our GenQA format for inference\n")
     sys.stdout.flush()
 
     if datasets_cluster_name == 'pileNER':
@@ -55,55 +56,48 @@ def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, d
             path_to_pileNER_test_GenQA_format = './datasets/pileNER/GenQA_format_FalseDef/test.jsonl'
             return load_dataset("json", data_files=path_to_pileNER_test_GenQA_format)['train']
 
-    if datasets_cluster_name == 'BUSTER':
-        if not os.path.exists(f"./datasets/BUSTER/GenQA_format_{with_definition}Def"):
-            if with_definition:
-                path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_guidelines/BUSTER"
-            else:
-                path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_no_def/BUSTER"
-            dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_BUSTER_MSEQA)
-            data_handler.convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition, f"./datasets/BUSTER/GenQA_format_{with_definition}Def")
-        return load_dataset("json", data_files=f"./datasets/BUSTER/GenQA_format_{with_definition}Def/test.jsonl")['train']  # since saved as single Dataset
+    elif datasets_cluster_name == 'BUSTER':
+        if with_definition:
+            path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_guidelines/BUSTER"
+        else:
+            path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_no_def/BUSTER"
+        dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_BUSTER_MSEQA)
+        return data_handler.convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition, path_to_save_to=f"./datasets/BUSTER/GenQA_format_{with_definition}Def", only_test=True)['test']
 
-    if datasets_cluster_name == 'crossNER':
-        path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/CrossNER_{subdataset_name}.json"
     else:
-        path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/mit-{subdataset_name}.json"
-    path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
-
-    # load definitions also if with_def False to map NEs to their canonical names
-    path_to_subdataset_guidelines = os.path.join(path_to_guidelines_folder, subdataset_name + '_NE_definitions.json')
-    return data_handler.convert_official_uniNER_eval_dataset_for_GenQA(subdataset_name, path_to_eval_dataset_uniNER, with_definition, path_to_subdataset_guidelines)
+        if datasets_cluster_name == 'crossNER':
+            path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/CrossNER_{subdataset_name}.json"
+        else:
+            path_to_eval_dataset_uniNER = f"./datasets/eval_data_UniNER/mit-{subdataset_name}.json"
+        path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
+        # load definitions also if with_def False to map NEs to their canonical names
+        path_to_subdataset_guidelines = os.path.join(path_to_guidelines_folder, subdataset_name + '_NE_definitions.json')
+        return data_handler.convert_official_uniNER_eval_dataset_for_GenQA(subdataset_name, path_to_eval_dataset_uniNER, with_definition, path_to_subdataset_guidelines)
 
 
 if __name__ == '__main__':
 
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
-    print("CrossNER/MIT ZERO-SHOT NER EVALUATIONS with UniNER official eval script:\n")
+    print("CrossNER/MIT/BUSTER ZERO-SHOT NER EVALUATIONS with UniNER official eval script and datasets (w/o misc):\n")
 
     to_eval_on = [
         # converting from uniNER eval datasets using function inside data_handler_pileNER
         {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
         {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant']},
         {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER']},
-        {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
+        # {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = True
     print(f"\nWith definition: {WITH_DEFINITION}")
 
-    #model_path_or_name = "andrewzamai/Llama2-7B-TrueDef"
-    #model_path_or_name = "./merged_models/llama2_7B_5samplesPerNE_TrueDef_NOenhanced_plus_negatives"
+    partial_evaluate = False
+    print(f"\npartial_evaluate: {partial_evaluate}")
 
-    model_path_or_name = "./merged_models/llama2_7B_5pos_5neg_perNE_TrueZeroShot_top50NEs_FalseDef"
-    #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_mid_eval_cp"
-    #model_path_or_name = "./merged_models/llama2_4_NER_FalseDef"
-    #model_path_or_name = "andrewzamai/Llama2-7B-FalseDef"
-    #model_path_or_name = "./merged_models/llama2_4_NER_TrueDef_enhanced_2_mid_cp"
+    model_path_or_name = "./merged_models/llama2_7B_5pos_5neg_perNE_TrueZeroShot_top50NEs_TrueDef"
     print(f"LLM model: {model_path_or_name}")
 
-    # TODO: load from configs parameters
     max_new_tokens = 256
     print(f"max_new_tokens {max_new_tokens}")
 
@@ -163,8 +157,8 @@ if __name__ == '__main__':
                 instructions.append(sample['instruction'])
             """
             instructions = dataset_MSEQA_format['instruction']
-
             print(instructions[0])
+            sys.stdout.flush()
 
             inputs = dataset_MSEQA_format['input']
 
@@ -191,26 +185,67 @@ if __name__ == '__main__':
             print(all_gold_answers[0:10])
             print("pred_answers")
             print(all_pred_answers[0:10])
-            eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(all_pred_answers, all_gold_answers)
+            if partial_evaluate:
+                eval_result = uniNER_official_eval_script.NEREvaluator().partial_evaluate(all_pred_answers, all_gold_answers)
+            else:
+                eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(all_pred_answers, all_gold_answers)
             precision = round(eval_result["precision"]*100, 2)
             recall = round(eval_result["recall"]*100, 2)
             f1 = round(eval_result["f1"]*100, 2)
             print("\n{} ==> micro-Precision: {:.2f}, micro-Recall: {:.2f}, micro-F1: {:.2f}".format(subdataset_name, precision, recall, f1))
 
             print("\nMetrics per NE category (100%):\n")
+            this_dataset_metrics = {}
             for tagName, indices_for_this_tagName in indices_per_tagName.items():
                 this_tagName_golds = [gold_ans for idx, gold_ans in enumerate(all_gold_answers) if idx in indices_for_this_tagName]
                 this_tagName_preds = [pred_ans for idx, pred_ans in enumerate(all_pred_answers) if idx in indices_for_this_tagName]
-                eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(this_tagName_preds, this_tagName_golds)
+                if partial_evaluate:
+                    eval_result = uniNER_official_eval_script.NEREvaluator().partial_evaluate(this_tagName_preds, this_tagName_golds)
+                else:
+                    eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(this_tagName_preds, this_tagName_golds)
                 # eval json dumps to list before counting support
-                support = sum(len(eval(sublist)) for sublist in this_tagName_golds)
+                # CANNOT count here support as the gold answers are not reduced to SET yet
+                # support = sum(len(eval(sublist)) for sublist in this_tagName_golds)
 
-                print("{} --> support: {}".format(tagName, support))
+                print("{} --> support: {}".format(tagName, eval_result['support']))
+                print("{} --> TP: {}, FN: {}, FP: {}, TN: {}".format(tagName, eval_result['TP'], eval_result['FN'], eval_result['FP'], -1))
                 precision = round(eval_result["precision"] * 100, 2)
                 recall = round(eval_result["recall"] * 100, 2)
                 f1 = round(eval_result["f1"] * 100, 2)
                 print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(tagName, precision, recall, f1))
                 print("------------------------------------------------------- ")
+                this_dataset_metrics[tagName] = {
+                    'support': eval_result['support'],
+                    'precision': precision,
+                    'recall': recall,
+                    'f1': f1
+                }
+
+            # computing MACRO scores
+            this_dataset_precisions = [this_dataset_metrics[tagName]['precision'] for tagName in this_dataset_metrics]
+            this_dataset_recalls = [this_dataset_metrics[tagName]['recall'] for tagName in this_dataset_metrics]
+            this_dataset_f1s = [this_dataset_metrics[tagName]['f1'] for tagName in this_dataset_metrics]
+            this_dataset_supports = [this_dataset_metrics[tagName]['support'] for tagName in this_dataset_metrics]
+            print(
+                "\n{} ==> MACRO-Precision: {:.2f} +- {:.2f}, MACRO-Recall: {:.2f} +- {:.2f}, MACRO-F1: {:.2f} +- {:.2f}".format(
+                    subdataset_name,
+                    np.average(this_dataset_precisions),
+                    np.std(this_dataset_precisions),
+                    np.average(this_dataset_recalls),
+                    np.std(this_dataset_recalls),
+                    np.average(this_dataset_f1s),
+                    np.std(this_dataset_f1s)))
+
+            this_dataset_supports_sum = sum(this_dataset_supports)
+            this_dataset_precisions_weighted = [this_dataset_metrics[tagName]['precision'] * (this_dataset_metrics[tagName]['support']/this_dataset_supports_sum) for tagName in this_dataset_metrics]
+            this_dataset_recalls_weighted = [this_dataset_metrics[tagName]['recall'] * (this_dataset_metrics[tagName]['support']/this_dataset_supports_sum) for tagName in this_dataset_metrics]
+            this_dataset_f1s_weighted = [this_dataset_metrics[tagName]['f1'] * (this_dataset_metrics[tagName]['support']/this_dataset_supports_sum) for tagName in this_dataset_metrics]
+            print(
+                "\n{} ==> Weighted-Precision: {:.2f}, Weighted-Recall: {:.2f}, Weighted-F1: {:.2f}".format(
+                    subdataset_name,
+                    np.sum(this_dataset_precisions_weighted),
+                    np.sum(this_dataset_recalls_weighted),
+                    np.sum(this_dataset_f1s_weighted)))
 
             preds_to_save = []
             for i, sample in enumerate(dataset_MSEQA_format):
@@ -221,11 +256,11 @@ if __name__ == '__main__':
                     'pred_answers': all_pred_answers[i]
                 })
 
-            """
-            path_to_save_predictions = './eval_predictions'
+            path_to_save_predictions = os.path.join("./predictions", model_path_or_name.split('/')[-1])
+            if not os.path.exists(path_to_save_predictions):
+                os.makedirs(path_to_save_predictions)
             with open(os.path.join(path_to_save_predictions, subdataset_name + '.json'), 'w', encoding='utf-8') as f:
                 json.dump(preds_to_save, f, ensure_ascii=False, indent=2)
-            """
             print("\n")
 
     print("\nDONE :)")

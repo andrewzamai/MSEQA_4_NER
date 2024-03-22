@@ -58,8 +58,8 @@ def loadDataset(pathToDir):
     return load_dataset("json", data_files=data_files)
 
 
-def get_dataset_statistics():
-    BUSTER_BIO = loadDataset('../../../datasets/BUSTER/FULL_KFOLDS/123_4_5')
+def get_dataset_statistics(BUSTER_BIO):
+    #BUSTER_BIO = loadDataset('../../../datasets/BUSTER/FULL_KFOLDS/123_4_5')
 
     per_split_statistics = {split: {} for split in BUSTER_BIO.keys()}
     for split in per_split_statistics:
@@ -143,6 +143,28 @@ def get_ne_categories_labels_unique(dataset_dict):
 def get_ne_categories_only(dataset_dict):
     ne_cat_lbls_unique = get_ne_categories_labels_unique(dataset_dict)
     return [lbl[2:] for lbl in ne_cat_lbls_unique if lbl[0] == 'B']
+
+
+def convert_tagName_in_natural_language_format(ne):
+    if ne == 'O':
+        return ne
+    tagFamily, tagName = ne.split(".")
+    tagName = ' '.join(tagName.lower().split("_"))
+    return tagName
+
+def get_ne_categories_only_natural_language_format(dataset_dict):
+    ne_categories = get_ne_categories_only(dataset_dict)
+    natural_language_mapping = {
+        "Advisors.GENERIC_CONSULTING_COMPANY": "generic consulting company",
+        "Advisors.LEGAL_CONSULTING_COMPANY": "legal consulting company",
+        "Generic_Info.ANNUAL_REVENUES": "annual revenues",
+        "Parties.ACQUIRED_COMPANY": "acquired company",
+        "Parties.BUYING_COMPANY": "buying company",
+        "Parties.SELLING_COMPANY": "selling company"
+    }
+
+    #return [natural_language_mapping[x] for x in ne_categories]
+    return [convert_tagName_in_natural_language_format(ne) for ne in ne_categories]
 
 
 # a list of questions for each class is stored in a 'questions.txt' file
