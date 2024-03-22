@@ -194,8 +194,8 @@ if __name__ == '__main__':
     #BUSTER_BIO_CHUNKED = data_handler_BUSTER.loadDataset('../../../datasets/BUSTER/CHUNKED_KFOLDS/123_4_5')
     print(BUSTER_BIO)
 
-    #BUSTER_BIO_statistics = data_handler_BUSTER.get_dataset_statistics(BUSTER_BIO_CHUNKED)
-    #print(BUSTER_BIO_statistics)
+    BUSTER_BIO_statistics = data_handler_BUSTER.get_dataset_statistics(BUSTER_BIO)
+    print(BUSTER_BIO_statistics)
 
     #ne_types_list = data_handler_BUSTER.get_ne_categories_only_natural_language_format(BUSTER_BIO_CHUNKED)
     ne_types_list = ['generic consulting company', 'legal consulting company', 'annual revenues', 'acquired company', 'buying company', 'selling company']
@@ -208,11 +208,12 @@ if __name__ == '__main__':
 
     #BUSTER_GNER_test_sentences = convert_test_dataset_for_GNER_inference_splitting_into_sentences(BUSTER_BIO)
 
-    BUSTER_GNER_test_sliding_window = convert_test_dataset_for_GNER_inference_sliding_window_chunking(BUSTER_BIO, window_size=150, overlap=15)
+    BUSTER_GNER_test_sliding_window = convert_test_dataset_for_GNER_inference_sliding_window_chunking(BUSTER_BIO, window_size=100, overlap=15)
 
     #BUSTER_GNER_test.to_json("./BUSTER_GNER_test.jsonl")
     #BUSTER_GNER_test_sentences.to_json("./BUSTER_GNER_test_sentences.jsonl")
-    BUSTER_GNER_test_sliding_window.to_json("./BUSTER_GNER_test_sliding_window.jsonl")
+
+    #BUSTER_GNER_test_sliding_window.to_json("./BUSTER_GNER_test_sliding_window.jsonl")
     print(BUSTER_GNER_test_sliding_window)
 
     from transformers import AutoTokenizer

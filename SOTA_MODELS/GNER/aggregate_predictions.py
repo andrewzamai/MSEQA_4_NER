@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # grouping all chunks in which a document was divided
     chunks_per_document = defaultdict(list)
-    with open('./BUSTER_GNER/BUSTER_GNER_test_sw_150_15_w_preds.jsonl', 'r') as fh:
+    with open('./BUSTER_GNER/BUSTER_GNER_test_w_preds.jsonl', 'r') as fh:
         for line in fh.readlines():
             line_data = json.loads(line)
             chunks_per_document[line_data['instance']['id']].append(line_data)

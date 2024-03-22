@@ -1383,6 +1383,10 @@ def keep_only_top_N_tagNames(datasetDict_QA, top_N_tagNames):
 
 if __name__ == "__main__":
 
+    fullPileNER_MSEQA_FalseDef = build_dataset_MSEQA_format()
+    print(fullPileNER_MSEQA_FalseDef)
+
+    """
     DATASET_NAME = '5pos_5neg_perNE_TrueZeroShot_top50NEs'
 
     # N samples per NE (N positive + N negatives)
@@ -1431,6 +1435,8 @@ if __name__ == "__main__":
     dataset_MSEQA_format_with_n_samples_per_NE_TrueDef.save_to_disk(f"../../../datasets/pileNER/{DATASET_NAME}_MSEQA_TrueDef")
 
     convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_with_n_samples_per_NE_TrueDef, with_definition=True, path_to_save_to=f"../../../datasets/pileNER/{DATASET_NAME}_GenQA_TrueDef")
+    
+    """
 
     """
     # TO add ADVERSARIAL POSITIVE EXAMPLES
