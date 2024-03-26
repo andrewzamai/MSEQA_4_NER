@@ -324,7 +324,25 @@ if __name__ == "__main__":
     #print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 5 positive + 3 negative + ADVERSARIAL examples (2 train + 1 val per NER) + NO enhanced \n")
 
     #print("Llama-2-7b-chat finetuning on pileNER - w guidelines - 5 positive + 5 negative + POS NEG ADVERSARIAL examples (1+1 train + 1+1 val per NER) + NO enhanced \n")
-    print("Llama-2-7b-chat finetuning on pileNER - FalseDef - 5 positive + 5 negative + removed NEs from CrossNER/MIT + only top 50 NEs\n")
+    # print("Llama-2-7b-chat finetuning on pileNER - FalseDef - 5 positive + 5 negative + removed NEs from CrossNER/MIT + only top 50 NEs\n")
+    print("Llama-2-7b-chat finetuning on pileNER - FalseDef - FULL pileNER dataset\n")
+
+    from MSEQA_4_NER.data_handlers import data_handler_pileNER
+    fullPileNER_MSEQA_FalseDef = data_handler_pileNER.build_dataset_MSEQA_format()
+    print("Train statistics: ")
+    dataset_statistics = data_handler_pileNER.get_statistics_for_QA_dataset(fullPileNER_MSEQA_FalseDef['train'], input_column_name='document_context', instruction_column_name='question', output_column_name='answers')
+    print(dataset_statistics)
+    print("\n\nValidation statistics: ")
+    dataset_statistics = data_handler_pileNER.get_statistics_for_QA_dataset(fullPileNER_MSEQA_FalseDef['validation'], input_column_name='document_context', instruction_column_name='question', output_column_name='answers')
+    print(dataset_statistics)
+    print("\n\nTest statistics: ")
+    dataset_statistics = data_handler_pileNER.get_statistics_for_QA_dataset(fullPileNER_MSEQA_FalseDef['test'], input_column_name='document_context', instruction_column_name='question', output_column_name='answers')
+    print(dataset_statistics)
+    # fullPileNER_MSEQA_FalseDef.save_to_disk(f"./datasets/pileNER/FULLpileNER_MSEQA_FalseDef")
+    #fullPileNER_MSEQA_TrueDef = data_handler_pileNER.build_dataset_MSEQA_format_with_guidelines("./src/MSEQA_4_NER/questions/pileNER/all_423_NE_definitions.json", fullPileNER_MSEQA_FalseDef)
+    #print(fullPileNER_MSEQA_TrueDef)
+    # dataset_MSEQA_format_with_n_samples_per_NE_TrueDef.save_to_disk(f"./datasets/pileNER/FULLpileNER_MSEQA_TrueDef")
+    data_handler_pileNER.convert_MSEQA_dataset_to_GenQA_format(fullPileNER_MSEQA_FalseDef, with_definition=False, path_to_save_to=f"./datasets/pileNER/FULLpileNER_GenQA_FalseDef")
 
     # load HuggingFace access token with permissions to LLAMA repo
     from huggingface_hub import login
@@ -332,7 +350,8 @@ if __name__ == "__main__":
     login(token=HF_ACCESS_TOKEN)
 
     #path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_enhanced.yml'
-    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_NsamplesPerNE.yml'
+    #path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_TrueDef_NsamplesPerNE.yml'
+    path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_FalseDef.yml'
 
     parser = argparse.ArgumentParser(description='''LLMs Supervised Fine-tuning Trainer''')
     parser.add_argument('--config', type=str, default=path_to_training_config, help='Config file for finetuning')

@@ -84,8 +84,8 @@ if __name__ == '__main__':
 
     to_eval_on = [
         # converting from uniNER eval datasets using function inside data_handler_pileNER
-        #{'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
-        #{'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant']},
+        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
+        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant']},
         {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER']},
         # {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     partial_evaluate = False
     print(f"\npartial_evaluate: {partial_evaluate}")
 
-    model_path_or_name = "andrewzamai/llama2_7B_5pos_5neg_perNE_TrueZeroShot_FalseDef"
+    model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_FULLpileNER"
     print(f"LLM model: {model_path_or_name}")
 
     max_new_tokens = 256

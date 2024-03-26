@@ -4,11 +4,12 @@
 base_model: meta-llama/Llama-2-7b-chat-hf
 prompt_template_name: reverse_INST
 # using dataset converted from MSEQA format to GenQA format (instruction, input, output) columns
-data_path: ./datasets/pileNER/GenQA_format_FalseDef/train.jsonl
-val_data_path: ./datasets/pileNER/GenQA_format_FalseDef/validation.jsonl
+#data_path: ./datasets/pileNER/GenQA_format_FalseDef/train.jsonl
+data_path: ./datasets/pileNER/FULLpileNER_GenQA_FalseDef/train.jsonl
+val_data_path: ./datasets/pileNER/FULLpileNER_GenQA_FalseDef/validation.jsonl
 select_train_portion: -1
 val_set_size: 5000
-output_dir: ./trained_models/llama2_4_NER_FalseDef
+output_dir: ./trained_models/llama2_4_NER_FalseDef_FULLpileNER
 #training hyperparams
 batch_size: 256
 micro_batch_size: 1

@@ -1,0 +1,128 @@
+__package__ = "SOTA_MODELS.GoLLIE"
+
+import json
+from collections import defaultdict
+from typing import Type, Any
+from datasets import Dataset
+
+from MSEQA_4_NER.data_handlers import data_handler_BUSTER
+
+
+def instantiate_class(class_name: Type, span: str) -> Any:
+    """Instantiate a BUSTER Entity class with the given span."""
+    return class_name(span)
+
+
+def getGoldSpans(documentTokens, documentLabels):
+    docMetadata = defaultdict(list)
+    i = 0
+    index = 0
+    startIndex = index
+    entity = ''  # entity being reconstructed
+    while i < len(documentLabels):
+        # if the token is labelled as part of an entity
+        if documentLabels[i] != 'O':
+            if entity == '':
+                startIndex = index
+            entity = entity + ' ' + documentTokens[i]  # this will add an initial space (to be removed)
+            # if next label is Other or the beginning of another entity
+            # or end of document, the current entity is complete
+            if (i < len(documentLabels) - 1 and documentLabels[i + 1][0] in ["O", "B"]) or (i == len(documentLabels) - 1):
+                # add to metadata
+                tagFamily, tagName = documentLabels[i].split(".")
+                # adding also if same name but will have != start-end indices
+                docMetadata[tagName].append(entity[1:])
+                # cleaning for next entity
+                entity = ''
+
+        index = index + len(documentTokens[i]) + 1
+        i += 1
+
+    # tagName mapping to class names
+    tagName_to_class_mapping = {
+        "BUYING_COMPANY": BuyingCompany,
+        "ACQUIRED_COMPANY": AcquiredCompany,
+        "SELLING_COMPANY": SellingCompany,
+        "GENERIC_CONSULTING_COMPANY": GenericConsultingCompany,
+        "LEGAL_CONSULTING_COMPANY": LegalConsultingCompany,
+        "ANNUAL_REVENUES": AnnualRevenues
+    }
+
+    gold_spans = []
+    for tagName, this_tagName_spans in docMetadata.items():
+        class_name = tagName_to_class_mapping[tagName]
+        for span in this_tagName_spans:
+            gold_spans.append(instantiate_class(class_name, span))
+
+    return gold_spans
+
+def convert_BUSTER_sample_for_GoLLIE(BUSTER_BIO_sample, prompt_template, guidelines):
+    document_input = ' '.join(BUSTER_BIO_sample['tokens'])
+
+    goldSpans = getGoldSpans(BUSTER_BIO_sample['tokens'], BUSTER_BIO_sample['labels'])
+
+    sample_prompt = prompt_template.render(guidelines=guidelines, text=document_input, annotations=goldSpans)
+
+    black_mode = black.Mode()
+    sample_prompt_black_formatted = black.format_str(sample_prompt, mode=black_mode)
+
+    prompt_only, _ = sample_prompt_black_formatted.split("result =")
+    prompt_only = prompt_only + "result ="
+
+    return {
+            'guidelines_input_results': sample_prompt_black_formatted,
+            'prompt_only': prompt_only,
+            'goldSpans': str(goldSpans),
+            'prediction': ""
+        }
+
+def convert_BUSTER_test_dataset_for_GoLLIE(BUSTER_BIO, prompt_template, guidelines):
+    BUSTER_test_GoLLIE = []
+    for BUSTER_BIO_sample in BUSTER_BIO['test']:
+        sample_GoLLIE = convert_BUSTER_sample_for_GoLLIE(BUSTER_BIO_sample, prompt_template, guidelines)
+        BUSTER_test_GoLLIE.append(sample_GoLLIE)
+    return Dataset.from_list(BUSTER_test_GoLLIE)
+
+
+if __name__ == '__main__':
+
+    import inspect
+    import black
+    from jinja2 import Template
+    from BUSTER_guidelines_GoLLIE import *
+
+    BUSTER_guidelines = [inspect.getsource(definition) for definition in ENTITY_DEFINITIONS]
+    print(BUSTER_guidelines)
+
+    with open("../../GoLLIE/templates/prompt.txt", "rt") as f:
+        gollie_prompt_template = Template(f.read())
+
+    BUSTER_BIO = data_handler_BUSTER.loadDataset('../../../datasets/BUSTER/FULL_KFOLDS/123_4_5')
+    BUSTER_sample_GoLLIE = convert_BUSTER_sample_for_GoLLIE(BUSTER_BIO['test'][1], prompt_template=gollie_prompt_template, guidelines=BUSTER_guidelines)
+    print(BUSTER_sample_GoLLIE)
+
+    BUSTER_test_GoLLIE = convert_BUSTER_test_dataset_for_GoLLIE(BUSTER_BIO, prompt_template=gollie_prompt_template, guidelines=BUSTER_guidelines)
+    print(BUSTER_test_GoLLIE)
+    print(BUSTER_test_GoLLIE[0])
+
+    BUSTER_test_GoLLIE.to_json('./BUSTER_test_GoLLIE.jsonl')
+
+    """
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained("HiTZ/GoLLIE-7B")
+
+    tokenized_input = tokenizer.encode(formated_text)
+    print(tokenized_input)
+    print(len(tokenized_input))
+    """
+
+    """
+    BUSTER_BIO = data_handler_BUSTER.loadDataset('../../../datasets/BUSTER/FULL_KFOLDS/123_4_5')
+    average = 0
+    for i, sample in enumerate(BUSTER_BIO['test']):
+        input = ' '.join(sample['tokens'])
+        tokenized_input = tokenizer.encode(input)
+        print(len(tokenized_input))
+        average += len(tokenized_input)
+    print(average/754)
+    """
