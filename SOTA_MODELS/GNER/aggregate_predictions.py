@@ -1,6 +1,7 @@
 from datasets import Dataset, load_dataset
 from transformers import AutoTokenizer
 from collections import defaultdict
+import numpy as np
 import json
 
 from GNER import evaluate as GNER_evaluate
@@ -41,7 +42,7 @@ if __name__ == '__main__':
 
     # grouping all chunks in which a document was divided
     chunks_per_document = defaultdict(list)
-    with open('./BUSTER_GNER/BUSTER_GNER_test_w_preds.jsonl', 'r') as fh:
+    with open('./BUSTER_GNER/BUSTER_GNER_test_sw_100_15_w_preds.jsonl', 'r') as fh:
         for line in fh.readlines():
             line_data = json.loads(line)
             chunks_per_document[line_data['instance']['id']].append(line_data)
@@ -93,19 +94,25 @@ if __name__ == '__main__':
     f1 = round(f1 * 100, 2)
     print("\n{} ==> micro-Precision: {:.2f}, micro-Recall: {:.2f}, micro-F1: {:.2f}".format("BUSTER", precision, recall, f1))
 
+    macro_precision = []
+    macro_recall = []
+    macro_f1 = []
     for ne, ne_scores in scores_per_NE.items():
         prec = ne_scores['n_correct'] / (ne_scores['n_pos_pred'] + 1e-10)
         recall = ne_scores['n_correct'] / (ne_scores['n_pos_gold'] + 1e-10)
         f1 = 2 * prec * recall / (prec + recall + 1e-10)
 
         precision = round(prec * 100, 2)
+        macro_precision.append(precision)
         recall = round(recall * 100, 2)
+        macro_recall.append(recall)
         f1 = round(f1 * 100, 2)
+        macro_f1.append(f1)
         print("{} --> support: {}".format(ne, ne_scores['n_pos_gold']))
         print("{} --> TP: {}, FN: {}, FP: {}, TN: {}".format(ne, ne_scores['n_correct'], ne_scores['n_pos_gold'] - ne_scores['n_correct'], ne_scores['n_pos_pred'] - ne_scores['n_correct'], -1))
         print("{} --> Precision: {:.2f}, Recall: {:.2f}, F1: {:.2f}".format(ne, precision, recall, f1))
         print("------------------------------------------------------- ")
-
+    print("\n{} ==> Macro-Precision: {:.2f}, Macro-Recall: {:.2f}, Macro-F1: {:.2f}".format("BUSTER", np.average(macro_precision), np.average(macro_recall), np.average(macro_f1)))
 
 
 

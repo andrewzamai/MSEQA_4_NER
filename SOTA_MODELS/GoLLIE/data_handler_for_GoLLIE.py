@@ -105,7 +105,7 @@ if __name__ == '__main__':
     print(BUSTER_test_GoLLIE)
     print(BUSTER_test_GoLLIE[0])
 
-    BUSTER_test_GoLLIE.to_json('./BUSTER_test_GoLLIE.jsonl')
+    # BUSTER_test_GoLLIE.to_json('./BUSTER_test_GoLLIE.jsonl')
 
     """
     from transformers import AutoTokenizer
@@ -116,13 +116,14 @@ if __name__ == '__main__':
     print(len(tokenized_input))
     """
 
-    """
-    BUSTER_BIO = data_handler_BUSTER.loadDataset('../../../datasets/BUSTER/FULL_KFOLDS/123_4_5')
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained("HiTZ/GoLLIE-7B")
     average = 0
-    for i, sample in enumerate(BUSTER_BIO['test']):
-        input = ' '.join(sample['tokens'])
-        tokenized_input = tokenizer.encode(input)
-        print(len(tokenized_input))
+    for i, sample in enumerate(BUSTER_test_GoLLIE):
+        tokenized_input = tokenizer.encode(sample['prompt_only'])
+        # print(len(tokenized_input))
+        if len(tokenized_input) > 3000:
+            print(len(tokenized_input))
         average += len(tokenized_input)
     print(average/754)
-    """
+

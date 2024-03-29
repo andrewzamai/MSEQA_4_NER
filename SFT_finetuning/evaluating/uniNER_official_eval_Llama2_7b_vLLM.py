@@ -8,6 +8,8 @@ Evaluating pileNER-finetuned Llama-2-7B for zero-shot NER on CrossNER/MIT/BUSTER
 UniNER's authors provide the crossNER/MIT test datasets already converted to QA format
 ./datasets/eval_data_UniNER/CrossNER_ai.json
 
+Importantly these provided datasets exclude MISCELLANEOUS class
+
 We use convert_official_uniNER_eval_dataset_for_GenQA for:
  - replacing question with definition if with_definition=True
  - format to input expected by SFT_finetuning preprocess and tokenizer function
@@ -15,25 +17,24 @@ We use convert_official_uniNER_eval_dataset_for_GenQA for:
 
 __package__ = "SFT_finetuning.evaluating"
 
-import re
-from collections import defaultdict
-
-import numpy as np
 # use vllm_pip_container.sif
 # noinspection PyUnresolvedReferences
 from vllm import LLM, SamplingParams
 
 from datasets import Dataset, DatasetDict, load_dataset
+from collections import defaultdict
+import numpy as np
+import argparse
 import json
 import sys
 import os
+import re
 
 # copy of uniNER official eval script from their github
 import uniNER_official_eval_script
 
 # my libraries
 from MSEQA_4_NER.data_handlers import data_handler_pileNER, data_handler_BUSTER
-
 from ..commons.initialization import get_HF_access_token
 from ..commons.preprocessing import truncate_input
 from ..commons.prompter import Prompter
@@ -78,6 +79,15 @@ def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, d
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser(description='''Llama eval parser''')
+    # adding arguments
+    parser.add_argument('--with_guidelines', action='store_true', help='Whether to use guidelines')
+    parser.add_argument('number_NEs', type=int, help='Number of NEs')
+    parser.add_argument('number_pos_samples_per_NE', type=int, help='Number of positive samples per NE')
+    parser.add_argument('number_neg_samples_per_NE', type=int, help='Number of negative samples per NE')
+    # parsing arguments
+    args = parser.parse_args()
+
     HF_ACCESS_TOKEN = get_HF_access_token('./.env')
 
     print("CrossNER/MIT/BUSTER ZERO-SHOT NER EVALUATIONS with UniNER official eval script and datasets (w/o misc):\n")
@@ -90,13 +100,13 @@ if __name__ == '__main__':
         # {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
 
-    WITH_DEFINITION = False
+    WITH_DEFINITION = args.with_guidelines
     print(f"\nWith definition: {WITH_DEFINITION}")
 
     partial_evaluate = False
     print(f"\npartial_evaluate: {partial_evaluate}")
 
-    model_path_or_name = "./merged_models/llama2_4_NER_FalseDef_FULLpileNER"
+    model_path_or_name = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def"
     print(f"LLM model: {model_path_or_name}")
 
     max_new_tokens = 256

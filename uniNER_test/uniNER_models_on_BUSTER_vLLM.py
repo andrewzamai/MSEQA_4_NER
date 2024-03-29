@@ -16,6 +16,7 @@ We use convert_official_uniNER_eval_dataset_for_GenQA for:
 __package__ = "uniNER_test"
 
 import re
+from collections import defaultdict
 
 import torch
 # use vllm_pip_container.sif
@@ -112,8 +113,8 @@ if __name__ == '__main__':
     print(f"\nWith definition: {WITH_DEFINITION}")
 
     #model_path_or_name = "Universal-NER/UniNER-7B-type"
-    #model_path_or_name = "Universal-NER/UniNER-7B-definition"
-    model_path_or_name = "Universal-NER/UniNER-7B-all"
+    model_path_or_name = "Universal-NER/UniNER-7B-definition"
+    #model_path_or_name = "Universal-NER/UniNER-7B-all"
     print(f"LLM model: {model_path_or_name}")
 
     max_new_tokens = 256
@@ -137,7 +138,7 @@ if __name__ == '__main__':
 
             cutoff_len = 768  # 768
             if subdataset_name == 'BUSTER':
-                cutoff_len = 1528
+                cutoff_len = 768  # 1528
             print(f"cutoff_len: {cutoff_len}")
 
             dataset_GenQA_format = load_or_build_dataset_GenQA_format(data['datasets_cluster_name'], subdataset_name, data['data_handler'], WITH_DEFINITION)
@@ -165,11 +166,50 @@ if __name__ == '__main__':
                 instructions.append(instruction)
             """
 
-            batch_instruction_input_pairs = [
-                (instruction,
-                 truncate_input({"input": context, "instruction": instruction}, tokenizer, prompter, cutoff_len))
-                for context, instruction in zip(inputs, instructions)
-            ]
+            if data['datasets_cluster_name'] != 'BUSTER':
+                batch_instruction_input_pairs = [
+                    (instruction,
+                     truncate_input({"input": context, "instruction": instruction}, tokenizer, prompter, cutoff_len))
+                    for context, instruction in zip(inputs, instructions)
+                ]
+
+            else:
+                def chunk_document_w_sliding_window(document_input, window_size=300, overlap=15):
+                    """ splits a long BUSTER document in chunks of length=window_size, with an overlap b/t two consecutive windows of 'overlap' words """
+                    chunks = []
+                    start = 0
+                    end = window_size
+                    while start < len(document_input):
+                        chunk_inputs = document_input[start:end]
+                        chunks.append(chunk_inputs)
+                        start += window_size - overlap
+                        end += window_size - overlap
+                    if len(chunks[-1].split(' ')) < 20:
+                        chunks = chunks[:-1]
+                    return chunks
+
+
+                batch_instruction_input_pairs = []
+                # for each sample ID a list of indices of its chunks
+                chunks_per_sample = defaultdict(list)
+                chunk_id = 0
+                for sample in dataset_GenQA_format:
+                    document_input = sample['input']
+                    instruction = sample['instruction']
+                    chunks = chunk_document_w_sliding_window(document_input, window_size=900, overlap=15)
+                    for chunk_input in chunks:
+                        chunks_per_sample[sample['doc_question_pairID']].append(chunk_id)
+                        batch_instruction_input_pairs.append((instruction, chunk_input))
+                        chunk_id += 1
+
+                        # print(chunk_input)
+                        # print("\n\n")
+                        # sys.stdout.flush()
+                    # print("\n\n------------------------------------------\n\n")
+
+                sys.stdout.flush()
+
+                print(f"Number of samples num_NE x n_chunks: {len(batch_instruction_input_pairs)}")
 
             prompts = [prompter.generate_prompt(instruction, input) for instruction, input in batch_instruction_input_pairs]
             print(prompts[0])
@@ -184,6 +224,26 @@ if __name__ == '__main__':
                 responses_corret_order.append(response_set[prompt])
             responses = responses_corret_order
             all_pred_answers = [output.outputs[0].text.strip() for output in responses]
+
+            if data['datasets_cluster_name'] == 'BUSTER':
+                # aggregate predictions from chunks to document level
+                all_pred_answers_aggregated = []
+                # for sample_ID, chunks_indices in chunks_per_sample.items():
+                for sample in dataset_GenQA_format:
+                    sampleID = sample['doc_question_pairID']
+                    chunks_indices = chunks_per_sample[sampleID]
+                    document_level_preds = set()
+                    for idx in chunks_indices:
+                        this_chunk_preds = all_pred_answers[idx]
+                        try:
+                            this_chunk_preds = json.loads(this_chunk_preds)
+                        except:
+                            this_chunk_preds = []
+                        for pred in this_chunk_preds:
+                            document_level_preds.add(pred)
+                    document_level_preds = json.dumps(list(document_level_preds))
+                    all_pred_answers_aggregated.append(document_level_preds)
+                all_pred_answers = all_pred_answers_aggregated
 
             print("\ngold_answers")
             print(all_gold_answers[0:10])
@@ -201,7 +261,8 @@ if __name__ == '__main__':
                 this_tagName_preds = [pred_ans for idx, pred_ans in enumerate(all_pred_answers) if idx in indices_for_this_tagName]
                 eval_result = uniNER_official_eval_script.NEREvaluator().evaluate(this_tagName_preds, this_tagName_golds)
                 # eval json dumps to list before counting support
-                support = sum(len(eval(sublist)) for sublist in this_tagName_golds)
+                #support = sum(len(eval(sublist)) for sublist in this_tagName_golds)
+                support = eval_result['support']
 
                 print("{} --> support: {}".format(tagName, support))
                 precision = round(eval_result["precision"] * 100, 2)

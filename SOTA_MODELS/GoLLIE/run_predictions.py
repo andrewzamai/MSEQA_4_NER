@@ -5,6 +5,8 @@ Using VLLM for faster inference.
 
 __package__ = "SOTA_MODELS.GoLLIE"
 
+import sys
+
 # noinspection PyUnresolvedReferences
 from vllm import LLM, SamplingParams
 from datasets import Dataset, load_dataset
@@ -37,12 +39,14 @@ if __name__ == '__main__':
     BUSTER_test_GoLLIE = load_dataset(path='json', data_files='./datasets/others/BUSTER_test_GoLLIE.jsonl')['train']
     print(BUSTER_test_GoLLIE)
 
-    vllm_model = LLM(model="HiTZ/GoLLIE-7B", download_dir='./hf_cache_dir')
+    vllm_model = LLM(model="HiTZ/GoLLIE-7B", download_dir='./hf_cache_dir', max_model_len=4000)
 
-    max_new_tokens = 256
+    max_new_tokens = 456
     sampling_params = SamplingParams(temperature=0, max_tokens=max_new_tokens, stop=['</s>'])
 
     prompts = BUSTER_test_GoLLIE['prompt_only']
+    print(prompts[0])
+    sys.stdout.flush()
     # prompts = prompts[1:10]
     BUSTER_test_GoLLIE = BUSTER_test_GoLLIE.to_list()
     responses = vllm_model.generate(prompts, sampling_params)
@@ -54,4 +58,4 @@ if __name__ == '__main__':
 
     BUSTER_test_GoLLIE = Dataset.from_list(BUSTER_test_GoLLIE)
 
-    BUSTER_test_GoLLIE.to_json('./predictions/BUSTER_test_GoLLIE_w_preds.jsonl')
+    BUSTER_test_GoLLIE.to_json('./predictions/BUSTER_test_GoLLIE_w_preds_maxlength4000_maxout456.jsonl')

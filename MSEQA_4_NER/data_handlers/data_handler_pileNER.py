@@ -176,7 +176,10 @@ def get_statistics_for_QA_dataset(dataset_QA, input_column_name, instruction_col
                 raise Exception("Unexpected keys, expected 'text'")
         # GenQA case is a dumped JSON list
         elif isinstance(output, str):
-            answers_text = json.loads(output)
+            try:
+                answers_text = json.loads(output)
+            except:
+                answers_text = []
 
         n_total_samples += 1
         if not answers_text:
@@ -255,8 +258,9 @@ def build_dataset_MSEQA_format():
 def remove_bad_ne_types(dataset_MSEQA_format):
     # get same NE types list for which we have GPT guidelines
     ne_types_list = get_ne_types_list(dataset_MSEQA_format, 100)
-    print(len(ne_types_list))
-    print(ne_types_list)
+    # print(len(ne_types_list))
+    # print(ne_types_list)
+
     # if the pileNER dataset is built by retaining only those NE which number of occurrences is > 100
     # the total number of NEs now should be 455
     # by plotting the dendrogram of the word embeddings using plot_word_emb.ipynb
@@ -1223,7 +1227,8 @@ def build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_N
     if removeTestDatasetsNEs:
         dataset_MSEQA_format = remove_MIT_CrossNER_NEs_from_train(dataset_MSEQA_format)
 
-    if keep_only_top_tagNames > -1:
+    # if keep_only_top_tagNames==391 we consider it already filtered topNEs=391
+    if keep_only_top_tagNames > -1 and keep_only_top_tagNames != 391:
         dataset_MSEQA_format = keep_only_top_N_tagNames(dataset_MSEQA_format, keep_only_top_tagNames)
 
     n_samples_per_NE_MSEQA_dataset = {split: [] for split in dataset_MSEQA_format.keys()}
@@ -1359,6 +1364,7 @@ def remove_MIT_CrossNER_NEs_from_train(datasetDict_QA):
     tagName_to_remove_list = list(set(tagName_to_remove_list))
 
     datasetDict_QA['train'] = datasetDict_QA['train'].filter(lambda sample: sample['tagName'] not in tagName_to_remove_list)
+    datasetDict_QA['validation'] = datasetDict_QA['validation'].filter(lambda sample: sample['tagName'] not in tagName_to_remove_list)
 
     return datasetDict_QA
 
@@ -1383,8 +1389,19 @@ def keep_only_top_N_tagNames(datasetDict_QA, top_N_tagNames):
 
 if __name__ == "__main__":
 
-    fullPileNER_MSEQA_FalseDef = build_dataset_MSEQA_format()
-    print(fullPileNER_MSEQA_FalseDef)
+    #fullPileNER_MSEQA_FalseDef = build_dataset_MSEQA_format()
+    #print(fullPileNER_MSEQA_FalseDef)
+
+    dataset_MSEQA_format_with_n_samples_per_NE_FalseDef = build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE=20, n_neg_samples_per_NE=20, removeTestDatasetsNEs=True, keep_only_top_tagNames=391)
+    print("\nMSEQA FalseDef train tagName list:")
+    ne_list = {}
+    for sample in dataset_MSEQA_format_with_n_samples_per_NE_FalseDef['train']:
+        ne_type = sample['tagName']
+        if ne_type in ne_list:
+            ne_list[ne_type] += 1
+        else:
+            ne_list[ne_type] = 1
+    print(sorted(ne_list.items(), key=lambda x: x[1], reverse=True))
 
     """
     DATASET_NAME = '5pos_5neg_perNE_TrueZeroShot_top50NEs'
@@ -1479,7 +1496,7 @@ if __name__ == "__main__":
     pileNER_MSEQA_TrueDef_enhanced_split.to_json(os.path.join("../../../datasets/pileNER_MSEQA_TrueDef_enhanced", 'validation' + '.jsonl'))
     """
 
-    print("\n\n\n")
+    #print("\n\n\n")
     """
     pileNER_train_GenQA_TrueDef = load_dataset("../../../datasets/pileNER_GenQA_format_TrueDef")['validation']
     print(pileNER_train_GenQA_TrueDef)
@@ -1758,6 +1775,7 @@ if __name__ == "__main__":
         json.dump(sentences_per_ne_type, f, indent=2)
     """
 
+    """
     with open("./questions/pileNER/sentences_per_ne_type.json", 'r') as file:
         sentences_per_ne_type = json.load(file)
 
@@ -1770,6 +1788,7 @@ if __name__ == "__main__":
     print(prompt)
 
     print("\n")
+    """
 
     """
     dataset_MSEQA_format = build_dataset_MSEQA_format()
@@ -1804,7 +1823,7 @@ if __name__ == "__main__":
 
     print(dataset_MSEQA_format_with_guidelines)
     """
-    print("\n")
+    #print("\n")
 
     """
     for sample in dataset_MSEQA_format_with_guidelines['train']:

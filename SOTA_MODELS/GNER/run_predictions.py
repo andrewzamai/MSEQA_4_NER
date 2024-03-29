@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # using sliding window of 150: instruction itself is 173 tokens ca.
     # with 150 words per chunk we get approximately 412 input tokens
     # in output we expect (412-173)*2 = 478 new tokens which is < max_new_tokens=640
-    BUSTER_GNER_test = data_handler_for_GNER.convert_test_dataset_for_GNER_inference_sliding_window_chunking(BUSTER_BIO, 100, 15)
+    BUSTER_GNER_test = data_handler_for_GNER.convert_test_dataset_for_GNER_inference_sliding_window_chunking(BUSTER_BIO, 60, 15)
 
     BUSTER_GNER_test = BUSTER_GNER_test.to_list()
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     BUSTER_GNER_test = Dataset.from_list(BUSTER_GNER_test)
 
-    BUSTER_GNER_test.to_json('./predictions/BUSTER_GNER_test_sw_100_15_w_preds.jsonl')
+    BUSTER_GNER_test.to_json('./predictions/BUSTER_GNER_test_sw_60_15_w_preds.jsonl')
 
     """
     from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSeq2SeqLM
