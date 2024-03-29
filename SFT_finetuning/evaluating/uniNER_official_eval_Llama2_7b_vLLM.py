@@ -17,6 +17,8 @@ We use convert_official_uniNER_eval_dataset_for_GenQA for:
 
 __package__ = "SFT_finetuning.evaluating"
 
+import shutil
+
 # use vllm_pip_container.sif
 # noinspection PyUnresolvedReferences
 from vllm import LLM, SamplingParams
@@ -339,4 +341,12 @@ if __name__ == '__main__':
             print("\n")
 
     print("\nDONE :)")
+
+    #TODO: DELETING MODEL!
+    print("Assuming model is on HF, deleting model!!!")
+    if 'andrewzamai' in model_path_or_name:
+        model_path_or_name = os.path.join('./hf_cache_dir', 'models--andrewzamai--' + model_path_or_name.split("/")[-1])
+
+    shutil.rmtree(model_path_or_name)
+
     sys.stdout.flush()
