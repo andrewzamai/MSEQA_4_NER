@@ -67,12 +67,14 @@ if __name__ == "__main__":
     parser.add_argument('number_neg_samples_per_NE', type=int, help='Number of negative samples per NE')
     # parsing arguments
     args = parser.parse_args()
-    path_to_lora = f"./trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
-    save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
+    path_to_lora = f"./trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-C"
+    save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-C"
 
     merge_main(base_model, path_to_lora, save_model_at)
 
     """ PUSH TO HF HUB """
+
+    """
     from huggingface_hub import create_repo, upload_folder
     from SFT_finetuning.commons.initialization import get_HF_access_token
 
@@ -88,6 +90,7 @@ if __name__ == "__main__":
 
     print(url_new_repo_name)
 
+    
     uploaded_folder_results = upload_folder(
         folder_path=save_model_at,
         repo_id=new_repo_name,
@@ -98,3 +101,4 @@ if __name__ == "__main__":
     print(uploaded_folder_results)
 
     print("Merged and pushed to HF hub :)\n\n")
+    """

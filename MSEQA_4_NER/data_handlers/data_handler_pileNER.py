@@ -239,7 +239,7 @@ def build_dataset_MSEQA_format():
     test_fold = val_test_fold[math.floor(len(val_test_fold) / 2.0):]
 
     # shuffling here after partitioning in fold so that same context is not both in train and val/test
-    random.seed(42)
+    random.seed(42) #42
     random.shuffle(train_fold)
     random.shuffle(val_fold)
     random.shuffle(test_fold)
@@ -522,8 +522,8 @@ def build_dataset_MSEQA_format_with_guidelines(path_to_NE_guidelines_json, datas
     # dataset_MSEQA_format.save_to_disk("../../../datasets/pileNER_dataset_MSEQA_format")
     # dataset_MSEQA_format = DatasetDict.load_from_disk("../../../datasets/pileNER_dataset_MSEQA_format"
     ne_types_list = get_ne_types_list(dataset_MSEQA_format, min_num_samples_per_ne_type)
-    print(len(ne_types_list))
-    print(ne_types_list)
+    #print(len(ne_types_list))
+    #print(ne_types_list)
 
     # if the pileNER dataset is built by retaining only those NE which number of occurrences is > 100
     # the total number of NEs now should be 455
@@ -911,6 +911,52 @@ def convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition=
 
         dataset_GenQA.to_json(os.path.join(path_to_save_to, split_name + '.jsonl'))
 
+def convert_MSEQA_dataset_to_GenQA_format_SI(dataset_MSEQA_format, with_definition=True, path_to_save_to='./unk_dataset_GenQA'):
+
+    for split_name in dataset_MSEQA_format.keys():
+        dataset_GenQA = []
+        for MSEQA_sample in dataset_MSEQA_format[split_name]:
+            genQA_sample = {
+                "doc_question_pairID": MSEQA_sample['doc_question_pairID'],
+                "tagName": MSEQA_sample['tagName'],
+                # new column names as finetune_sft.py requires
+                "input": MSEQA_sample['document_context'],
+                "instruction": "",
+                "output": ""
+            }
+            if with_definition:
+                instruction = MSEQA_sample['question']
+                instruction = instruction.replace("from an input TEXT", "from the text chunk you have read")
+                instruction = instruction.replace("Your task is to extract", "Extract")
+                # instruction = instruction.replace("\nTEXT: ", "\nReturn a JSON list.")
+                instruction = instruction.replace("\nTEXT: ", f"\nReturn a JSON list of instances of this Named Entity type. Return an empty list if no instances are present.")
+                genQA_sample['instruction'] = instruction
+            else:
+                # TODO: rephrase question What describes X in the text?
+                instruction_wo_guidelines = f"Extract the Named Entities of type {MSEQA_sample['tagName'].upper()} from the text chunk you have read."
+                instruction_wo_guidelines += "\nReturn a JSON list of instances of this Named Entity type. Return an empty list if no instances are present."
+                #genQA_sample['instruction'] = MSEQA_sample['question']
+                genQA_sample['instruction'] = instruction_wo_guidelines
+
+            # sorting the text answers by ascending starting positions to give the LLM a pattern: extract the occurences in the order they appear in the passage of text
+            # this is because although the evaluation metrics are order independent the NTP loss penalizes order
+            # we also delete duplicate occurrences thus obtaining a SET of gold_answers
+            gold_answers_with_char_starts = MSEQA_sample['answers']
+            # sort text answers by ascending start positions
+            sorted_start_answers = sorted(zip(gold_answers_with_char_starts['answer_start'], gold_answers_with_char_starts['text']), key=lambda x: x[0])
+            # retrieve only text answers
+            sorted_answers_text_only = [item[1] for item in sorted_start_answers]
+            # deleting any duplicate while preserving order (order within document context)
+            sorted_textonly_gold_answers_wo_duplicates = list(OrderedDict.fromkeys(sorted_answers_text_only).keys())
+            #genQA_sample["output"] = str(sorted_textonly_gold_answers_wo_duplicates)  # stringifying list
+            genQA_sample["output"] = json.dumps(sorted_textonly_gold_answers_wo_duplicates)  # stringifying list
+
+            dataset_GenQA.append(genQA_sample)
+
+        dataset_GenQA = Dataset.from_list(dataset_GenQA)
+
+        dataset_GenQA.to_json(os.path.join(path_to_save_to, split_name + '.jsonl'))
+
 
 def convert_official_uniNER_eval_dataset_for_GenQA(dataset_name, path_to_dataset, with_definition=False, path_to_NE_guidelines_json=None):
     """
@@ -1227,6 +1273,21 @@ def build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_N
     if removeTestDatasetsNEs:
         dataset_MSEQA_format = remove_MIT_CrossNER_NEs_from_train(dataset_MSEQA_format)
 
+    """
+    number_samples_per_ne_type = {}
+    for sample in dataset_MSEQA_format['train']:
+        ne_type = sample['tagName']
+        if ne_type in number_samples_per_ne_type:
+            number_samples_per_ne_type[ne_type] += 1
+        else:
+            number_samples_per_ne_type[ne_type] = 1
+    number_samples_per_ne_type = sorted(number_samples_per_ne_type.items(), key=lambda x: x[1], reverse=True)
+    number_samples_per_ne_type_only_names = [x[0] for x in number_samples_per_ne_type]
+    with open("../../../datasets/pileNER/top_391_NamedEntities.json", 'w') as f:
+        json.dump(number_samples_per_ne_type_only_names, f, indent=2)
+    print("DONE")
+    """
+
     # if keep_only_top_tagNames==391 we consider it already filtered topNEs=391
     if keep_only_top_tagNames > -1 and keep_only_top_tagNames != 391:
         dataset_MSEQA_format = keep_only_top_N_tagNames(dataset_MSEQA_format, keep_only_top_tagNames)
@@ -1385,6 +1446,131 @@ def keep_only_top_N_tagNames(datasetDict_QA, top_N_tagNames):
     datasetDict_QA['validation'] = datasetDict_QA['validation'].filter(lambda sample: sample['tagName'] in valid_tagNames_list)
 
     return datasetDict_QA
+
+
+def convert_official_uniNER_eval_dataset_for_GenQA_same_instruction(dataset_name, path_to_dataset, with_definition=False, path_to_NE_guidelines_json=None):
+    """
+    Adapting UniNER eval datasets mit/crossNER for eval with Generative LLMs.
+    Changing document_context column name to 'input' and answers to 'output'.
+    Adding NE Guidelines as 'instruction'
+    """
+
+    with open(path_to_dataset, 'r') as fh:
+        uniNER_eval_samples = json.load(fh)
+
+    # we load guidelines also if with_def False to make NE mapping to canonical names (uniNER eval NEs are different)
+    with open(path_to_NE_guidelines_json, 'r') as file:
+        all_NEs_guidelines = json.load(file)
+
+    # converting list to dict for fast access
+    if all_NEs_guidelines and isinstance(all_NEs_guidelines, list):
+        all_NEs_guidelines = {x['named_entity']: x for x in all_NEs_guidelines}
+
+    dataset_GenQA = []  # dataset being constructed
+    for uniNER_sample in uniNER_eval_samples:
+
+        context, questions_answers_list = extract_context_quests_answers(uniNER_sample['conversations']).values()
+
+        if len(questions_answers_list) > 1:
+            raise ValueError("Expected only 1 question")
+
+        question, ne_type, answers = questions_answers_list[0].values()
+
+        # some uniNER NEs are different from the original NEs
+        try:
+            gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            # NE name in natural languange form, e.g. ORG --> organization
+            real_name_ne = all_NEs_guidelines[ne_type]['real_name']
+        except KeyError:
+            if dataset_name in ['ai', 'literature', 'science', 'politics', 'music']:
+                ne_mapping = {
+                    'organization': 'organisation',
+                    'program language': 'programlang',
+                    'literary genre': 'literarygenre',
+                    'astronomical object': 'astronomicalobject',
+                    'chemical element': 'chemicalelement',
+                    'chemical compound': 'chemicalcompound',
+                    'academic journal': 'academicjournal',
+                    'political party': 'politicalparty',
+                    'musical artist': 'musicalartist',
+                    'musical instrument': 'musicalinstrument',
+                    'music genre': 'musicgenre',
+                }
+            elif dataset_name == 'movie':
+                ne_mapping = {
+                    'character': 'CHARACTER',
+                    'plot': 'PLOT',
+                    'year': 'YEAR',
+                    'director': 'DIRECTOR',
+                    'rating': 'RATING',
+                    'average ratings': 'RATINGS_AVERAGE',
+                    'actor': 'ACTOR',
+                    'genre': 'GENRE',
+                    'song': 'SONG',
+                    'trailer': 'TRAILER',
+                    'review': 'REVIEW',
+                    'title': 'TITLE'
+                }
+            elif dataset_name == 'restaurant':
+                ne_mapping = {
+                    'amenity': 'Amenity',
+                    'location': 'Location',
+                    'cuisine': 'Cuisine',
+                    'restaurant name': 'Restaurant_Name',
+                    'rating': 'Rating',
+                    'hours': 'Hours',
+                    'price': 'Price',
+                    'dish': 'Dish'
+                }
+            ne_type = ne_mapping[ne_type]
+            gpt_definition = all_NEs_guidelines[ne_type]['gpt_answer'].strip()
+            real_name_ne = all_NEs_guidelines[ne_type]['real_name']
+
+
+        # gpt answer may have been truncated, ensure it ends by "} before evaluating to dict
+        if not gpt_definition.endswith("}"):
+            if not gpt_definition.endswith("\""):
+                gpt_definition += "\""
+            gpt_definition += "}"
+
+        this_ne_guidelines = eval(gpt_definition)
+        # replacing ne types occurrences between single quotes to their UPPERCASE
+        ne_type_in_natural_language = all_NEs_guidelines[ne_type]['real_name']
+        pattern = re.compile(rf'\'{re.escape(ne_type_in_natural_language)}\'')
+        this_ne_guidelines = {k: pattern.sub(f'{ne_type_in_natural_language.upper()}', v) for k, v in this_ne_guidelines.items()}
+
+        if with_definition:
+            question = f"Your task is to extract the Named Entities of type {ne_type_in_natural_language.upper()} from an input TEXT. "
+            question += "You are given a DEFINITION and some GUIDELINES.\n"
+            question += "DEFINITION: " + this_ne_guidelines['Definition'] + "\nGUIDELINES: " + this_ne_guidelines['Guidelines'] + "\n"
+            question += f"TEXT: "
+
+            # adapting to reverse_INST template Prompter
+            question = question.replace("from an input TEXT", "from the text chunk you have read")
+            question = question.replace("Your task is to extract", "Extract")
+            #question = question.replace("\nTEXT: ", "\nReturn a JSON list.")
+            #question = question.replace("\nTEXT: ", "\nReturn a JSON list of strings for each occurrence you identify. Do not provide any further explanation.")
+            #question = question.replace("\nTEXT: ", f"\nReturn a JSON list containing the occurrences you identify e.g. [\"{ne_type_in_natural_language.upper()}-1\", \"{ne_type_in_natural_language.upper()}-2\"]. Do not provide any further explanation or introduction to the answer.")
+            #question = question.replace("\nTEXT: ", f"\nReturn a list containing the occurrences you identify e.g. [\"{ne_type_in_natural_language.upper()}-1\", \"{ne_type_in_natural_language.upper()}-2\"]. Return an empty list if no occurrences for this Named Entity type are present. Do not provide any further explanation or introduction to the answer.")
+            question = question.replace("\nTEXT: ", "\nReturn a JSON list of instances of this Named Entity type. Return an empty list if no instances are present.")
+
+        else:
+            #question = f"Extract the Named Entities of type {ne_type_in_natural_language.upper()} from the text chunk you have read.\nReturn a JSON list."
+            #question = f"Extract the Named Entities of type {ne_type_in_natural_language.upper()} from the text chunk you have read.\nReturn a JSON list of strings for each occurrence you identify. Do not provide any further explanation."
+            #question = f"Extract the Named Entities of type {ne_type_in_natural_language.upper()} from the text chunk you have read.\n\nReturn a JSON list containing the occurrences you identify e.g. [\"{ne_type_in_natural_language.upper()}-1\", \"{ne_type_in_natural_language.upper()}-2\"]. Do not provide any further explanation or introduction to the answer."
+            #question = f"Extract the Named Entities of type {ne_type_in_natural_language.upper()} from the text chunk you have read.\nReturn a list containing the occurrences you identify e.g. [\"{ne_type_in_natural_language.upper()}-1\", \"{ne_type_in_natural_language.upper()}-2\"]. Return an empty list if no occurrences for this Named Entity type are present. Do not provide any further explanation or introduction to the answer."
+            question = f"Extract the Named Entities of type {ne_type_in_natural_language.upper()} from the text chunk you have read.\nReturn a JSON list of instances of this Named Entity type. Return an empty list if no instances are present."
+
+        genQA_sample = {
+            "doc_question_pairID": uniNER_sample['id'],
+            "input": context,
+            "tagName": ne_type,  # real_name_ne if want to mask in evaluation given tagName
+            "instruction": question,
+            "output": uniNER_sample['conversations'][-1]['value']
+        }
+        dataset_GenQA.append(genQA_sample)
+
+    return Dataset.from_list(dataset_GenQA)
 
 
 if __name__ == "__main__":

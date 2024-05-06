@@ -64,6 +64,13 @@ if __name__ == '__main__':
     path_to_dataset = "../../../datasets/pileNER/pileNER_GenQA_format_TrueDef/train.jsonl"
     data = load_dataset("json", data_files=path_to_dataset)
 
+    sample = data['train'][0]
+    prompt = Prompter("reverse_INST", template_path="../templates").generate_prompt(instruction=sample['instruction'],
+                                                                                    input=sample['input'],
+                                                                                    label=sample['output'])
+    #print(json.dumps(prompt))
+    print(prompt)
+    """
     from transformers import AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf", token="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")
@@ -78,6 +85,7 @@ if __name__ == '__main__':
         average_prompt_length += n_tokens
 
     print(f"\nAverage n tokens: {average_prompt_length/1000}")
+    """
 
 
 

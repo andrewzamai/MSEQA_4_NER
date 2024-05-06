@@ -66,7 +66,8 @@ def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, d
         else:
             path_to_BUSTER_MSEQA = f"./datasets/BUSTER/MSEQA_format_no_def/BUSTER"
         dataset_MSEQA_format = DatasetDict.load_from_disk(path_to_BUSTER_MSEQA)
-        return data_handler.convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format, with_definition, path_to_save_to=f"./datasets/BUSTER/GenQA_format_{with_definition}Def", only_test=True)['test']
+        # TODO: changed to same instruction
+        return data_handler.convert_MSEQA_dataset_to_GenQA_format_SI(dataset_MSEQA_format, with_definition, path_to_save_to=f"./datasets/BUSTER/GenQA_format_{with_definition}Def", only_test=True)['test']
 
     else:
         if datasets_cluster_name == 'crossNER':
@@ -76,12 +77,13 @@ def load_or_build_dataset_GenQA_format(datasets_cluster_name, subdataset_name, d
         path_to_guidelines_folder = f"./src/MSEQA_4_NER/data_handlers/questions/{datasets_cluster_name}/gpt_guidelines"
         # load definitions also if with_def False to map NEs to their canonical names
         path_to_subdataset_guidelines = os.path.join(path_to_guidelines_folder, subdataset_name + '_NE_definitions.json')
-        return data_handler.convert_official_uniNER_eval_dataset_for_GenQA(subdataset_name, path_to_eval_dataset_uniNER, with_definition, path_to_subdataset_guidelines)
+        # TODO: changed to same instruction
+        return data_handler.convert_official_uniNER_eval_dataset_for_GenQA_same_instruction(subdataset_name, path_to_eval_dataset_uniNER, with_definition, path_to_subdataset_guidelines)
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='''Llama eval parser''')
+    parser = argparse.ArgumentParser(description='''Llama eval parser same instructions''')
     # adding arguments
     parser.add_argument('--with_guidelines', action='store_true', help='Whether to use guidelines')
     parser.add_argument('number_NEs', type=int, help='Number of NEs')
@@ -108,10 +110,10 @@ if __name__ == '__main__':
     partial_evaluate = False
     print(f"\npartial_evaluate: {partial_evaluate}")
 
-    model_path_or_name = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
+    model_path_or_name = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-C"
     print(f"LLM model: {model_path_or_name}")
 
-    max_new_tokens = 256
+    max_new_tokens = 128
     print(f"max_new_tokens {max_new_tokens}")
 
     vllm_model = LLM(model=model_path_or_name, download_dir='./hf_cache_dir')

@@ -208,6 +208,8 @@ def train(
                                                                             output_column_name='output')
     print(dataset_statistics)
 
+    print(train_data['instruction'][0])
+
     # TODO: masking for enhanced training
     from MSEQA_4_NER.data_handlers.data_handler_pileNER import mask_named_entities
     # train_data = mask_named_entities(train_data, corruption_prob=0.5, masking_prob=0.8, default_mask='<unk>')
@@ -339,7 +341,7 @@ if __name__ == "__main__":
 
     # with_guidelines, number_NEs, number_pos_samples_per_NE, number_neg_samples_per_NE
     # use number_NEs=391 or -1 for using top423NEs/MIT/crossNER labels
-    parser = argparse.ArgumentParser(description='''pileNER dataset constructor for NER Instuction-Tuning''')
+    parser = argparse.ArgumentParser(description='''pileNER dataset constructor for NER Instuction-Tuning - same instructions''')
     # adding arguments
     parser.add_argument('--with_guidelines', action='store_true', help='Whether to use guidelines')
     parser.add_argument('number_NEs', type=int, help='Number of NEs')
@@ -354,19 +356,24 @@ if __name__ == "__main__":
     print("number_pos_samples_per_NE:", args.number_pos_samples_per_NE)
     print("number_neg_samples_per_NE:", args.number_neg_samples_per_NE)
 
+    # TODO: added -SI as SameInstruction
+    dataset_name = f"{args.number_NEs}x{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_GenQA_{args.with_guidelines}Def-SI"
     from MSEQA_4_NER.data_handlers import data_handler_pileNER
+
+    """
     pileNER_MSEQA_FalseDef = data_handler_pileNER.build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(args.number_pos_samples_per_NE,
                                                                                                            args.number_neg_samples_per_NE,
                                                                                                            removeTestDatasetsNEs=True if args.number_NEs < 423 else False,
                                                                                                            keep_only_top_tagNames=args.number_NEs)
     # convert from FalseDef to TrueDef if args.with_guidelines==True
-    dataset_name = f"{args.number_NEs}x{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_GenQA_{args.with_guidelines}Def"
     if args.with_guidelines:
         # adding guidelines to MSEQA format datasetDict before converting to GenQA
         pileNER_MSEQA_TrueDef = data_handler_pileNER.build_dataset_MSEQA_format_with_guidelines("./src/MSEQA_4_NER/data_handlers/questions/pileNER/all_423_NE_definitions.json", pileNER_MSEQA_FalseDef)
-        data_handler_pileNER.convert_MSEQA_dataset_to_GenQA_format(pileNER_MSEQA_TrueDef, with_definition=args.with_guidelines, path_to_save_to=f"./datasets/pileNER/{dataset_name}")
+        # TODO: same instruction for both FalseDef and TrueDef
+        data_handler_pileNER.convert_MSEQA_dataset_to_GenQA_format_SI(pileNER_MSEQA_TrueDef, with_definition=args.with_guidelines, path_to_save_to=f"./datasets/pileNER/{dataset_name}")
     else:
-        data_handler_pileNER.convert_MSEQA_dataset_to_GenQA_format(pileNER_MSEQA_FalseDef, with_definition=args.with_guidelines, path_to_save_to=f"./datasets/pileNER/{dataset_name}")
+        data_handler_pileNER.convert_MSEQA_dataset_to_GenQA_format_SI(pileNER_MSEQA_FalseDef, with_definition=args.with_guidelines, path_to_save_to=f"./datasets/pileNER/{dataset_name}")
+    """
 
     # now loading training config from yml and overriding some variables like dataset name and output_dir
     path_to_training_config = './src/SFT_finetuning/training_config/llama2_4_NER_XDef_NsamplesPerNE.yml'
@@ -374,7 +381,7 @@ if __name__ == "__main__":
         configs = yaml.safe_load(f.read())
     configs['data_path'] = f"./datasets/pileNER/{dataset_name}/train.jsonl"
     configs['val_data_path'] = f"./datasets/pileNER/{dataset_name}/validation.jsonl"
-    configs['output_dir'] = f"./trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
+    configs['output_dir'] = f"./trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-C"
 
     train(**configs)
 
