@@ -103,9 +103,9 @@ if __name__ == '__main__':
     to_eval_on = [
         # converting from uniNER eval datasets using function inside data_handler_pileNER
         {'datasets_cluster_name': 'BUSTER', 'data_handler': data_handler_BUSTER, 'subdataset_names': ['BUSTER']},
-        {'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
-        {'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant']},
-        {'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
+        #{'datasets_cluster_name': 'crossNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['ai', 'literature', 'music', 'politics', 'science']},
+        #{'datasets_cluster_name': 'MIT', 'data_handler': data_handler_pileNER, 'subdataset_names': ['movie', 'restaurant']},
+        #{'datasets_cluster_name': 'pileNER', 'data_handler': data_handler_pileNER, 'subdataset_names': ['pileNER']},
     ]
 
     # NB: all uniNER models are trained without Definition
@@ -113,7 +113,8 @@ if __name__ == '__main__':
     print(f"\nWith definition: {WITH_DEFINITION}")
 
     #model_path_or_name = "Universal-NER/UniNER-7B-type"
-    model_path_or_name = "Universal-NER/UniNER-7B-definition"
+    # model_path_or_name = "Universal-NER/UniNER-7B-definition"
+    model_path_or_name = "Universal-NER/UniNER-7B-type-sup"
     #model_path_or_name = "Universal-NER/UniNER-7B-all"
     print(f"LLM model: {model_path_or_name}")
 
@@ -153,18 +154,18 @@ if __name__ == '__main__':
             # retrieving gold answers (saved in ouput during dataset conversion from uniNER eval datatasets)
             all_gold_answers = dataset_GenQA_format['output']
 
-            instructions = dataset_GenQA_format['instruction']
+            #instructions = dataset_GenQA_format['instruction']
             inputs = dataset_GenQA_format['input']
-            """
+
             instructions = []
-            for sample in dataset_MSEQA_format:
+            for sample in dataset_GenQA_format:
                 tagName = sample['tagName']
                 if '_' in tagName:
                     tagName = tagName.lower().split('_')
                     tagName = ' '.join(tagName)
                 instruction = f"What describes {tagName} in the text?"
+                sample['instruction'] = instruction
                 instructions.append(instruction)
-            """
 
             if data['datasets_cluster_name'] != 'BUSTER':
                 batch_instruction_input_pairs = [
@@ -193,9 +194,10 @@ if __name__ == '__main__':
                 # for each sample ID a list of indices of its chunks
                 chunks_per_sample = defaultdict(list)
                 chunk_id = 0
-                for sample in dataset_GenQA_format:
+                for i, sample in enumerate(dataset_GenQA_format):
                     document_input = sample['input']
-                    instruction = sample['instruction']
+                    #instruction = sample['instruction']
+                    instruction = instructions[i]
                     chunks = chunk_document_w_sliding_window(document_input, window_size=900, overlap=15)
                     for chunk_input in chunks:
                         chunks_per_sample[sample['doc_question_pairID']].append(chunk_id)

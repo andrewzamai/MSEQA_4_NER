@@ -38,11 +38,12 @@ if __name__ == '__main__':
     """ 2) LOADING PREDICTIONS, applying Hierarchical Matching Algorithm, parsing to pred_tuples """
 
     # load tokenizer and prediction data
-    tokenizer = AutoTokenizer.from_pretrained("dyyyyyyyy/GNER-LLaMA-7B")
+    #tokenizer = AutoTokenizer.from_pretrained("dyyyyyyyy/GNER-LLaMA-7B")
+    tokenizer = AutoTokenizer.from_pretrained("dyyyyyyyy/GNER-T5-xxl")
 
     # grouping all chunks in which a document was divided
     chunks_per_document = defaultdict(list)
-    with open('./BUSTER_GNER/BUSTER_GNER_test_sw_100_15_w_preds.jsonl', 'r') as fh:
+    with open('./BUSTER_GNER/BUSTER_GNER_test_w_T5_preds_bs4.jsonl', 'r') as fh:
         for line in fh.readlines():
             line_data = json.loads(line)
             chunks_per_document[line_data['instance']['id']].append(line_data)

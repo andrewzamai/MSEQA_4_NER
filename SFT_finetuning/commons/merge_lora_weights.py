@@ -67,8 +67,10 @@ if __name__ == "__main__":
     parser.add_argument('number_neg_samples_per_NE', type=int, help='Number of negative samples per NE')
     # parsing arguments
     args = parser.parse_args()
-    path_to_lora = f"./trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
-    save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
+    #path_to_lora = f"./trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
+    #save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
+    path_to_lora = f"./llama_for_NER_trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-B"
+    save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-B"
 
     merge_main(base_model, path_to_lora, save_model_at)
 
@@ -76,17 +78,20 @@ if __name__ == "__main__":
     from huggingface_hub import create_repo, upload_folder
     from SFT_finetuning.commons.initialization import get_HF_access_token
 
-    new_repo_name = f"andrewzamai/{save_model_at.split('/')[-1]}"
+    # new_repo_name = f"andrewzamai/{save_model_at.split('/')[-1]}"
+    new_repo_name = "expertai/SLIMER"
 
+    """
     url_new_repo_name = create_repo(
         repo_id=new_repo_name,
         token=HF_ACCESS_TOKEN,
-        exist_ok=False,
+        exist_ok=False, # False
         private=True,
         repo_type='model',
     )
 
     print(url_new_repo_name)
+    """
 
     uploaded_folder_results = upload_folder(
         folder_path=save_model_at,

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 import pandas as pd
 import numpy as np
+import math
 import re
 
 
@@ -181,6 +182,91 @@ def collect_tp_fp_from_eval_outputs(path_to_file, per_dataset_metrics=False):
     return overall_df
 
 
+def collect_tp_fp_from_eval_outputs_perNE(path_to_file):
+    """
+    collects TP/FN/FP count on each Named Entity in test, for each different model configuration
+    no further computing F1 metrics
+    """
+    with open(path_to_file, 'r') as file:
+        logs = file.readlines()
+
+    # to extract model name and dataset the scores that will follow belong to
+    evaluating_pattern = re.compile(r'^Evaluating model named \'(.+?)\' on \'(.+?)\' test fold in ZERO-SHOT setting$')
+    # metrics on a single NE pattern
+    support_pattern = re.compile(r'^([\w\s.]+) --> support: (\d+)$')
+    tp_fp_fn_pattern = re.compile(r'^([\w\s.]+) --> TP: (\d+), FN: (\d+), FP: (\d+), TN: -1$')
+    metrics_pattern = re.compile(r'^([\w\s.]+) --> Precision: (\d+\.\d+), Recall: (\d+\.\d+), F1: (\d+\.\d+)$')
+
+    model_name = ""
+    dataset_name = ""
+    number_NEs = -1
+    with_definition = None
+    number_samples_per_NE = -1
+    support = -1
+    current_ne = ""
+    tp = fn = fp = this_ne_precision = this_ne_recall = this_ne_f1 = -1
+    df_list = []
+    for i, line in enumerate(logs):
+        evaluate_match = evaluating_pattern.match(line)
+        if evaluate_match:
+            model_name = evaluate_match.group(1)
+            dataset_name = evaluate_match.group(2)
+            # print(f"{model_name} on {dataset_name} scores ...")
+
+            # extracting number of distinct NEs it has been trained on
+            number_NEs_pattern = re.compile(r'top(\d+)NEs')
+            number_NEs_match = number_NEs_pattern.search(model_name)
+            number_NEs = int(number_NEs_match.group(1)) if number_NEs_match else -1
+
+            # with or w/o guidelines
+            with_definition = True if 'True' in model_name else False
+
+            # number of pos training samples per NE
+            number_samples_pattern = re.compile(r'llama2_7B_(\d+)pos_')
+            number_samples_match = number_samples_pattern.search(model_name)
+            number_samples_per_NE = int(number_samples_match.group(1)) if number_samples_match else -1
+
+        support_match = support_pattern.match(line)
+        if support_match:
+            support = int(support_match.group(2))
+        tp_fp_fn_pattern_match = tp_fp_fn_pattern.match(line.strip())
+        if tp_fp_fn_pattern_match:
+            tp = int(tp_fp_fn_pattern_match.group(2))
+            fn = int(tp_fp_fn_pattern_match.group(3))
+            fp = int(tp_fp_fn_pattern_match.group(4))
+            if (tp + fn) != support:
+                raise ValueError("TP+FN != support")
+        metrics_match = metrics_pattern.match(line)
+        if metrics_match:
+            current_ne = metrics_match.group(1)
+            if '.' in current_ne:
+                current_ne = current_ne.split('.')[-1]
+            this_ne_precision = float(metrics_match.group(2))
+            this_ne_recall = float(metrics_match.group(3))
+            this_ne_f1 = float(metrics_match.group(4))
+
+            scores = {
+                'model': model_name,
+                'dataset': dataset_name,
+                'w_def': with_definition,
+                'num_NEs': number_NEs,
+                'samples_per_NE': number_samples_per_NE,
+                'test_NE': current_ne,
+                'TP': tp,
+                'FP': fp,
+                'FN': fn,
+                'this_NE_precision': this_ne_precision,
+                'this_NE_recall': this_ne_recall,
+                'this_NE_F1': this_ne_f1
+            }
+            df = pd.DataFrame(scores, index=['m_on_ne'])  # model on NE scores
+            df = df.drop(columns='model')
+            df_list.append(df)
+
+    overall_df = pd.concat(df_list)
+    return overall_df
+
+
 def collect_BUSTER_eval_outputs(path_to_file, num_NEs, samples_per_NE):
 
     with open(path_to_file, 'r') as file:
@@ -269,6 +355,100 @@ def collect_BUSTER_eval_outputs(path_to_file, num_NEs, samples_per_NE):
 
 
 if __name__ == '__main__':
+
+    save_images_to = '../../experiments_outputs/fewShot_experiments/plots'
+    plots_fontsize = 16
+
+    """ plot SOTA models x: BUSTER y: MIT/CROSSNER, circles prop to number training samples """
+    plt.figure(figsize=(8, 6))
+    models = ['UniNER-type', 'UniNER-def', 'UniNER-type+sup', 'GoLLIE', 'GLiNER', 'GNER LLAMA', 'GNER T5', 'SLIMER', 'SLIMER w/o D&G']
+    x_avgF1_BUSTER = [34.78, 33.62, 37.82, 27.68, 26.57, 23.58, 27.88, 45.27, 40.41]
+    x_clip_range = (21, 48)
+    y_avgF1_MITCROSSNER = [53.40, 45.00, 61.8, 58.40, 60.90, 66.10, 69.1, 54.00, 51.30]
+    y_clip_range = (42, 72)
+
+    training_samples_per_model = [
+        45889,  # pileNER-type
+        47671,  # pileNER-def
+        1450613,  # type + sup 1.404.724
+        165162,  # from gollie appendix
+        45889,  # Gliner on pileNER-type
+        45889,  # GNER evaluates on MIT/crossner w/o supervised data
+        45889,
+        3910,  # SLIMER 391NEs x 5 samples x 2(pos/negative)
+        3910
+    ]
+    #x = np.arange(len(x_avgF1_BUSTER))
+    #plt.xticks(x, x_avgF1_BUSTER, rotation=0, fontsize=8)
+
+    #circle_sizes = [1000 * math.sqrt(n_params / max(training_samples_per_model) / math.pi) for n_params in training_samples_per_model]
+    circle_sizes = [10 * size / min(training_samples_per_model) for size in training_samples_per_model]
+    #circle_sizes = [100 * math.sqrt(size / min(training_samples_per_model) / math.pi) for size in training_samples_per_model]
+    colors = ['red', 'pink', 'gray', 'purple', 'green', 'cyan', 'black', 'orange', 'blue']
+    # Plot each point with size proportional to training samples
+    plt.scatter(x_avgF1_BUSTER, y_avgF1_MITCROSSNER, s=circle_sizes, color=colors)
+
+    # Add labels to each point
+    for i, model in enumerate(models):
+        if model == 'GoLLIE':
+            plt.annotate(model, (x_avgF1_BUSTER[i], y_avgF1_MITCROSSNER[i]), textcoords="offset points", xytext=(0, -25), ha='center', fontsize=plots_fontsize-4)
+        elif model == 'UniNER-type+sup':
+            plt.annotate(model, (x_avgF1_BUSTER[i], y_avgF1_MITCROSSNER[i]), textcoords="offset points", xytext=(0, 40), ha='center', fontsize=plots_fontsize-4)
+        else:
+            plt.annotate(model, (x_avgF1_BUSTER[i], y_avgF1_MITCROSSNER[i]), textcoords="offset points", xytext=(0, 15), ha='center', fontsize=plots_fontsize-4)
+
+        #plt.text(x_avgF1_BUSTER[i], y_avgF1_MITCROSSNER[i], model)
+
+    # Add labels and title
+    plt.xlabel(u"\n\u03bc-F1 unseen NEs BUSTER", fontsize=plots_fontsize)
+    plt.ylabel(u"\n\u03bc-F1 OOD MIT+CrossNER\n", fontsize=plots_fontsize)
+    # plt.title('SOTA Models Performance')
+
+    plt.grid(True, linestyle='--', alpha=0.3)
+    plt.xlim(x_clip_range)
+    plt.ylim(y_clip_range)
+    plt.xticks(fontsize=plots_fontsize)
+    plt.yticks(fontsize=plots_fontsize)
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_images_to, 'x_vs_y_training_samples.pdf'), dpi=300, bbox_inches='tight')
+    plt.show()
+
+    """ Collecting evaluations on each NE for best model configuration NEs=391 x 5 samples per NE across runs """
+    path_to_eval_folder = '../../experiments_outputs/fewShot_experiments/SameInstruction/as_NEs_increase'
+    run_names = ['SI', 'SI-B', 'SI-C']
+    all_runs_eval_results = []
+    for run in run_names:
+        eval_results_FalseDef = collect_tp_fp_from_eval_outputs_perNE(
+            os.path.join(path_to_eval_folder, f'inscreasing_NEs_FalseDef_{run}.txt')
+        )
+        # print(f"inscreasing_NEs_FalseDef_{run}")
+        # print(eval_results_FalseDef)
+        eval_results_TrueDef = collect_tp_fp_from_eval_outputs_perNE(
+            os.path.join(path_to_eval_folder, f'inscreasing_NEs_TrueDef_{run}.txt')
+        )
+        # print(f"inscreasing_NEs_TrueDef_{run}")
+        # print(eval_results_TrueDef)
+
+        eval_results_FalseDef['run'] = run
+        eval_results_TrueDef['run'] = run
+
+        all_runs_eval_results.append(eval_results_FalseDef)
+        all_runs_eval_results.append(eval_results_TrueDef)
+
+    # all eval results with run name
+    all_runs_eval_results = pd.concat(all_runs_eval_results).reset_index(drop=True)
+    all_runs_eval_results = all_runs_eval_results[all_runs_eval_results['num_NEs'] == 391]
+    all_runs_eval_results = all_runs_eval_results[all_runs_eval_results['samples_per_NE'] == 5]
+    all_runs_eval_results.drop(columns=['num_NEs', 'samples_per_NE'])
+    print(all_runs_eval_results)
+
+    # averaging per NE across runs
+    all_runs_eval_results = all_runs_eval_results.groupby(['dataset', 'test_NE', 'w_def']).agg(
+        {'this_NE_precision': ['mean', np.std], 'this_NE_recall': ['mean', np.std], 'this_NE_F1': ['mean', np.std]}).reset_index()
+    all_runs_eval_results.columns = ['dataset', 'test_NE', 'w_def', 'this_NE_precision', 'this_NE_precision-std', 'this_NE_recall', 'this_NE_recall-std', 'this_NE_F1', 'this_NE_F1-std']
+    print(all_runs_eval_results)
+    # all_runs_eval_results.to_excel("./perNE_SLIMER_scores.xlsx")
+
 
     """ Collecting evaluations on BUSTER for best model configuration NEs=391 x 5 samples per NE """
     path_to_eval_folder = '../../experiments_outputs/fewShot_experiments/SameInstruction/as_NEs_increase'
@@ -397,7 +577,7 @@ if __name__ == '__main__':
     print("AVG-STD across runs:")
     print(overall_avg_std_across_runs)
 
-    save_images_to = '../../experiments_outputs/fewShot_experiments/plots'
+
 
     """ 
     1) Plotting FalseDef vs TrueDef as Number distinct NEs in training increase [10,20,30,50,100,200,391] with (5pos + 5neg) samples per NE
@@ -407,8 +587,8 @@ if __name__ == '__main__':
     """
 
     metric_to_plot_to_label = {
-        'micro-f1': "micro-F1",
-        'macro-f1': "MACRO-F1"
+        'micro-f1': u"\u03bc-F1",
+        'macro-f1': "M-F1"
     }
 
     #path_to_eval_folder = '../../experiments_outputs/fewShot_experiments/as_NEs_increase'
@@ -469,23 +649,27 @@ if __name__ == '__main__':
         #axs[i].plot(n_distinct_NEs, TrueDef_avg_score[metric_to_plot], marker='D', label='w guidelines')
 
         #axs[i].errorbar(n_distinct_NEs, FalseDef_avg_score[metric_to_plot], yerr=FalseDef_avg_score[metric_to_plot+'-std'], marker='o',label='w/o guidelines')
-        axs[i].errorbar(n_distinct_NEs, FalseDef_avg_score[metric_to_plot], yerr=FalseDef_avg_score[metric_to_plot+'-std'], label='w/o guidelines', fmt='--o', capsize=5)
-        axs[i].errorbar(n_distinct_NEs, TrueDef_avg_score[metric_to_plot], yerr=TrueDef_avg_score[metric_to_plot+'-std'], label='w guidelines', fmt='-o', capsize=5)
+        axs[i].errorbar(n_distinct_NEs, FalseDef_avg_score[metric_to_plot], yerr=FalseDef_avg_score[metric_to_plot+'-std'], label='baseline w/o D&G', fmt='--o', capsize=5)
+        axs[i].errorbar(n_distinct_NEs, TrueDef_avg_score[metric_to_plot], yerr=TrueDef_avg_score[metric_to_plot+'-std'], label='SLIMER', fmt='-o', capsize=5)
 
         #axs[i].set_xticks(n_distinct_NEs)
         axs[i].set_xscale('log')  # Using logarithmic scale for the x-axis
         n_distinct_NEs_log = np.log10(n_distinct_NEs)
-        axs[i].set_xticks(10 ** n_distinct_NEs_log, n_distinct_NEs)
+        axs[i].set_xticks(10 ** n_distinct_NEs_log, n_distinct_NEs, fontsize=plots_fontsize)
         axs[i].xaxis.set_minor_locator(matplotlib.ticker.NullLocator())  # Disabling minor ticks
 
         axs[i].grid(axis='y', linestyle='--', color='lightgray')
         #axs[i].set_ylabel(f"avg {metric_to_plot}")
-        axs[i].set_ylabel(metric_to_plot_to_label[metric_to_plot])
+        axs[i].set_ylabel(metric_to_plot_to_label[metric_to_plot]+'\n', fontsize=plots_fontsize)
+        axs[i].set_yticks([i for i in range(0, 55, 10)], labels=[i for i in range(0, 55, 10)], fontsize=plots_fontsize)
+
+        axs[i].legend(loc='lower right', fontsize=plots_fontsize)  # Reversing both handles and labels
 
     # axs[0].set_title(f"Zero-Shot Evaluation runs {run_names} - MIT+CrossNER+BUSTER", fontsize=12)
-    axs[0].set_title(f"Zero-Shot Evaluations on MIT+CrossNER+BUSTER", fontsize=12)
-    axs[-1].legend(loc='lower right')
-    axs[-1].set_xlabel('Unique NE types in training (log scale)')
+    # axs[0].set_title(f"Zero-Shot Evaluations on MIT+CrossNER+BUSTER", fontsize=12)
+    #axs[-1].legend(loc='lower right')
+
+    axs[-1].set_xlabel('\nUnique NE types in training (log scale)', fontsize=plots_fontsize+2)
     plt.tight_layout()
     plt.savefig(os.path.join(save_images_to, 'IncreaseDistinctNEs.pdf'), dpi=300, bbox_inches='tight')
     plt.show()
@@ -544,15 +728,15 @@ if __name__ == '__main__':
         FalseDef_avg_score = dataset_data[dataset_data['w_def'] == False][metric_to_plot]
 
         plt.plot(n_distinct_NEs, FalseDef_avg_score, marker='o', linestyle='--', color=color,
-                 label=f'{dataset} w/o guidelines')
+                 label=f'{dataset} - baseline w/o D&G')
 
         plt.plot(n_distinct_NEs, TrueDef_avg_score, marker='D', linestyle='-', color=color,
-                 label=f'{dataset} w/ guidelines')
+                 label=f'{dataset} - SLIMER')
 
-    plt.xlabel('Unique NE types in training (log scale)')
+    plt.xlabel('\nUnique NE types in training (log scale)', fontsize=12)
     #plt.xticks(n_distinct_NEs)
     plt.ylabel(metric_to_plot_to_label[metric_to_plot])
-    plt.title(f"Zero-Shot {metric_to_plot_to_label[metric_to_plot]} per-dataset MIT/CrossNER/BUSTER", fontsize=12)
+    #plt.title(f"Zero-Shot {metric_to_plot_to_label[metric_to_plot]} per-dataset MIT/CrossNER/BUSTER", fontsize=12)
     #plt.legend(loc='lower right')
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.tight_layout()
@@ -617,20 +801,27 @@ if __name__ == '__main__':
 
         axs[i].errorbar(n_samples_per_NE, FalseDef_avg_score[metric_to_plot],
                         yerr=FalseDef_avg_score[metric_to_plot + '-std'],
-                        label='w/o guidelines', fmt='--o', capsize=5)
+                        label='baseline w/o D&G', fmt='--o', capsize=5)
         axs[i].errorbar(n_samples_per_NE, TrueDef_avg_score[metric_to_plot],
                         yerr=TrueDef_avg_score[metric_to_plot + '-std'],
-                        label='w guidelines', fmt='-o', capsize=5)
+                        label='SLIMER', fmt='-o', capsize=5)
 
         #axs[i].plot(n_samples_per_NE, FalseDef_avg_score[metric_to_plot], marker='o', label='w/o guidelines')
         #axs[i].plot(n_samples_per_NE, TrueDef_avg_score[metric_to_plot], marker='D', label='w guidelines')
-        axs[i].set_xticks(n_samples_per_NE)
+        axs[i].set_xticks(n_samples_per_NE, labels=n_samples_per_NE, fontsize=plots_fontsize)
         axs[i].grid(axis='y', linestyle='--', color='lightgray')
-        axs[i].set_ylabel(metric_to_plot_to_label[metric_to_plot])
+        axs[i].set_ylabel(metric_to_plot_to_label[metric_to_plot]+'\n', fontsize=plots_fontsize)
+        axs[i].set_yticks([i for i in range(0, 55, 10)], labels=[i for i in range(0, 55, 10)], fontsize=plots_fontsize)
 
-    axs[0].set_title(f"Zero-Shot Evaluations on MIT+CrossNER+BUSTER", fontsize=12)
-    axs[-1].legend(loc='lower right')
-    axs[-1].set_xlabel('Positive samples per NE')
+        axs[i].legend(loc='lower right', fontsize=plots_fontsize)  # Reversing both handles and labels
+
+
+    #axs[0].set_title(f"Zero-Shot Evaluations on MIT+CrossNER+BUSTER", fontsize=12)
+    #axs[-1].legend(loc='lower right')
+    #axs[-1].legend(handles=axs[-1].get_legend_handles_labels()[0][::-1],
+                   #labels=axs[-1].get_legend_handles_labels()[1][::-1],
+                   #loc='lower right', fontsize=plots_fontsize)  # Reversing both handles and labels
+    axs[-1].set_xlabel('\nPositive samples per NE type', fontsize=plots_fontsize+2)
     plt.tight_layout()
     plt.savefig(os.path.join(save_images_to, 'IncreaseSamplesPerNE.pdf'), dpi=300, bbox_inches='tight')
     plt.show()
@@ -691,13 +882,13 @@ if __name__ == '__main__':
         TrueDef_avg_score = dataset_data[dataset_data['w_def'] == True][metric_to_plot]
         FalseDef_avg_score = dataset_data[dataset_data['w_def'] == False][metric_to_plot]
 
-        plt.plot(n_samples_per_NE, FalseDef_avg_score, marker='o', linestyle='--', color=color, label=f'{dataset} w/o guidelines')
+        plt.plot(n_samples_per_NE, FalseDef_avg_score, marker='o', linestyle='--', color=color, label=f'{dataset} - baseline w/o D&G')
 
-        plt.plot(n_samples_per_NE, TrueDef_avg_score, marker='D', linestyle='-', color=color, label=f'{dataset} w/ guidelines')
+        plt.plot(n_samples_per_NE, TrueDef_avg_score, marker='D', linestyle='-', color=color, label=f'{dataset} - SLIMER')
 
-    plt.xlabel('Positive samples per NE')
+    plt.xlabel('\nPositive samples per NE', fontsize=12)
     plt.ylabel(metric_to_plot_to_label[metric_to_plot])
-    plt.title(f"Zero-Shot {metric_to_plot_to_label[metric_to_plot]} per-dataset MIT/CrossNER/BUSTER", fontsize=14)
+    #plt.title(f"Zero-Shot {metric_to_plot_to_label[metric_to_plot]} per-dataset MIT/CrossNER/BUSTER", fontsize=14)
     #plt.legend(loc='lower right')
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.tight_layout()
