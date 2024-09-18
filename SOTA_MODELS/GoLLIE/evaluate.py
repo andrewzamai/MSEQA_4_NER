@@ -6,11 +6,17 @@ from GoLLIE.src.tasks.utils_typing import AnnotationList
 
 from BUSTER_guidelines_GoLLIE import *
 
+from typing import List, Dict
+
 from GNER.evaluate import normalize_answer
 
 if __name__ == '__main__':
 
-    BUSTER_test_GoLLIE = load_dataset(path='json', data_files='./preds/BUSTER_test_GoLLIE_w_preds_maxlength4000_maxout456.jsonl')['train']
+    #BUSTER_test_GoLLIE = load_dataset(path='json', data_files='./preds/BUSTER_GoLLIE-CodeLLaMA2-7B-pileNER391x50.jsonl')['train']
+    #BUSTER_test_GoLLIE = load_dataset(path='json', data_files='./preds/BUSTER_GoLLIE-LLaMA2-7B-chat-pileNER391x50_maxLength260.jsonl')['train']
+    BUSTER_test_GoLLIE = load_dataset(path='json', data_files='./preds/BUSTER_GoLLIE-LLaMA2-7B-chat-pileNER391x50_FULL.jsonl')['train']
+    #BUSTER_test_GoLLIE = load_dataset(path='json', data_files='./preds/BUSTER_GoLLIE-LLaMA2-7B-chat-pileNER391x50_maxLength260_noexamples_sp.jsonl')['train']
+    #BUSTER_test_GoLLIE = load_dataset(path='json', data_files='./preds/BUSTER_GoLLIE-LLaMA2-7B-chat-pileNER391x50_maxLength260_t06_sp_buying.jsonl')['train']
     print(BUSTER_test_GoLLIE)
 
     """
@@ -43,18 +49,22 @@ if __name__ == '__main__':
         raw_prediction_str = sample['prediction']
         list_pred_tuples = []
         # adjusting truncated outputs and hallucinated classes
-        if raw_prediction_str and raw_prediction_str.strip()[-1] != ']':
+        #if raw_prediction_str and raw_prediction_str.strip()[-1] != ']':
+        if raw_prediction_str and not raw_prediction_str.endswith(']'):
             number_truncated_responses += 1
             # print(raw_prediction_str)
             raw_prediction_str = raw_prediction_str.strip()
             last_comma_index = raw_prediction_str.rfind(',')
             if last_comma_index != -1:
                 raw_prediction_str = raw_prediction_str[:last_comma_index] + ']'
+        print(raw_prediction_str)
 
         filtered_preds = AnnotationList.from_output(raw_prediction_str, task_module='BUSTER_guidelines_GoLLIE')
 
         for pred in filtered_preds:
-            if isinstance(pred, GoLLIE.src.tasks.utils_typing.HallucinatedType):
+            print(pred)
+            #print(pred is GoLLIE.src.tasks.utils_typing.HallucinatedType)
+            if pred is GoLLIE.src.tasks.utils_typing.HallucinatedType or isinstance(pred, GoLLIE.src.tasks.utils_typing.HallucinatedType):
                 list_pred_tuples.append(("", "Hallucination"))
             else:
                 list_pred_tuples.append((pred.span, type(pred).__name__))

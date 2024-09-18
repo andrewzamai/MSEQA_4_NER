@@ -39,11 +39,14 @@ if __name__ == '__main__':
 
     # load tokenizer and prediction data
     #tokenizer = AutoTokenizer.from_pretrained("dyyyyyyyy/GNER-LLaMA-7B")
-    tokenizer = AutoTokenizer.from_pretrained("dyyyyyyyy/GNER-T5-xxl")
+    #tokenizer = AutoTokenizer.from_pretrained("dyyyyyyyy/GNER-T5-xxl")
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
 
     # grouping all chunks in which a document was divided
     chunks_per_document = defaultdict(list)
-    with open('./BUSTER_GNER/BUSTER_GNER_test_w_T5_preds_bs4.jsonl', 'r') as fh:
+    #with open('./BUSTER_GNER/BUSTER_GNER_test_w_T5_preds_bs4.jsonl', 'r') as fh:
+    #with open('../../GNER/data/predictions/BUSTER_GNER_391x100_sw_100_15_w_preds.jsonl', 'r') as fh:
+    with open('../../GNER/data/predictions/BUSTER_GNER_391x50_sw_100_15_w_preds.jsonl', 'r') as fh:
         for line in fh.readlines():
             line_data = json.loads(line)
             chunks_per_document[line_data['instance']['id']].append(line_data)

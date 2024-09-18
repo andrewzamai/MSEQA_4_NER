@@ -1,2 +1,1 @@
 rsync -av --exclude='.git' src zamaiandre@login.dei.unipd.it:/nfsd/VFdisk/zamaiandre/ZeroShotNER
-

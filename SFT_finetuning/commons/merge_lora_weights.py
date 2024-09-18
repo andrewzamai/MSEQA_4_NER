@@ -59,6 +59,7 @@ if __name__ == "__main__":
     base_model = "meta-llama/Llama-2-7b-chat-hf"
     # as it is the code requires namespace/model_name format only, no more subfolders
 
+    """
     parser = argparse.ArgumentParser(description='''Llama merger parser''')
     # adding arguments
     parser.add_argument('--with_guidelines', action='store_true', help='Whether to use guidelines')
@@ -67,11 +68,15 @@ if __name__ == "__main__":
     parser.add_argument('number_neg_samples_per_NE', type=int, help='Number of negative samples per NE')
     # parsing arguments
     args = parser.parse_args()
+    """
     #path_to_lora = f"./trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
     #save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-E"
-    path_to_lora = f"./llama_for_NER_trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-B"
-    save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-B"
 
+    #path_to_lora = f"./llama_for_NER_trained_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-B"
+    #save_model_at = f"./merged_models/llama2_7B_{args.number_pos_samples_per_NE}pos_{args.number_neg_samples_per_NE}neg_perNE_top{args.number_NEs}NEs_{args.with_guidelines}Def-SI-B"
+
+    path_to_lora = "/nfsd/VFdisk/zamaiandre/ZeroShotNER/trained_models/GNER-pileNER-391x50-onlyPOS"
+    save_model_at = "/nfsd/VFdisk/zamaiandre/ZeroShotNER/merged_models/GNER-pileNER-391x50-onlyPOS"
     merge_main(base_model, path_to_lora, save_model_at)
 
     """ PUSH TO HF HUB """
@@ -79,7 +84,7 @@ if __name__ == "__main__":
     from SFT_finetuning.commons.initialization import get_HF_access_token
 
     # new_repo_name = f"andrewzamai/{save_model_at.split('/')[-1]}"
-    new_repo_name = "expertai/SLIMER"
+    #new_repo_name = "expertai/SLIMER"
 
     """
     url_new_repo_name = create_repo(
@@ -91,7 +96,7 @@ if __name__ == "__main__":
     )
 
     print(url_new_repo_name)
-    """
+    
 
     uploaded_folder_results = upload_folder(
         folder_path=save_model_at,
@@ -103,3 +108,4 @@ if __name__ == "__main__":
     print(uploaded_folder_results)
 
     print("Merged and pushed to HF hub :)\n\n")
+    """

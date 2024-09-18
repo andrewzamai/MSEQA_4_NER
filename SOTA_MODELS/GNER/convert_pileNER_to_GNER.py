@@ -87,7 +87,14 @@ def save_conll_format(dataset_path, words_list, labels_list):
 if __name__ == '__main__':
 
     # load pileNER subset used for training SLIMER-391x5(391 NEs, 5pos+5neg per NE)
-    data_SLIMER_format = load_dataset("json", data_files=f'../../../datasets/pileNER/391x5pos_5neg_GenQA_FalseDef-SI/train.jsonl')['train']
+    #data_SLIMER_format = load_dataset("json", data_files=f'../../../datasets/pileNER/391x5pos_5neg_GenQA_FalseDef-SI/train.jsonl')['train']
+    #data_SLIMER_format = load_dataset("json", data_files=f'../../../datasets/pileNER/391x50pos_50neg_GenQA_FalseDef/validation.jsonl')['train']
+
+    #from MSEQA_4_NER.data_handlers import data_handler_pileNER
+    #dataset_MSEQA_format_FalseDef = data_handler_pileNER.build_dataset_MSEQA_format_with_n_samples_per_NE_pos_neg(n_pos_samples_per_NE=10, n_neg_samples_per_NE=10, removeTestDatasetsNEs=True, keep_only_top_tagNames=391)
+    #data_handler_pileNER.convert_MSEQA_dataset_to_GenQA_format(dataset_MSEQA_format_FalseDef, with_definition=False, path_to_save_to="../../../datasets/pileNER/391x10pos_10neg_GenQA_FalseDef")
+
+    data_SLIMER_format = load_dataset("json", data_files=f'../../../datasets/pileNER/391x50pos_50neg_GenQA_FalseDef/train.jsonl')['train']
     print(data_SLIMER_format)
 
     # HERE we group the SLIMER samples per docID and collect all the tagName-occurrences for a docID
@@ -98,21 +105,23 @@ if __name__ == '__main__':
     id_counts = Counter(id_list)
     # Sort the dictionary by count in descending order
     sorted_id_counts = dict(sorted(id_counts.items(), key=lambda item: item[1], reverse=True))
-    print(sorted_id_counts)
 
     # collect the tagName-entities for each docID
     entities_per_docID = {docID: {} for docID in sorted_id_counts.keys()}
+    unique_tagNames = set()
     for sample in data_SLIMER_format:
         docID = sample["doc_question_pairID"].split(':')[0]
         tagName = sample['tagName']
+        unique_tagNames.add(tagName)
         entities = json.loads(sample['output'])
         entities_per_docID[docID][tagName] = entities
-    print(entities_per_docID)
+    #print(entities_per_docID)
 
     inputs_per_docID = {sample["doc_question_pairID"].split(':')[0]: sample['input'] for sample in data_SLIMER_format}
     # GENERATE the words, labels lists for each docID
     data_BIO_format = []
-    for docID in inputs_per_docID:
+    # max_dataset_size = 3910
+    for docID in sorted_id_counts:
         input = inputs_per_docID[docID]
         # Process the input data
         words = split_text(input)
@@ -120,10 +129,17 @@ if __name__ == '__main__':
         entities_per_tagName = entities_per_docID[docID]
         bio_labels = generate_bio_labels(words, entities_per_tagName)
 
+        # TODO: ONLY FOR GOLLIE merge spaces with dash _
+        # bio_labels = ['_'.join(label.split()) for label in bio_labels]
+
         if len(words) == len(bio_labels):
             # do not add if negative sample (all O)
             if not all(element == "O" for element in bio_labels):
                 data_BIO_format.append((words, bio_labels))
+                # max_dataset_size -= 1
+
+        #if max_dataset_size <= 0:
+        #    break
 
     print(len(data_BIO_format))
     print(data_BIO_format[0])
@@ -136,7 +152,9 @@ if __name__ == '__main__':
                 count_music_group += 1
     print(count_music_group)
 
-    save_conll_format('../../../datasets/pileNER/391x5pos_5neg_BIO/train.txt', [x[0] for x in data_BIO_format], [x[1] for x in data_BIO_format])
+    #save_conll_format('../../../datasets/pileNER/PileNER-3910samples-GoLLIE/train.txt', [x[0] for x in data_BIO_format], [x[1] for x in data_BIO_format])
+    print(len(unique_tagNames))
+    print(unique_tagNames)
 
     def convert_labels_from_json_to_txt(json_filename, txt_filename):
         # Load the JSON file
@@ -156,7 +174,7 @@ if __name__ == '__main__':
     # Example usage
     json_filename = '../../../datasets/pileNER/top_391_NamedEntities.json'
     txt_filename = '../../../datasets/pileNER/391x5pos_5neg_BIO/label.txt'
-    convert_labels_from_json_to_txt(json_filename, txt_filename)
+    #convert_labels_from_json_to_txt(json_filename, txt_filename)
 
     """
     data_BIO_format = []

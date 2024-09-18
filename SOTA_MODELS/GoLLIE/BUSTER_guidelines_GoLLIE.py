@@ -46,11 +46,11 @@ class AcquiredCompany(Entity):
 
 @dataclass
 class BuyingCompany(Entity):
-    """Refers to a company that is acquiring another company or its assets through a transaction or merger.
+    """Refers to a company that is buying another company or its assets through a transaction or merger.
     When recognizing 'buying company' entities, focus on the company names directly involved in the acquisition process as buyers, while being careful not to label subsidiaries or companies in other roles. The company's role as 'buyer' must be understandable from the sentence in which it appears. Do not label company names which role in the transaction is not evident.
     """
 
-    span: str  # Such as: "Core", "DIRECTV", "Vuance Ltd."
+    span: str  # Such as: "Liberty Media Corporation", "Security Holding Corp. (SHC)", "Somaxon Pharmaceuticals , Inc ."
 
 
 @dataclass
@@ -59,8 +59,10 @@ class SellingCompany(Entity):
     Be careful when identifying the entity actually doing the selling, as it may not be the main subject of the sentence or document. Pay attention to possessive forms and synonyms such as 'vendor', 'owner', or 'parent company'. The company's role as 'seller' must be understandable from the sentence in which it appears. Do not label company names which role in the transaction is not evident.
     """
 
+    span: str  # Such as: "Liberty Media Corporation", "Security Holding Corp. (SHC)", "Somaxon Pharmaceuticals , Inc ."
 
-ENTITY_DEFINITIONS: List[Entity] = [
+
+ENTITY_DEFINITIONS: List = [
     GenericConsultingCompany,
     LegalConsultingCompany,
     AnnualRevenues,

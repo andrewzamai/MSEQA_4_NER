@@ -634,7 +634,7 @@ if __name__ == '__main__':
     n_distinct_NEs = sorted(list(set(results_avg_across_runs['num_NEs'])))
     print(n_distinct_NEs)
 
-    metrics_to_plot = ['micro-f1', 'macro-f1']
+    metrics_to_plot = ['macro-f1', 'micro-f1']
 
     # Create subplots
     fig, axs = plt.subplots(len(metrics_to_plot), 1, figsize=(10, 6))
@@ -791,7 +791,7 @@ if __name__ == '__main__':
     n_samples_per_NE = sorted(list(set(results_avg_across_runs['samples_per_NE'])))
     print(n_samples_per_NE)
 
-    metrics_to_plot = ['micro-f1', 'macro-f1']
+    metrics_to_plot = ['macro-f1', 'micro-f1']
     fig, axs = plt.subplots(len(metrics_to_plot), 1, figsize=(10, 6))
 
     for i, metric_to_plot in enumerate(metrics_to_plot):
